@@ -59,14 +59,14 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                 return;
             }
 
-            if (GUILayout.Button("Back to Configuration Profile"))
+            if (DrawBacktrackProfileButton("Back to Configuration Profile", MixedRealityToolkit.Instance.ActiveProfile))
             {
-                Selection.activeObject = MixedRealityToolkit.Instance.ActiveProfile;
+                return;
             }
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Camera Profile", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox("The Camera Profile helps tweak camera settings no matter what platform you're building for.", MessageType.Info);
+            EditorGUILayout.HelpBox("The Camera Profile helps configure cross platform camera settings.", MessageType.Info);
 
             CheckProfileLock(target);
 

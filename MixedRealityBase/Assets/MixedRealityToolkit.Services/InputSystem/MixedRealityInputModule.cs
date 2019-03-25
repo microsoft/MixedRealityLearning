@@ -438,22 +438,32 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
         void IMixedRealitySourceStateHandler.OnSourceDetected(SourceStateEventData eventData)
         {
-            for (int i = 0; i < eventData.InputSource.Pointers.Length; i++)
+            var inputSource = eventData.InputSource;
+            for (int i = 0; i < inputSource.Pointers.Length; i++)
             {
-                Debug.Assert(!pointersToUpdate.Contains(eventData.InputSource.Pointers[i]));
-                pointersToUpdate.Add(eventData.InputSource.Pointers[i]);
+                var pointer = inputSource.Pointers[i];
+                if (pointer.InputSourceParent == inputSource)
+                {
+                    Debug.Assert(!pointersToUpdate.Contains(pointer));
+                    pointersToUpdate.Add(pointer);
+                }
             }
         }
 
         void IMixedRealitySourceStateHandler.OnSourceLost(SourceStateEventData eventData)
         {
+            var inputSource = eventData.InputSource;
             for (int i = 0; i < eventData.InputSource.Pointers.Length; i++)
             {
-                Debug.Assert(pointersToUpdate.Contains(eventData.InputSource.Pointers[i]));
-                pointersToUpdate.Remove(eventData.InputSource.Pointers[i]);
+                var pointer = inputSource.Pointers[i];
+                if (pointer.InputSourceParent == inputSource)
+                {
+                    Debug.Assert(pointersToUpdate.Contains(pointer));
+                    pointersToUpdate.Remove(pointer);
 
-                Debug.Assert(!pointersToRemove.Contains(eventData.InputSource.Pointers[i]));
-                pointersToRemove.Add(eventData.InputSource.Pointers[i]);
+                    Debug.Assert(!pointersToRemove.Contains(pointer));
+                    pointersToRemove.Add(pointer);
+                }
             }
         }
 

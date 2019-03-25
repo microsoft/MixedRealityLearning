@@ -147,7 +147,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                 if (GUILayout.Button("Create new profiles"))
                 {
                     ScriptableObject profile = CreateInstance(nameof(MixedRealityToolkitConfigurationProfile));
-                    var newProfile = profile.CreateAsset("Assets/MixedRealityToolkit-Generated/CustomProfiles") as MixedRealityToolkitConfigurationProfile;
+                    var newProfile = profile.CreateAsset("Assets/MixedRealityToolkit.Generated/CustomProfiles") as MixedRealityToolkitConfigurationProfile;
                     MixedRealityToolkit.Instance.ActiveProfile = newProfile;
                     Selection.activeObject = newProfile;
                 }
@@ -285,6 +285,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
+                    EditorGUILayout.HelpBox("It is recommended to enable the Diagnostics system during development. Be sure to disable prior to building your shipping product.", MessageType.Warning);
                     EditorGUILayout.PropertyField(enableDiagnosticsSystem);
                     EditorGUILayout.PropertyField(diagnosticsSystemType);
                     changed |= RenderProfile(diagnosticsSystemProfile);

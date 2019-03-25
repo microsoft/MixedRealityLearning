@@ -3,6 +3,7 @@
 
 using Microsoft.MixedReality.Toolkit.Core.Attributes;
 using Microsoft.MixedReality.Toolkit.Core.Definitions;
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Inspectors.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Services;
 using UnityEditor;
@@ -40,9 +41,9 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                 return;
             }
 
-            if (GUILayout.Button("Back to Configuration Profile"))
+            if (DrawBacktrackProfileButton("Back to Configuration Profile", MixedRealityToolkit.Instance.ActiveProfile))
             {
-                Selection.activeObject = MixedRealityToolkit.Instance.ActiveProfile;
+                return;
             }
 
             EditorGUILayout.Space();
@@ -138,8 +139,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                     {
                         // Try to assign default configuration profile when type changes.
                         serializedObject.ApplyModifiedProperties();
-                        AssignDefaultConfigurationProfile(
-                            ((MixedRealityRegisteredServiceProvidersProfile)serializedObject.targetObject).Configurations[i].ComponentType, managerConfig);
+                        AssignDefaultConfigurationValues(((MixedRealityRegisteredServiceProvidersProfile)serializedObject.targetObject).Configurations[i].ComponentType, configurationProfile, runtimePlatform);
                         changed = true;
 
                         GUILayout.EndVertical();
@@ -149,6 +149,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                     EditorGUI.BeginChangeCheck();
                     EditorGUILayout.PropertyField(priority);
                     EditorGUILayout.PropertyField(runtimePlatform);
+
                     changed |= EditorGUI.EndChangeCheck();
 
                     changed |= RenderProfile(configurationProfile);
@@ -171,19 +172,16 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
             }
         }
 
-        private void AssignDefaultConfigurationProfile(System.Type componentType, SerializedProperty managerConfig)
+        private void AssignDefaultConfigurationValues(System.Type componentType, SerializedProperty configurationProfile, SerializedProperty runtimePlatform)
         {
-            SerializedProperty configurationProfile = managerConfig.FindPropertyRelative("configurationProfile");
             configurationProfile.objectReferenceValue = null;
+            runtimePlatform.intValue = -1;
 
             if (componentType != null &&
                 MixedRealityExtensionServiceAttribute.Find(componentType) is MixedRealityExtensionServiceAttribute attr)
             {
                 configurationProfile.objectReferenceValue = attr.DefaultProfile;
-            }
-            else
-            {
-                configurationProfile.objectReferenceValue = null;
+                runtimePlatform.intValue = (int)attr.RuntimePlatforms;
             }
 
             serializedObject.ApplyModifiedProperties();

@@ -423,18 +423,72 @@ namespace Microsoft.MixedReality.Toolkit.Providers.WindowsMixedReality
                     break;
             }
 
-            var pointers = interactionSource.supportsPointing ? RequestPointers(typeof(WindowsMixedRealityController), controllingHand) : null;
+            IMixedRealityPointer[] pointers = null;
+            switch(interactionSource.kind)
+            {
+                case InteractionSourceKind.Controller:
+                    pointers = RequestPointers(SupportedControllerType.WindowsMixedReality, controllingHand);
+                    break;
+                case InteractionSourceKind.Hand:
+                    if(interactionSource.supportsPointing)
+                    {
+                        pointers = RequestPointers(SupportedControllerType.ArticulatedHand, controllingHand);
+                    }
+                    else
+                    {
+                        pointers = RequestPointers(SupportedControllerType.GGVHand, controllingHand);
+                    }
+                    break;
+                case InteractionSourceKind.Voice:
+                    // set to null: when pointers are null we use head gaze, which is what we want for voice
+                    break;
+                default:
+                    Debug.LogError($"Unknown new type in WindowsMixedRealityDeviceManager {interactionSource.kind}, make sure to add a SupportedControllerType");
+                    break;
+
+            }
+
             string nameModifier = controllingHand == Handedness.None ? interactionSource.kind.ToString() : controllingHand.ToString();
             var inputSource = MixedRealityToolkit.InputSystem?.RequestNewGenericInputSource($"Mixed Reality Controller {nameModifier}", pointers);
-            var detectedController = new WindowsMixedRealityController(TrackingState.NotTracked, controllingHand, inputSource);
 
             InputSourceType inputSourceType = interactionSource.kind == InteractionSourceKind.Controller ? InputSourceType.Controller : interactionSource.kind == InteractionSourceKind.Hand ? InputSourceType.Hand : InputSourceType.Other;
 
-            if (!detectedController.SetupConfiguration(typeof(WindowsMixedRealityController), inputSourceType))
+            WindowsMixedRealityController detectedController;
+            if (interactionSource.kind == InteractionSourceKind.Hand)
             {
-                // Controller failed to be setup correctly.
-                // Return null so we don't raise the source detected.
-                return null;
+                if (interactionSource.supportsPointing)
+                {
+                    detectedController = new WindowsMixedRealityArticulatedHand(TrackingState.NotTracked, controllingHand, inputSource);
+                    if (!detectedController.SetupConfiguration(typeof(WindowsMixedRealityArticulatedHand), inputSourceType))
+                    {
+                        // Controller failed to be setup correctly.
+                        // Return null so we don't raise the source detected.
+                        return null;
+                    }
+                }
+                else
+                {
+                    detectedController = new WindowsMixedRealityGGVHand(TrackingState.NotTracked, controllingHand, inputSource);
+                    if (!detectedController.SetupConfiguration(typeof(WindowsMixedRealityGGVHand), inputSourceType))
+                    {
+                        // Controller failed to be setup correctly.
+                        // Return null so we don't raise the source detected.
+                        return null;
+                    }
+
+                }
+
+            }
+            else
+            {
+                detectedController = new WindowsMixedRealityController(TrackingState.NotTracked, controllingHand, inputSource);
+
+                if (!detectedController.SetupConfiguration(typeof(WindowsMixedRealityController), inputSourceType))
+                {
+                    // Controller failed to be setup correctly.
+                    // Return null so we don't raise the source detected.
+                    return null;
+                }
             }
 
             for (int i = 0; i < detectedController.InputSource?.Pointers?.Length; i++)

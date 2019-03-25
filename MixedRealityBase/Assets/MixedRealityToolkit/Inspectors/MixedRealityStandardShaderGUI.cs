@@ -131,6 +131,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             public static GUIContent borderWidth = new GUIContent("Width %", "Uniform Width Along Border as a % of the Smallest XYZ Dimension");
             public static GUIContent borderMinValue = new GUIContent("Brightness", "Brightness Scaler");
             public static GUIContent edgeSmoothingValue = new GUIContent("Edge Smoothing Value", "Smooths Edges When Round Corners and Transparency Is Enabled");
+            public static GUIContent borderLightOpaqueAlpha = new GUIContent("Alpha", "Alpha value of \"opaque\" borders.");
             public static GUIContent innerGlow = new GUIContent("Inner Glow", "Enable Inner Glow (Assumes UVs Specify Borders of Surface, Works Best on Unity Cube, Quad, and Plane)");
             public static GUIContent innerGlowColor = new GUIContent("Color", "Inner Glow Color (RGB) and Intensity (A)");
             public static GUIContent innerGlowPower = new GUIContent("Power", "Power Exponent to Control Glow");
@@ -214,6 +215,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
         protected MaterialProperty borderWidth;
         protected MaterialProperty borderMinValue;
         protected MaterialProperty edgeSmoothingValue;
+        protected MaterialProperty borderLightOpaqueAlpha;
         protected MaterialProperty innerGlow;
         protected MaterialProperty innerGlowColor;
         protected MaterialProperty innerGlowPower;
@@ -296,6 +298,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             borderWidth = FindProperty("_BorderWidth", props);
             borderMinValue = FindProperty("_BorderMinValue", props);
             edgeSmoothingValue = FindProperty("_EdgeSmoothingValue", props);
+            borderLightOpaqueAlpha = FindProperty("_BorderLightOpaqueAlpha", props);
             innerGlow = FindProperty("_InnerGlow", props);
             innerGlowColor = FindProperty("_InnerGlowColor", props);
             innerGlowPower = FindProperty("_InnerGlowPower", props);
@@ -675,6 +678,11 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
                     (mode == RenderingMode.Custom && customMode == CustomRenderingMode.Transparent))
                 {
                     materialEditor.ShaderProperty(borderLightOpaque, Styles.borderLightOpaque, 2);
+
+                    if (PropertyEnabled(borderLightOpaque))
+                    {
+                        materialEditor.ShaderProperty(borderLightOpaqueAlpha, Styles.borderLightOpaqueAlpha, 4);
+                    }
                 }
             }
 

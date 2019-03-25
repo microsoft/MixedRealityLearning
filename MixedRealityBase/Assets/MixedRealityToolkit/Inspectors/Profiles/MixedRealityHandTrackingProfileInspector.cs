@@ -13,7 +13,6 @@ namespace Microsoft.MixedReality.Toolkit.Inspectors
     [CustomEditor(typeof(MixedRealityHandTrackingProfile))]
     public class MixedRealityHandTrackingProfileInspector : BaseMixedRealityToolkitConfigurationProfileInspector
     {
-        private SerializedProperty simulatedHandPrefab;
         private SerializedProperty jointPrefab;
         private SerializedProperty palmPrefab;
         private SerializedProperty fingertipPrefab;
@@ -26,7 +25,6 @@ namespace Microsoft.MixedReality.Toolkit.Inspectors
 
             if (!MixedRealityInspectorUtility.CheckMixedRealityConfigured(false)) { return; }
 
-            simulatedHandPrefab = serializedObject.FindProperty("simulatedHandPrefab");
             jointPrefab = serializedObject.FindProperty("jointPrefab");
             fingertipPrefab = serializedObject.FindProperty("fingertipPrefab");
             palmPrefab = serializedObject.FindProperty("palmPrefab");
@@ -59,10 +57,6 @@ namespace Microsoft.MixedReality.Toolkit.Inspectors
             EditorGUILayout.PropertyField(fingertipPrefab);
             EditorGUILayout.PropertyField(handMeshPrefab);
             EditorGUILayout.PropertyField(enableHandMeshUpdates);
-
-            GUILayout.Space(12f);
-            EditorGUILayout.LabelField("Simulated Hand settings", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(simulatedHandPrefab);
 
             serializedObject.ApplyModifiedProperties();
         }

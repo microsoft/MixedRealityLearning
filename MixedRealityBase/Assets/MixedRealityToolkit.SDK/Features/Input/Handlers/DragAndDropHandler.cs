@@ -14,12 +14,11 @@ using UnityEngine;
 namespace Microsoft.MixedReality.Toolkit.SDK.Input.Handlers
 {
     /// <summary>
-    /// Component that allows dragging a <see cref="GameObject"/>.
+    /// Component that allows dragging a <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see>.
     /// Dragging is done by calculating the angular delta and z-delta between the current and previous hand positions,
     /// and then repositioning the object based on that.
     /// </summary>
     public class DragAndDropHandler : BaseFocusHandler,
-        IMixedRealityInputHandler,
         IMixedRealityInputHandler<MixedRealityPose>,
         IMixedRealityPointerHandler,
         IMixedRealitySourceStateHandler
@@ -273,7 +272,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Input.Handlers
             }
         }
 
-        #region IMixedRealitySourcePoseHandler Implementation
+        #region IMixedRealityInputHandler<MixedRealityPose> Implementation
 
         void IMixedRealityInputHandler<MixedRealityPose>.OnInputChanged(InputEventData<MixedRealityPose> eventData)
         {
@@ -388,15 +387,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Input.Handlers
             }
         }
 
-        void IMixedRealityInputHandler.OnInputUp(InputEventData eventData) { }
-
-        void IMixedRealityInputHandler.OnInputDown(InputEventData eventData) { }
-
-        void IMixedRealityInputHandler.OnInputPressed(InputEventData<float> eventData) { }
-
-        void IMixedRealityInputHandler.OnPositionInputChanged(InputEventData<Vector2> eventData) { }
-
-        #endregion IMixedRealitySourcePoseHandler Implementation
+        #endregion IMixedRealityInputHandler<MixedRealityPose> Implementation
 
         #region Private Helpers
 

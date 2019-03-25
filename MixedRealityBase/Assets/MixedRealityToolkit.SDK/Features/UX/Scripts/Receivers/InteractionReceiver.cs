@@ -16,7 +16,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
     /// based on events from those interactable objects. This is the base abstract class to extend from.
     /// </summary>
     public abstract class InteractionReceiver : BaseInputHandler,
-        IMixedRealityHandTrackHandler,
+        IMixedRealityTouchHandler,
         IMixedRealityFocusChangedHandler,
         IMixedRealityInputHandler,
         IMixedRealityInputHandler<float>,
@@ -58,7 +58,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         [Tooltip("When true, this interaction receiver will draw connections in the editor to Interactables and Targets")]
         private bool drawEditorConnections = true;
 
-        #region MonoBehaviour implementation
+        #region MonoBehaviour Implementation
 
         /// <summary>
         /// On enable, set the BaseInputHandler's IsFocusRequired to false to receive all events.
@@ -106,7 +106,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        #endregion MonoBehaviour implementation
+        #endregion MonoBehaviour Implementation
 
         /// <summary>
         /// Register an interactable with this receiver.
@@ -178,7 +178,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
 
         #endregion IMixedRealityFocusChangedHandler Implementation
 
-        #region IMixedRealityInputHandler Impmentations
+        #region IMixedRealityInputHandler Implementation
 
         /// <inheritdoc />
         void IMixedRealityInputHandler.OnInputUp(InputEventData eventData)
@@ -229,9 +229,9 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        #endregion IMixedRealityInputHandler Impmentations
+        #endregion IMixedRealityInputHandler Implementation
 
-        #region IMixedRealityGestureHandler Impmentations
+        #region IMixedRealityGestureHandler Implementation
 
         /// <inheritdoc />
         void IMixedRealityGestureHandler.OnGestureStarted(InputEventData eventData)
@@ -323,18 +323,16 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        #endregion IMixedRealityGestureHandler Impmentations
+        #endregion IMixedRealityGestureHandler Implementation
 
         #region IMixedRealityHandTrackingHandler Implementation
 
         /// <inheritdoc />
-        void IMixedRealityHandTrackHandler.OnTouchStarted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchStarted(HandTrackingInputEventData eventData)
         {
-            Debug.Log("touched in IR");
-            if (IsInteractable(eventData.TouchedObject))
+            if (IsInteractable(eventData.selectedObject))
             {
-                Debug.Log("touched object: " + eventData.TouchedObject);
-                TouchStarted(eventData.TouchedObject, eventData);
+                TouchStarted(eventData.selectedObject, eventData);
             }
         }
 
@@ -343,11 +341,11 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         }
 
         /// <inheritdoc />
-        void IMixedRealityHandTrackHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
         {
-            if (IsInteractable(eventData.TouchedObject))
+            if (IsInteractable(eventData.selectedObject))
             {
-                TouchCompleted(eventData.TouchedObject, eventData);
+                TouchCompleted(eventData.selectedObject, eventData);
             }
 
         }

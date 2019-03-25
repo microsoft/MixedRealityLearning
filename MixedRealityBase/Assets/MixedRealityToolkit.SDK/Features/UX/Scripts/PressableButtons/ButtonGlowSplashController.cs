@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
+using Microsoft.MixedReality.Toolkit.Core.Devices.Hands;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Services;
 using UnityEngine;
@@ -32,9 +33,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         private Material material;
         [SerializeField]
         private Collider buttonCollider;
-
-        private IMixedRealityHandJointService HandJointService => handJointService ?? (handJointService = MixedRealityToolkit.Instance.GetService<IMixedRealityHandJointService>());
-        private IMixedRealityHandJointService handJointService = null;
 
         void Start()
         {
@@ -105,13 +103,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
 
         void Update()
         {
-            Transform leftTip = HandJointService.RequestJoint(TrackedHandJoint.IndexTip, Handedness.Left);
-            Transform rightTip = HandJointService.RequestJoint(TrackedHandJoint.IndexTip, Handedness.Right);
+            HandJointUtils.TryGetJointPose(TrackedHandJoint.IndexTip, Handedness.Left, out MixedRealityPose leftTip);
+            HandJointUtils.TryGetJointPose(TrackedHandJoint.IndexTip, Handedness.Right, out MixedRealityPose rightTip);
 
             bool leftTipInBounds = false;
             bool rightTipInBounds = false;
-            leftTipInBounds = PointInBounds(leftTip.position);
-            rightTipInBounds = PointInBounds(rightTip.position);
+            leftTipInBounds = PointInBounds(leftTip.Position);
+            rightTipInBounds = PointInBounds(rightTip.Position);
 
             if (pulseActiveLeft)
             {
@@ -123,7 +121,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
                 if (pulseActiveLeft)
                 {
                     startTimeLeft = Time.time;
-                    PlayTapSound(leftTip.position);
+                    PlayTapSound(leftTip.Position);
                 }
             }
 
@@ -137,7 +135,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
                 if (pulseActiveRight)
                 {
                     startTimeRight = Time.time;
-                    PlayTapSound(rightTip.position);
+                    PlayTapSound(rightTip.Position);
                 }
             }
 

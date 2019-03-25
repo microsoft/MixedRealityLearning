@@ -28,7 +28,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
         private static bool showGazeProperties = true;
         private SerializedProperty gazeCursorPrefab;
         private SerializedProperty gazeProviderType;
-        private SerializedProperty pointerBehavior;
+        private SerializedProperty pointerMediator;
 
         private int currentlySelectedPointerOption = -1;
 
@@ -48,7 +48,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
             debugDrawPointingRayColors = serializedObject.FindProperty("debugDrawPointingRayColors");
             gazeCursorPrefab = serializedObject.FindProperty("gazeCursorPrefab");
             gazeProviderType = serializedObject.FindProperty("gazeProviderType");
-            pointerBehavior = serializedObject.FindProperty("pointerBehavior");
+            pointerMediator = serializedObject.FindProperty("pointerMediator");
 
             pointerOptionList = new ReorderableList(serializedObject, pointerOptions, false, false, true, true)
             {
@@ -68,9 +68,9 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                 return;
             }
 
-            if (GUILayout.Button("Back to Input Profile"))
+            if (DrawBacktrackProfileButton("Back to Input Profile", MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile))
             {
-                Selection.activeObject = MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile;
+                return;
             }
 
             EditorGUILayout.Space();
@@ -80,9 +80,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
 
             CheckProfileLock(target);
             serializedObject.Update();
-
-            EditorGUILayout.Space();
-
             currentlySelectedPointerOption = -1;
 
             EditorGUILayout.Space();
@@ -93,7 +90,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                 {
                     EditorGUILayout.PropertyField(pointingExtent);
                     EditorGUILayout.PropertyField(pointingRaycastLayerMasks, true);
-                    EditorGUILayout.PropertyField(pointerBehavior);
+                    EditorGUILayout.PropertyField(pointerMediator);
 
                     EditorGUILayout.Space();
                     showPointerOptionProperties = EditorGUILayout.Foldout(showPointerOptionProperties, "Pointer Options", true);
@@ -137,7 +134,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                     }
                 }
             }
-
+            
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -171,14 +168,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
         private void OnPointerOptionAdded(ReorderableList list)
         {
             pointerOptions.arraySize += 1;
-            var pointerOption = pointerOptions.GetArrayElementAtIndex(pointerOptions.arraySize - 1);
-            var controllerType = pointerOption.FindPropertyRelative("controllerType");
-            var referenceType = controllerType.FindPropertyRelative("reference");
-            referenceType.stringValue = string.Empty;
-            var handedness = pointerOption.FindPropertyRelative("handedness");
-            handedness.enumValueIndex = 0;
-            var prefab = pointerOption.FindPropertyRelative("pointerPrefab");
-            prefab.objectReferenceValue = null;
         }
 
         private void OnPointerOptionRemoved(ReorderableList list)

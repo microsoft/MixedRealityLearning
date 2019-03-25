@@ -45,7 +45,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities
         /// The default value for a Six Dof Transform.
         /// </summary>
         /// <returns>
-        /// <see cref="Vector3.zero"/> and <see cref="Quaternion.identity"/>.
+        /// <see href="https://docs.unity3d.com/ScriptReference/Vector3-zero.html">Vector3.zero</see> and <see href="https://docs.unity3d.com/ScriptReference/Quaternion-identity.html">Quaternion.identity</see>.
         /// </returns>
         public static MixedRealityPose ZeroIdentity { get; } = new MixedRealityPose(Vector3.zero, Quaternion.identity);
 
@@ -78,6 +78,15 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities
         {
             return $"{position} | {rotation}";
         }
+
+        /// The Z axis of the pose in world space
+        public Vector3 Forward => rotation * Vector3.forward + position;
+
+        /// The Y axis of the pose in world space
+        public Vector3 Up => rotation * Vector3.up + position;
+
+        /// The X axis of the pose in world space
+        public Vector3 Right => rotation * Vector3.right + position;
 
         #region IEqualityComparer Implementation
 

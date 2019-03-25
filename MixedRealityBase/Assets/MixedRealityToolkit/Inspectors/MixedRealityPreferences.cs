@@ -41,7 +41,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
 
         #region Ignore startup settings prompt
 
-        private static readonly GUIContent IgnoreContent = new GUIContent("Ignore Settings Prompt on Startup", "Prevents settings dialog popup from showing on startup.\n\nThis setting applies to all projects using MRTK.");
+        private static readonly GUIContent IgnoreContent = new GUIContent("Ignore Settings Prompt on Startup", "Prevents settings dialog pop-up from showing on startup.\n\nThis setting applies to all projects using MRTK.");
         private const string IgnoreKey = "_MixedRealityToolkit_Editor_IgnoreSettingsPrompts";
         private static bool ignorePrefLoaded;
         private static bool ignoreSettingsPrompt;
@@ -83,7 +83,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
 
             if (!LockProfiles)
             {
-                EditorGUILayout.HelpBox("This is only to be used to update the default SDK profiles. If any edits are made, and not checked into the MRTK's Github, the changes may be lost next time you update your local copy.", MessageType.Warning);
+                EditorGUILayout.HelpBox("This is only to be used to update the default SDK profiles. If any edits are made, and not checked into the MRTK's GitHub, the changes may be lost next time you update your local copy.", MessageType.Warning);
             }
 
             EditorGUI.BeginChangeCheck();

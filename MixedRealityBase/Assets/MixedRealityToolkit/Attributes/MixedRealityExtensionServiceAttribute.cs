@@ -59,11 +59,11 @@ namespace Microsoft.MixedReality.Toolkit.Core.Attributes
         /// Constructor
         /// </summary>
         /// <param name="runtimePlatforms">The platforms on which the extension service is supported.</param>
-        /// <param name="profilePath">The relative path to the default profile asset.</param>
+        /// <param name="defaultProfilePath">The relative path to the default profile asset.</param>
         /// <param name="packageFolder">The package folder to which the path is relative.</param>
         public MixedRealityExtensionServiceAttribute(
             SupportedPlatforms runtimePlatforms,
-            string defaultProfilePath = "", 
+            string defaultProfilePath = "",
             string packageFolder = "MixedRealityToolkit")
         {
             RuntimePlatforms = runtimePlatforms;
@@ -71,12 +71,17 @@ namespace Microsoft.MixedReality.Toolkit.Core.Attributes
             PackageFolder = packageFolder;
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// Convenience function for retrieving the attribute given a certain class type.
         /// </summary>
+        /// <remarks>
+        /// This function is only available in a UnityEditor context.
+        /// </remarks>
         public static MixedRealityExtensionServiceAttribute Find(Type type)
         {
             return type.GetCustomAttributes(typeof(MixedRealityExtensionServiceAttribute), true).FirstOrDefault() as MixedRealityExtensionServiceAttribute;
         }
+#endif // UNITY_EDITOR
     }
 }

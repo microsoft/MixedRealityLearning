@@ -16,7 +16,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers
         void OnHandMeshUpdated(InputEventData<HandMeshInfo> eventData);
     }
 
-    // See BaseHandVisualizer::OnHandMeshUpdated for an example of how to use the
+    // See BaseHandVisualizer.OnHandMeshUpdated for an example of how to use the
     // hand mesh info to render a mesh.
     public class HandMeshInfo
     {
@@ -24,7 +24,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers
         public Vector3[] vertices;
 
         // Mesh triangle indices
-        public ushort[] triangles;
+        public int[] triangles;
 
         // Hand mesh normals, in initial coordinate system
         public Vector3[] normals;

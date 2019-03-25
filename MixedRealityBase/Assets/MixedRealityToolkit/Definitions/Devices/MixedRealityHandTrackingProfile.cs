@@ -9,15 +9,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Devices
     public class MixedRealityHandTrackingProfile : BaseMixedRealityProfile
     {
         [SerializeField]
-        [Tooltip("A reference to the standard Hand API prefab.")]
-        private GameObject simulatedHandPrefab = null;
-
-        /// <summary>
-        /// A reference to the standard Hand API prefab.
-        /// </summary>
-        public GameObject SimulatedHandPrefab => simulatedHandPrefab;
-
-        [SerializeField]
         [Tooltip("The joint prefab to use.")]
         private GameObject jointPrefab = null;
 

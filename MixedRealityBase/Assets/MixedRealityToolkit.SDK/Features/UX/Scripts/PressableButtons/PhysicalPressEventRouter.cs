@@ -39,18 +39,22 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
         {
             PlayClip(touchClip);
 
-            routingTarget.SetPhysicalTouch(true);
-            if (InteractableOnClick == PhysicalPressEventBehavior.EventOnTouch)
+            if (routingTarget != null)
             {
-                routingTarget.SetPress(true);
-                routingTarget.OnPointerClicked(null);
-                routingTarget.SetPress(false);
+                routingTarget.SetPhysicalTouch(true);
+                if (InteractableOnClick == PhysicalPressEventBehavior.EventOnTouch)
+                {
+                    routingTarget.SetPress(true);
+                    routingTarget.OnPointerClicked(null);
+                    routingTarget.SetPress(false);
+                }
             }
         }
 
         public void OnHandPressUntouched()
         {
-            if (InteractableOnClick == PhysicalPressEventBehavior.EventOnTouch)
+            if (InteractableOnClick == PhysicalPressEventBehavior.EventOnTouch &&
+                routingTarget != null)
             {
                 routingTarget.SetPhysicalTouch(false);
                 routingTarget.SetPress(true);
@@ -61,11 +65,14 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
         {
             PlayClip(pressClip);
 
-            routingTarget.SetPhysicalTouch(true);
-            routingTarget.SetPress(true);
-            if (InteractableOnClick == PhysicalPressEventBehavior.EventOnPress)
+            if (routingTarget != null)
             {
-                routingTarget.OnPointerClicked(null);
+                routingTarget.SetPhysicalTouch(true);
+                routingTarget.SetPress(true);
+                if (InteractableOnClick == PhysicalPressEventBehavior.EventOnPress)
+                {
+                    routingTarget.OnPointerClicked(null);
+                }
             }
         }
 
@@ -73,13 +80,16 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
         {
             PlayClip(clickClip);
 
-            routingTarget.SetPhysicalTouch(true);
-            routingTarget.SetPress(true);
-            if (InteractableOnClick == PhysicalPressEventBehavior.EventOnClickCompletion)
+            if (routingTarget != null)
             {
-                routingTarget.OnPointerClicked(null);
+                routingTarget.SetPhysicalTouch(true);
+                routingTarget.SetPress(true);
+                if (InteractableOnClick == PhysicalPressEventBehavior.EventOnClickCompletion)
+                {
+                    routingTarget.OnPointerClicked(null);
+                }
+                routingTarget.SetPress(false);
             }
-            routingTarget.SetPress(false);
         }
 
         private void PlayClip(AudioClip clip)

@@ -29,7 +29,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
         /// <summary>
         /// Logs an error message.
         /// </summary>
-        /// <param name="condition">The message to log.</param>
+        /// <param name="message">The message to log.</param>
         public static void DebugLogError(string message)
         {
             Debug.LogError(message);
@@ -38,7 +38,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
         /// <summary>
         /// Logs a warning message.
         /// </summary>
-        /// <param name="condition">The message to log.</param>
+        /// <param name="message">The message to log.</param>
         public static void DebugLogWarning(string message)
         {
             Debug.LogWarning(message);
@@ -47,7 +47,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
         /// <summary>
         /// Logs a message.
         /// </summary>
-        /// <param name="condition">The message to log.</param>
+        /// <param name="message">The message to log.</param>
         public static void DebugLog(string message)
         {
             Debug.Log(message);
@@ -58,7 +58,15 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
         /// </summary>
         public static void DrawPoint(Vector3 point, Color color, float size = 0.05f)
         {
-            Vector3[] axes = { Vector3.up, Vector3.right, Vector3.forward };
+            DrawPoint(point, Quaternion.identity, color, size);
+        }
+        
+        ///
+        /// Draws a point with a rotation in the Scene window.
+        /// </summary>
+        public static void DrawPoint(Vector3 point, Quaternion rotation, Color color, float size = 0.05f)
+        {
+            Vector3[] axes = { rotation * Vector3.up, rotation * Vector3.right, rotation * Vector3.forward };
 
             for (int i = 0; i < axes.Length; ++i)
             {

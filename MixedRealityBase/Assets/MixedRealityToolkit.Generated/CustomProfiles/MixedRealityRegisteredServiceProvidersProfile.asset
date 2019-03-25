@@ -62,7 +62,7 @@ MonoBehaviour:
     componentName: Windows Mixed Reality Spatial Mesh Observer
     priority: 10
     runtimePlatform: 8
-    configurationProfile: {fileID: 11400000, guid: dcb423cb9db5ea24fbc8da5edab8dae6,
+    configurationProfile: {fileID: 11400000, guid: 4c9738c646e422949b25940338d4eea6,
       type: 2}
   - componentType:
       reference: Microsoft.MixedReality.Toolkit.Core.Devices.Hands.HandJointService,
@@ -70,11 +70,13 @@ MonoBehaviour:
     componentName: Hand Joint Service
     priority: 10
     runtimePlatform: -1
-    configurationProfile: {fileID: 0}
+    configurationProfile: {fileID: 11400000, guid: 41478039094d47641bf4e09c20e61a5a,
+      type: 2}
   - componentType:
-      reference: Microsoft.MixedReality.Toolkit.Core.Devices.Hands.SimulatedHandDeviceManager,
-        Microsoft.MixedReality.Toolkit
-    componentName: In-Editor Hand Simulation
+      reference: Microsoft.MixedReality.Toolkit.Services.InputSimulation.InputSimulationService,
+        Microsoft.MixedReality.Toolkit.Services.InputSimulation
+    componentName: In-Editor Input Simulation
     priority: 10
     runtimePlatform: 16
-    configurationProfile: {fileID: 0}
+    configurationProfile: {fileID: 11400000, guid: 41478039094d47641bf4e09c20e61a5a,
+      type: 2}

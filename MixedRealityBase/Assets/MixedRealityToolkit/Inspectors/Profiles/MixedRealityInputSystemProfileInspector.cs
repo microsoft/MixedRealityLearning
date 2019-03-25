@@ -34,7 +34,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
         private SerializedProperty speechCommandsProfile;
 
         private static bool showHandTrackingProperties = true;
-        private SerializedProperty enableHandTracking;
         private SerializedProperty handTrackingProfile;
 
         protected override void OnEnable()
@@ -55,7 +54,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
             controllerMappingProfile = serializedObject.FindProperty("controllerMappingProfile");
             enableControllerMapping = serializedObject.FindProperty("enableControllerMapping");
             controllerVisualizationProfile = serializedObject.FindProperty("controllerVisualizationProfile");
-            enableHandTracking = serializedObject.FindProperty("enableHandTracking");
             handTrackingProfile = serializedObject.FindProperty("handTrackingProfile");
         }
 
@@ -67,9 +65,9 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                 return;
             }
 
-            if (GUILayout.Button("Back to Configuration Profile"))
+            if (DrawBacktrackProfileButton("Back to Configuration Profile", MixedRealityToolkit.Instance.ActiveProfile))
             {
-                Selection.activeObject = MixedRealityToolkit.Instance.ActiveProfile;
+                return;
             }
 
             EditorGUILayout.Space();
@@ -154,7 +152,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.PropertyField(enableHandTracking);
                     changed |= RenderProfile(handTrackingProfile);
                 }
             }

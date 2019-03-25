@@ -10,10 +10,10 @@ using UnityEngine;
 namespace Microsoft.MixedReality.Toolkit.SDK.Audio.Influencers
 {
     /// <summary>
-    /// Class which supports components implementing <see cref="IAudioInfluencer"/> being used with audio sources.
+    /// Class which supports components implementing <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.Audio.IAudioInfluencer"/> being used with audio sources.
     /// </summary>
     /// <remarks>
-    /// AudioInfluencerController requires an <see cref="AudioSource"/> component. If one is not attached, it will be added automatically.
+    /// AudioInfluencerController requires an <see href="https://docs.unity3d.com/ScriptReference/AudioSource.html">AudioSource</see> component. If one is not attached, it will be added automatically.
     /// Each sound playing game object needs to have an AudioInfluencerController attached in order to have it's audio influenced.
     /// </remarks>
     [RequireComponent(typeof(AudioSource))]
@@ -167,7 +167,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Audio.Influencers
 
         private void Update() 
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
 
             // Audio influences are not updated every frame.
             if ((UpdateInterval * 1000.0f) <= (now - lastUpdate).TotalMilliseconds)

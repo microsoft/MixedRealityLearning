@@ -58,7 +58,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
         {
             if (eventData.Controller?.ControllerHandedness == handedness)
             {
-                if (eventData.Controller.Visualizer is IMixedRealityHandVisualizer)
+                if (eventData.Controller is IMixedRealityHand)
                 {
 
                 }
@@ -108,7 +108,16 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
         /// <param name="newController">The new controller to be tracked.</param>
         protected virtual void AddControllerTransform(IMixedRealityController newController)
         {
-            if (newController.ControllerHandedness == handedness && newController.Visualizer.GameObjectProxy.transform != null && !newController.Visualizer.GameObjectProxy.transform.Equals(ControllerTransform))
+            if (newController == null || 
+                newController.Visualizer == null || 
+                newController.Visualizer.GameObjectProxy == null ||
+                newController.Visualizer.GameObjectProxy.transform == null)
+            {
+                return;
+            }
+
+            if (newController.ControllerHandedness == handedness &&
+                newController.Visualizer.GameObjectProxy.transform.Equals(ControllerTransform))
             {
                 ControllerTransform = newController.Visualizer.GameObjectProxy.transform;
 

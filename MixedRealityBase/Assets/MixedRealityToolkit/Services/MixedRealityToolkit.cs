@@ -138,12 +138,12 @@ namespace Microsoft.MixedReality.Toolkit.Core.Services
         private static readonly List<Tuple<Type, IMixedRealityService>> registeredMixedRealityServices = new List<Tuple<Type, IMixedRealityService>>();
 
         /// <summary>
-        /// Local service registry for the Mixed Reality Toolkit, to allow runtime use of the <see cref="IMixedRealityService"/>.
+        /// Local service registry for the Mixed Reality Toolkit, to allow runtime use of the <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.IMixedRealityService"/>.
         /// </summary>
         public static IReadOnlyList<Tuple<Type, IMixedRealityService>> RegisteredMixedRealityServices => registeredMixedRealityServices;
 
         /// <summary>
-        /// Local service registry for the Mixed Reality Toolkit, to allow runtime use of the <see cref="IMixedRealityService"/>.
+        /// Local service registry for the Mixed Reality Toolkit, to allow runtime use of the <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.IMixedRealityService"/>.
         /// </summary>
         [Obsolete("Use RegisteredMixedRealityServices instead.")]
         public List<Tuple<Type, IMixedRealityExtensionService>> MixedRealityComponents => null;
@@ -582,6 +582,11 @@ namespace Microsoft.MixedReality.Toolkit.Core.Services
             UpdateAllServices();
         }
 
+        private void LateUpdate()
+        {
+            LateUpdateAllServices();
+        }
+
         private void OnDisable()
         {
             DisableAllServices();
@@ -630,6 +635,15 @@ namespace Microsoft.MixedReality.Toolkit.Core.Services
                 return false;
             }
 
+#if !UNITY_EDITOR
+            if (!Application.platform.IsPlatformSupported(supportedPlatforms))
+#else
+            if (!UnityEditor.EditorUserBuildSettings.activeBuildTarget.IsPlatformSupported(supportedPlatforms))
+#endif
+            {
+                return false;
+            }
+
             if (interfaceType == null)
             {
                 Debug.LogError("Unable to register a service with a null concrete type.");
@@ -639,15 +653,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Services
             if (!typeof(IMixedRealityService).IsAssignableFrom(interfaceType))
             {
                 Debug.LogError($"Unable to register the {interfaceType.Name} service. It does not implement {typeof(IMixedRealityService)}.");
-                return false;
-            }
-
-#if !UNITY_EDITOR
-            if (!Application.platform.IsPlatformSupported(supportedPlatforms))
-#else
-            if (!UnityEditor.EditorUserBuildSettings.activeBuildTarget.IsPlatformSupported(supportedPlatforms))
-#endif
-            {
                 return false;
             }
 
@@ -976,6 +981,27 @@ namespace Microsoft.MixedReality.Toolkit.Core.Services
             foreach (var service in registeredMixedRealityServices)
             {
                 service.Item2.Update();
+            }
+        }
+
+        private void LateUpdateAllServices()
+        {
+            // If the Mixed Reality Toolkit is not configured, stop.
+            if (activeProfile == null) { return; }
+
+            // If the Mixed Reality Toolkit is not initialized, stop.
+            if (!IsInitialized) { return; }
+
+            // Update all systems
+            foreach (var system in activeSystems)
+            {
+                system.Value.LateUpdate();
+            }
+
+            // Update all registered runtime services
+            foreach (var service in registeredMixedRealityServices)
+            {
+                service.Item2.LateUpdate();
             }
         }
 

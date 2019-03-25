@@ -84,7 +84,7 @@ namespace Microsoft.MixedReality.Toolkit.Providers.WindowsVoiceInput
                 {
                     if (Input.GetKeyDown(Commands[i].KeyCode))
                     {
-                        OnPhraseRecognized((ConfidenceLevel) RecognitionConfidenceLevel, TimeSpan.Zero, DateTime.Now, Commands[i].LocalizedKeyword);
+                        OnPhraseRecognized((ConfidenceLevel) RecognitionConfidenceLevel, TimeSpan.Zero, DateTime.UtcNow, Commands[i].LocalizedKeyword);
                     }
                 }
             }

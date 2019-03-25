@@ -89,7 +89,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Providers
         {
             get
             {
-                throw new NotImplementedException();
+                return true;
             }
         }
 

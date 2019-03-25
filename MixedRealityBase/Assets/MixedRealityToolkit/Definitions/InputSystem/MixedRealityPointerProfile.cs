@@ -64,7 +64,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
         private SystemType gazeProviderType;
 
         /// <summary>
-        /// The concrete type of <see cref="IMixedRealityGazeProvider"/> to use.
+        /// The concrete type of <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.IMixedRealityGazeProvider"/> to use.
         /// </summary>
         public SystemType GazeProviderType
         {
@@ -81,16 +81,17 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
         public PointerOption[] PointerOptions => pointerOptions;
 
         [SerializeField]
-        [Implements(typeof(IMixedRealityPointerBehavior), TypeGrouping.ByNamespaceFlat)]
-        [Tooltip("The concrete Pointer Behavior component to use.")]
-        private SystemType pointerBehavior = null;
+        [Implements(typeof(IMixedRealityPointerMediator), TypeGrouping.ByNamespaceFlat)]
+        [Tooltip("The concrete Pointer Mediator component to use. This is a component that mediates all pointers in system, disabling / enabling them based on the state of other pointers.")]
+        private SystemType pointerMediator = null;
 
         /// <summary>
-        /// The concrete Pointer Behavior component to use.
+        /// The concrete Pointer Mediator component to use.
+        /// This is a component that mediates all pointers in system, disabling / enabling them based on the state of other pointers.
         /// </summary>
-        public SystemType PointerBehavior
+        public SystemType PointerMediator
         {
-            get { return pointerBehavior; }
+            get { return pointerMediator; }
         }
     }
 }

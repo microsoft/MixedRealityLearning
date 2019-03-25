@@ -59,6 +59,13 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
                 lineMaterial = lineRenderer.sharedMaterial;
             }
 
+            // mafinc - Start the line renderer off disabled (invisible), we'll enable it
+            // when we have enough data for it to render properly.
+            if (lineRenderer != null)
+            {
+                lineRenderer.enabled = false;
+            }
+
             if (lineMaterial == null)
             {
                 Debug.LogError("MixedRealityLineRenderer needs a material.");
@@ -80,8 +87,8 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
                 return;
             }
 
-            lineRenderer.enabled = LineDataSource.enabled;
-            lineRenderer.positionCount = StepMode == StepMode.FromSource ? LineDataSource.PointCount : LineStepCount;
+            lineRenderer.enabled = lineDataSource.enabled;
+            lineRenderer.positionCount = StepMode == StepMode.FromSource ? lineDataSource.PointCount : LineStepCount;
 
             if (positions == null || positions.Length != lineRenderer.positionCount)
             {
@@ -92,17 +99,17 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
             {
                 if (StepMode == StepMode.FromSource)
                 {
-                    positions[i] = LineDataSource.GetPoint(i);
+                    positions[i] = lineDataSource.GetPoint(i);
                 }
                 else
                 {
-                    float normalizedDistance = (1f / (LineStepCount - 1)) * i;
-                    positions[i] = LineDataSource.GetPoint(normalizedDistance);
+                    float normalizedDistance = GetNormalizedPointAlongLine(i);
+                    positions[i] = lineDataSource.GetPoint(normalizedDistance);
                 }
             }
 
             // Set line renderer properties
-            lineRenderer.loop = LineDataSource.Loops;
+            lineRenderer.loop = lineDataSource.Loops;
             lineRenderer.numCapVertices = roundedCaps ? 8 : 0;
             lineRenderer.numCornerVertices = roundedEdges ? 8 : 0;
             lineRenderer.useWorldSpace = true;

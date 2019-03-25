@@ -5,7 +5,6 @@ using Microsoft.MixedReality.Toolkit.Core.Attributes;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.Core.Providers.UnityInput
@@ -16,7 +15,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Providers.UnityInput
     [MixedRealityController(
         SupportedControllerType.Xbox,
         new[] { Handedness.None },
-        "Resources/Textures/XboxController")]
+        "StandardAssets/Textures/XboxController")]
     public class XboxController : GenericJoystickController
     {
         /// <summary>

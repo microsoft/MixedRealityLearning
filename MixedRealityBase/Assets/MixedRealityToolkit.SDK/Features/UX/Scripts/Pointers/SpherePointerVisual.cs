@@ -1,5 +1,7 @@
+using System;
 using Microsoft.MixedReality.Toolkit.Core.Services;
 using Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.DataProviders;
+using Microsoft.MixedReality.Toolkit.Services.InputSystem;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
@@ -79,23 +81,27 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             bool tetherVisualsEnabled = false;
             if (pointer.IsFocusLocked)
             {
-                
-                Vector3 graspPosition;
-                pointer.TryGetNearGraspPoint(out graspPosition);
-                tetherLine.FirstPoint = graspPosition;
-                Vector3 endPoint = pointer.Result.Details.Object.transform.TransformPoint(pointer.Result.Details.PointLocalSpace);
-                tetherLine.LastPoint = endPoint;
-                tetherVisualsEnabled = Vector3.Distance(tetherLine.FirstPoint, tetherLine.LastPoint) > minTetherLength;
-                tetherLine.enabled = tetherVisualsEnabled;
-    
-                tetherEndPoint.position = endPoint;
-
-                tetherEndPoint.gameObject.SetActive(tetherVisualsEnabled);
+                NearInteractionGrabbable grabbedObject = GetGrabbedObject();
+                if (grabbedObject != null && grabbedObject.ShowTetherWhenManipulating)
+                {
+                    Vector3 graspPosition;
+                    pointer.TryGetNearGraspPoint(out graspPosition);
+                    tetherLine.FirstPoint = graspPosition;
+                    Vector3 endPoint = pointer.Result.Details.Object.transform.TransformPoint(pointer.Result.Details.PointLocalSpace);
+                    tetherLine.LastPoint = endPoint;
+                    tetherVisualsEnabled = Vector3.Distance(tetherLine.FirstPoint, tetherLine.LastPoint) > minTetherLength;
+                    tetherLine.enabled = tetherVisualsEnabled;
+                    tetherEndPoint.gameObject.SetActive(tetherVisualsEnabled);
+                    tetherEndPoint.position = endPoint;
+                }
             }
 
             visualsRoot.gameObject.SetActive(tetherVisualsEnabled);
-
         }
 
+        private NearInteractionGrabbable GetGrabbedObject()
+        {
+            return pointer.Result?.Details.Object?.GetComponent<NearInteractionGrabbable>();
+        }
     }
 }

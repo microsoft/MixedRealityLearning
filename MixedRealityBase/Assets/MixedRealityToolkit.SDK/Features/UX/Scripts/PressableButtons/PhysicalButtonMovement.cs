@@ -21,7 +21,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
     /// If you don't like <see cref="PhysicalPressEventRouter"/>, you can clone it and make your own!
     ///</summary>
     [RequireComponent(typeof(BoxCollider))]
-    public class PhysicalButtonMovement : MonoBehaviour, IMixedRealityHandTrackHandler
+    public class PhysicalButtonMovement : MonoBehaviour, IMixedRealityTouchHandler
     {
         [SerializeField]
         private GameObject handlerTarget = null;
@@ -29,19 +29,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
 
         [SerializeField]
         private GameObject movingButtonVisuals = null;
-
-        ///<summary>
-        /// Note: It is important the visuals object has a collider to still work with Gaze & Far Select
-        ///</summary>
-        [SerializeField]
-        private Collider visualsCollider = null;
-
-        ///<summary>
-        /// Force the Interactable to raycastable layer so it can be gazed with Cursor.
-        /// Temporary workaround as Interactable is being set to PhysicalButtonMovement's layer (IgnoreRaycast) for some reason
-        ///</summary>
-        [SerializeField]
-        private bool forceVisualToRaycastableLayer = false;
 
         [SerializeField]
         [Header("Press Settings")]
@@ -60,10 +47,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         [Tooltip("Withdraw amount needed to progress from Press to ClickCompleted. .01 is 1 cm.")]
         private float withdrawActivationAmount = 0.01f;
 
-        [SerializeField]
-        [Tooltip("How large the actual button's push size is relative to the touch collider's button collider size")]
-        private float buttonSizeRelativeToCollider = 0.25f;
-
         [Tooltip("Used to force a reacquisition of the cachedHandler, necessary if the handler might've changed")]
         [SerializeField]
         private bool forceHandlerToUpdate = false;
@@ -71,11 +54,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         [Header("Display of Internal Vars")]
         [SerializeField]
         private float currentPushDistance = 0.0f;
-
-        [SerializeField]
-        private float deepestPressDistance = 0.0f;
-        [SerializeField]
-        private float lastClickDepth = 0.0f;
 
         ///<summary>
         /// Represents the rate at which the button lerps to follow the press depth.
@@ -116,31 +94,22 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         ///</summary>
         private Vector3 localSpacePressDirection = new Vector3(0, 0, 1);
 
-        private List<IMixedRealityHandVisualizer> handSources = new List<IMixedRealityHandVisualizer>();
+        private List<IMixedRealityHand> handSources = new List<IMixedRealityHand>();
         private List<uint> sourceIds = new List<uint>();
         private Transform initialPosition;
         private Transform finalPosition;
 
         private float previousJointDistance = 0.0f;
 
-        private Vector3 previousPosition;
-        private Vector3 targetLocalPosition;
-
         private void Start()
         {
-            previousPosition = movingButtonVisuals.transform.localPosition;
-            targetLocalPosition = movingButtonVisuals.transform.localPosition;
             moveMode = false;
             initialPosition = null;
-            finalPosition = null;
             localSpacePressDirection.Normalize();
 
-            //Set ourself to ignore raycast (to prevent gaze cursor getting caught on our larger collider)
-            gameObject.layer = 2;
-
-            if (visualsCollider != null && forceVisualToRaycastableLayer)
+            if (gameObject.layer == 2)
             {
-                visualsCollider.gameObject.layer = 0;
+                Debug.LogWarning("PhysicalButtonMovement will not work if game object layer is set to 'Ignore Raycast'.");
             }
         }
 
@@ -150,15 +119,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
             {
                 return;
             }
-            previousPosition = movingButtonVisuals.transform.localPosition;
+            float previousPushDistance = currentPushDistance;
+            Vector3 prevLocalPosition = ComputeVisualsLocalPosition(previousPushDistance);
 
             Vector3 bestPushPointOnRay;
             float distance;
             jointWithinButton = false;
             bool IsTouchingCorrected = EvaluateProjectedTouchPosition(out bestPushPointOnRay, out distance);
-
-            distance = Mathf.Min(maxPushDistance, distance);
-            distance = Mathf.Clamp(distance, 0, float.MaxValue);
             currentPushDistance = distance;
 
             if (IsTouchingCorrected && !Touching)
@@ -172,64 +139,40 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
 
             if (IsTouchingCorrected)
             {
-                if (maxPushDistance != 0.0f)
+                HandlePressProgress(currentPushDistance, previousPushDistance);
+
+                if (movingButtonVisuals != null)
                 {
-                    //We remember the deepest the button has been pressed recently.
-                    if (currentPushDistance > deepestPressDistance)
-                    {
-                        deepestPressDistance = currentPushDistance;
-                    }
-
-                    HandlePressProgress(currentPushDistance);
+                    Vector3 targetLocalPosition = ComputeVisualsLocalPosition(currentPushDistance);
+                    targetLocalPosition = Vector3.Lerp(prevLocalPosition, targetLocalPosition, pressLerpRate);
+                    movingButtonVisuals.transform.localPosition = targetLocalPosition;
                 }
-
-                targetLocalPosition = initialPosition.localPosition + ((finalPosition.localPosition - initialPosition.localPosition).normalized * currentPushDistance);
-
-                //Sanitize the vector so we only move in the correct press direction.
-                targetLocalPosition = new Vector3(targetLocalPosition.x * localSpacePressDirection.x, targetLocalPosition.y * localSpacePressDirection.y, targetLocalPosition.z * localSpacePressDirection.z);
-
-                movingButtonVisuals.transform.localPosition = Vector3.Lerp(previousPosition, targetLocalPosition, pressLerpRate);
                 jointWithinButton = true;
             }
 
             if (initialPosition != null && jointWithinButton == false)
             {
-                if (movingButtonVisuals.transform.localPosition != finalPosition.localPosition)
+                currentPushDistance = (initialPosition.localPosition - prevLocalPosition).magnitude;
+                currentPushDistance = Mathf.Max(0.0f, currentPushDistance - currentPushDistance * returnRate * Time.deltaTime);
+
+                HandlePressProgress(currentPushDistance, previousPushDistance);
+
+                if (currentPushDistance <= 0.0001f)
                 {
-                    float remainingDistance = (initialPosition.localPosition - movingButtonVisuals.transform.localPosition).magnitude;
-
-                    HandlePressProgress(remainingDistance);
-
-                    if (distance <= 0)
+                    currentPushDistance = 0;
+                    if (movingButtonVisuals != null)
                     {
-                        deepestPressDistance = 0;
-                        lastClickDepth = 0;
+                        movingButtonVisuals.transform.localPosition = ComputeVisualsLocalPosition(currentPushDistance);
                     }
-                    else
-                    {
-                        //We only undo the depth press memory when we aren't currently partway through a click
-                        if (!Pressing)
-                        {
-                            //This handles undoing the deepest press memory.
-                            if (distance < deepestPressDistance)
-                            {
-                                deepestPressDistance = distance;
-                            }
-                            if (remainingDistance < lastClickDepth)
-                            {
-                                lastClickDepth = distance;
-                            }
-                        }
-                    }
+                    ClearPathMarkers();
+                    moveMode = false;
+                    return;
+                }
 
-                    float recoverDistance = remainingDistance * returnRate * Time.deltaTime;
-                    recoverDistance = Mathf.Min(remainingDistance, recoverDistance);
-                    targetLocalPosition = previousPosition + (initialPosition.localPosition - movingButtonVisuals.transform.localPosition).normalized * recoverDistance;
-
-                    //Sanitize this vector so we only move in the correct press direction.
-                    targetLocalPosition = new Vector3(targetLocalPosition.x * localSpacePressDirection.x, targetLocalPosition.y * localSpacePressDirection.y, targetLocalPosition.z * localSpacePressDirection.z);
-
-                    movingButtonVisuals.transform.localPosition = Vector3.Lerp(previousPosition, targetLocalPosition, returnLerpRate);
+                if (movingButtonVisuals != null)
+                {
+                    Vector3 targetLocalPosition = ComputeVisualsLocalPosition(currentPushDistance);
+                    movingButtonVisuals.transform.localPosition = Vector3.Lerp(prevLocalPosition, targetLocalPosition, returnLerpRate);
                 }
             }
 
@@ -241,25 +184,55 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         ///</summary>
         void OnDrawGizmos()
         {
-            if (visualsCollider != null)
+            var collider = GetComponent<Collider>();
+            if (collider != null)
             {
-                var worldPressDirection = (transform.rotation * localSpacePressDirection);
-                var buttonSize = visualsCollider.bounds.size.z * buttonSizeRelativeToCollider;
-                var startPoint = transform.position - worldPressDirection * buttonSize / 2;
-                var endPoint = startPoint + worldPressDirection * maxPushDistance;
-                var pushedPoint = startPoint + worldPressDirection * deepestPressDistance;
+                Vector3 worldPressDirection = (transform.rotation * localSpacePressDirection);
 
-                Gizmos.DrawLine(startPoint, endPoint);
+                Vector3 boundsCenter = collider.bounds.center;
+                Vector3 startPoint;
+                if (movingButtonVisuals != null)
+                {
+                    startPoint = movingButtonVisuals.transform.position;
+                }
+                else
+                {
+                    startPoint = transform.position;
+                }
+                startPoint = ProjectPointToVector(boundsCenter, boundsCenter + worldPressDirection, startPoint, out float distance);
+
+                Vector3 endPoint = startPoint + worldPressDirection * maxPushDistance;
+                Vector3 pushedPoint = startPoint + worldPressDirection * currentPushDistance;
+
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawLine(startPoint, pushedPoint);
-                Gizmos.color = Color.white;
+                Vector3 lastPoint = pushedPoint;
 
-                //Black Plus indicates the push depth
-                Gizmos.color = Color.black;
-                Gizmos.DrawLine(endPoint, endPoint + transform.rotation * Vector3.up * visualsCollider.bounds.size.y / 2);
-                Gizmos.DrawLine(endPoint, endPoint - transform.rotation * Vector3.up * visualsCollider.bounds.size.y / 2);
-                Gizmos.DrawLine(endPoint, endPoint + transform.rotation * Vector3.right * visualsCollider.bounds.size.x / 2);
-                Gizmos.DrawLine(endPoint, endPoint - transform.rotation * Vector3.right * visualsCollider.bounds.size.x / 2);
+                float releaseDistance = minPressDepth - withdrawActivationAmount;
+                if (releaseDistance > currentPushDistance)
+                {
+                    Gizmos.color = Color.yellow;
+                    Vector3 releasePoint = startPoint + worldPressDirection * releaseDistance;
+                    Gizmos.DrawLine(lastPoint, releasePoint);
+                    lastPoint = releasePoint;
+                }
+
+                if (minPressDepth > currentPushDistance)
+                {
+                    Gizmos.color = Color.cyan;
+                    Vector3 pressPoint = startPoint + worldPressDirection * minPressDepth;
+                    Gizmos.DrawLine(lastPoint, pressPoint);
+                    lastPoint = pressPoint;
+                }
+
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(lastPoint, endPoint);
+
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(endPoint, endPoint + transform.rotation * Vector3.up * collider.bounds.extents.y);
+                Gizmos.DrawLine(endPoint, endPoint - transform.rotation * Vector3.up * collider.bounds.extents.y);
+                Gizmos.DrawLine(endPoint, endPoint + transform.rotation * Vector3.right * collider.bounds.extents.x);
+                Gizmos.DrawLine(endPoint, endPoint - transform.rotation * Vector3.right * collider.bounds.extents.x);
             }
         }
 
@@ -277,27 +250,26 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         /// </param>
         public void OnTouchCompleted(HandTrackingInputEventData eventData)
         {
-            handSources.Remove((IMixedRealityHandVisualizer)eventData.Controller.Visualizer);
+            handSources.Remove((IMixedRealityHand)eventData.Controller);
             sourceIds.Remove(eventData.SourceId);
-
-            moveMode = false;
-            CompleteTouch();
         }
 
         public void OnTouchUpdated(HandTrackingInputEventData eventData)
         {
         }
+
         public void OnTouchStarted(HandTrackingInputEventData eventData)
         {
+            handSources.Add((IMixedRealityHand)eventData.Controller);
+            sourceIds.Add(eventData.SourceId);
+
             if (moveMode == false)
             {
-                ClearPathMarkers();
                 SetPathMarkers();
+                Vector3 bestPushPointOnRay;
+                EvaluateProjectedTouchPosition(out bestPushPointOnRay, out currentPushDistance);
                 moveMode = true;
             }
-
-            handSources.Add((IMixedRealityHandVisualizer)eventData.Controller.Visualizer);
-            sourceIds.Add(eventData.SourceId);
         }
         #endregion OnTouch
 
@@ -307,14 +279,30 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         {
             GameObject initialMarker = new GameObject("Initial");
             initialMarker.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-            initialMarker.transform.position = transform.position;
-            initialMarker.transform.parent = transform.transform.parent;
-            initialPosition = initialMarker.transform;
 
             GameObject finalMarker = new GameObject("Final");
             finalMarker.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-            finalMarker.transform.position = transform.position + (transform.TransformDirection(localSpacePressDirection.normalized).normalized * maxPushDistance);
-            finalMarker.transform.parent = transform.parent;
+
+            Vector3 worldSpacePressDirection = transform.TransformDirection(localSpacePressDirection).normalized;
+
+            if (movingButtonVisuals != null)
+            {
+                initialMarker.transform.position = movingButtonVisuals.transform.position;
+                initialMarker.transform.parent = movingButtonVisuals.transform.parent;
+
+                finalMarker.transform.position = movingButtonVisuals.transform.position + worldSpacePressDirection * maxPushDistance;
+                finalMarker.transform.parent = movingButtonVisuals.transform.parent;
+            }
+            else
+            {
+                initialMarker.transform.position = transform.position;
+                initialMarker.transform.parent = transform.parent;
+
+                finalMarker.transform.position = transform.position + worldSpacePressDirection * maxPushDistance;
+                finalMarker.transform.parent = transform.parent;
+            }
+
+            initialPosition = initialMarker.transform;
             finalPosition = finalMarker.transform;
         }
 
@@ -324,13 +312,15 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
             {
                 initialPosition.parent = null;
                 DestroyImmediate(initialPosition.gameObject);
+                initialPosition = null;
             }
+        }
 
-            if (finalPosition != null)
-            {
-                finalPosition.parent = null;
-                DestroyImmediate(finalPosition.gameObject);
-            }
+        private Vector3 ComputeVisualsLocalPosition(float distance)
+        {
+            Debug.Assert(initialPosition != null);
+            Vector3 dir = (finalPosition.localPosition - initialPosition.localPosition).normalized;
+            return initialPosition.localPosition + dir * distance;
         }
 
         // This function projects the joint position onto the 1D push direction of the button. Then depending on the depth and current state it will return the distance of the joint. It will return false with zeroed outs for invalid interaction cases (Backpressing, Too Far, No Hand Sources) 
@@ -345,84 +335,52 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
             }
 
             Vector3 bestPoint = Vector3.zero;
-            float bestDistance = -1.0f;
+            float bestDistance = float.MinValue;
             float testDistance;
             Vector3 pressPoint;
-            Transform rawHandPoint = null;
-
-            //The buttonSizeRelativeToCollider deals with the parenting problem caused by External Object Targeting
-            //We are evaluating our own collider's volume, which is not the same size as the VisualsCollider.
-            //This controls for it so we can get the correct dimensional data.
-            float size = visualsCollider.bounds.size.z * buttonSizeRelativeToCollider;
 
             for (int i = 0; i < handSources.Count; ++i)
             {
-                handSources[i].TryGetJoint(TrackedHandJoint.IndexTip, out rawHandPoint);
-
-                //This case is to early-out if we have an invalid joint.
-                if (rawHandPoint == null)
+                // This fails on Hololens v2, at least on a build from 2019/01/10
+                if (handSources[i].TryGetJoint(TrackedHandJoint.IndexTip, out MixedRealityPose rawHandPoint))
                 {
-                    bestHandPointOnRay = Vector3.zero;
-                    distance = 0.0f;
-
-                    return false;
-                }
-
-                pressPoint = ProjectPointToVector(initialPosition.position, finalPosition.position, rawHandPoint.position, transform.parent != null, out testDistance);
-                if (testDistance > bestDistance)
-                {
-                    bestDistance = testDistance + size;
-                    bestHandPointOnRay = pressPoint;
+                    pressPoint = ProjectPointToVector(initialPosition.position, finalPosition.position, rawHandPoint.Position, out testDistance);
+                    if (testDistance > bestDistance)
+                    {
+                        bestDistance = testDistance;
+                        bestHandPointOnRay = pressPoint;
+                    }
                 }
             }
 
-            //This case detects Backpresses (when you approach a button from behind)
-            //If we aren't touching, and the current touch distance is further than our push and a bit of the size of the visual box collider.
-            bool negativeDelta = bestDistance - previousJointDistance < 0;
-
-            if (!Touching && (negativeDelta || bestDistance > (currentPushDistance + size / 4)))
-            {
-                //Debug.LogError($"BACKPRESS? tDist: {bestDistance}    curPshDist: {currentPushDistance}     size: {size}             ");
-
-                //If we detect a backpress, this function returns zeroes and false. This results in the button doing nothing. The user must bring their finger in front of the button (and avoid this return case).
-                bestHandPointOnRay = Vector3.zero;
-                distance = 0.0f;
-
-                return false;
-            }
-
-            //If the user is in front of the button, but not farther than the button front plate (-size), we result in no behavior.
-            if (bestDistance < -size)
+            if (bestDistance == float.MinValue)
             {
                 bestHandPointOnRay = Vector3.zero;
                 distance = 0.0f;
-
                 return false;
             }
-
-            //Valid Pressing Case, return best point and distance
+            
             bestHandPointOnRay = bestPoint;
-            distance = bestDistance;// + size / 2;
+            distance = Mathf.Clamp(bestDistance, 0.0f, maxPushDistance); ;
             return true;
         }
 
-        private void HandlePressProgress(float pushDistance)
+        private void HandlePressProgress(float pushDistance, float previousPushDistance)
         {
             //If we aren't in a click and can't start a simple one.
             if (Touching && !Pressing)
             {
-                //Compare to our previous push depth.
-                if (pushDistance >= lastClickDepth + minPressDepth)
+                //Compare to our previous push depth. Use previous push distance to handle back-presses.
+                if (pushDistance >= minPressDepth && previousPushDistance < minPressDepth)
                 {
-                    deepestPressDistance = pushDistance;
                     BeginClick();
                 }
             }
-            // If we're in a click and we can't begin a press (
+            // If we're in a click and we can't begin a press
             else if (Pressing)
             {
-                var amountWithdrawn = deepestPressDistance - pushDistance;
-                if (amountWithdrawn >= withdrawActivationAmount)
+                float releaseThreshold = minPressDepth - withdrawActivationAmount;
+                if (pushDistance <= releaseThreshold && previousPushDistance > releaseThreshold)
                 {
                     CompleteClick(pushDistance);
                 }
@@ -448,10 +406,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
         {
             Touching = false;
             Pressing = false;
-
-            movingButtonVisuals.transform.position = initialPosition.position;
-            deepestPressDistance = 0;
-            lastClickDepth = 0;
 
             if (cachedHandler == null || forceHandlerToUpdate)
             {
@@ -489,8 +443,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
 
             Pressing = false;
 
-            lastClickDepth = Mathf.Clamp(pushDistance, 0.0f, maxPushDistance - minPressDepth);
-
             if (cachedHandler == null || forceHandlerToUpdate)
             {
                 ValidateHandlerTarget();
@@ -514,12 +466,12 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.PressableButtons
             }
         }
 
-        private Vector3 ProjectPointToVector(Vector3 vectorStart, Vector3 vectorEnd, Vector3 point, bool isChild, out float distance)
+        private Vector3 ProjectPointToVector(Vector3 vectorStart, Vector3 vectorEnd, Vector3 point, out float distance)
         {
             Vector3 localPoint = point - vectorStart;
             Vector3 localRay = (vectorEnd - vectorStart).normalized;
             float mag = Vector3.Dot(localPoint, localRay);
-            distance = mag;// * (isChild ? 2.0f : 1.0f);
+            distance = mag;
             return vectorStart + (localRay * mag);
         }
 

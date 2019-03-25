@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Physics
@@ -17,8 +18,19 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Physics
     public class TwoHandMoveLogic
     {
         private static readonly Vector3 offsetPosition = new Vector3(0, -0.2f, 0);
+        private readonly MovementConstraintType movementConstraint;
+
         private float handRefDistance;
         private float objRefDistance;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="movementConstraint"></param>
+        public TwoHandMoveLogic(MovementConstraintType movementConstraint)
+        {
+            this.movementConstraint = movementConstraint;
+        }
 
         /// <summary>
         /// The initial angle between the hand and the object
@@ -28,17 +40,17 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Physics
         private const float NearDistanceScale = 1.0f;
         private const float FarDistanceScale = 2.0f;
 
-        public void Setup(Vector3 startHandPositionMeters, Transform manipulationRoot)
+        public void Setup(Vector3 startHandPositionMeters, Vector3 manipulationObjectPosition)
         {
             var newHandPosition = startHandPositionMeters;
 
             // The pivot is just below and in front of the head.
             var pivotPosition = GetHandPivotPosition();
 
-            objRefDistance = Vector3.Distance(manipulationRoot.position, pivotPosition);
+            objRefDistance = Vector3.Distance(manipulationObjectPosition, pivotPosition);
             handRefDistance = Vector3.Distance(newHandPosition, pivotPosition);
 
-            var objDirection = Vector3.Normalize(manipulationRoot.position - pivotPosition);
+            var objDirection = Vector3.Normalize(manipulationObjectPosition - pivotPosition);
             var handDirection = Vector3.Normalize(newHandPosition - pivotPosition);
 
             // We transform the forward vector of the object, the direction of the object, and the direction of the hand
@@ -50,7 +62,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Physics
             gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
         }
 
-        public Vector3 Update(Vector3 centroid, Vector3 manipulationObjectPosition, bool isNearMode)
+        public Vector3 Update(Vector3 centroid, bool isNearMode)
         {
             float distanceScale = isNearMode ? NearDistanceScale : FarDistanceScale;
 
@@ -65,11 +77,17 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Physics
             var targetDirection = Vector3.Normalize(gazeAngularOffset * newHandDirection);
             targetDirection = CameraCache.Main.transform.TransformDirection(targetDirection);
 
-            // Compute how far away the object should be based on the ratio of the current to original hand distance
-            var currentHandDistance = Vector3.Magnitude(newHandPosition - pivotPosition);
-            var distanceRatio = currentHandDistance / handRefDistance;
-            var distanceOffset = distanceRatio > 0 ? (distanceRatio - 1f) * distanceScale : 0;
-            var targetDistance = objRefDistance + distanceOffset;
+            var targetDistance = objRefDistance;
+
+            if (movementConstraint != MovementConstraintType.FixDistanceFromHead)
+            {
+                // Compute how far away the object should be based on the ratio of the current to original hand distance
+                var currentHandDistance = Vector3.Magnitude(newHandPosition - pivotPosition);
+                var distanceRatio = currentHandDistance / handRefDistance;
+                var distanceOffset = distanceRatio > 0 ? (distanceRatio - 1f) * distanceScale : 0;
+                targetDistance += distanceOffset;
+            }
+
             var newPosition = pivotPosition + (targetDirection * targetDistance);
             var newDistance = Vector3.Distance(newPosition, pivotPosition);
 

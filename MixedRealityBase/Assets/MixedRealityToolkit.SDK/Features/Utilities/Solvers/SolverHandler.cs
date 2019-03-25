@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
+using Microsoft.MixedReality.Toolkit.Core.Devices.Hands;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Services;
 using Microsoft.MixedReality.Toolkit.Core.Utilities;
@@ -11,7 +12,7 @@ using UnityEngine;
 namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
 {
     /// <summary>
-    /// This class handles the solver components that are attached to this <see cref="GameObject"/>
+    /// This class handles the solver components that are attached to this <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see>
     /// </summary>
     public class SolverHandler : ControllerFinder
     {
@@ -265,12 +266,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
 
         public Transform RequestEnableHandJoint(Handedness handedness)
         {
-            if (HandJointService != null)
-            {
-                return HandJointService.RequestJoint(trackedHandJoint, handedness);
-            }
-
-            return null;
+            return HandJointService?.RequestJointTransform(trackedHandJoint, handedness);
         }
 
         private Transform MakeOffsetTransform(Transform parentTransform)

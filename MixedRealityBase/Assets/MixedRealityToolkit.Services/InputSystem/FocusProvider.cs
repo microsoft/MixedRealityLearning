@@ -26,7 +26,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         private readonly HashSet<GameObject> pendingOverallFocusEnterSet = new HashSet<GameObject>();
         private readonly HashSet<GameObject> pendingOverallFocusExitSet = new HashSet<GameObject>();
         private readonly List<PointerData> pendingPointerSpecificFocusChange = new List<PointerData>();
-        private readonly Dictionary<uint, IMixedRealityPointerBehavior> pointerBehaviors = new Dictionary<uint, IMixedRealityPointerBehavior>();
+        private readonly Dictionary<uint, IMixedRealityPointerMediator> pointerMediators = new Dictionary<uint, IMixedRealityPointerMediator>();
 
         #region IFocusProvider Properties
 
@@ -81,9 +81,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         /// <inheritdoc />
         public Camera UIRaycastCamera => uiRaycastCamera;
 
-        /// <inheritdoc />
-        public GameObject OverrideFocusedObject { get; set; }
-
         #endregion IFocusProvider Properties
 
         /// <summary>
@@ -126,7 +123,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         private PointerData gazeProviderPointingData;
 
         /// <summary>
-        /// Cached <see cref="Vector3"/> reference to the new raycast position.
+        /// Cached <see href="https://docs.unity3d.com/ScriptReference/Vector3.html">Vector3</see> reference to the new raycast position.
         /// <remarks>Only used to update UI raycast results.</remarks>
         /// </summary>
         private Vector3 newUiRaycastPosition = Vector3.zero;
@@ -214,6 +211,8 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 focusDetails.Point = hit.point;
                 focusDetails.Normal = hit.normal;
                 focusDetails.RayDistance = rayDistance;
+
+                Debug.Assert(hit.transform != null);
                 focusDetails.Object = hit.transform.gameObject;
                 focusDetails.PointLocalSpace = hit.transform.InverseTransformPoint(hit.point);
                 focusDetails.NormalLocalSpace = hit.transform.InverseTransformDirection(hit.normal);
@@ -234,8 +233,8 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 focusDetails.RayDistance = rayDistance;
                 focusDetails.Normal = hit.normal;
                 focusDetails.Object = result.gameObject;
-                focusDetails.PointLocalSpace = hit.transform.InverseTransformPoint(hit.point);
-                focusDetails.NormalLocalSpace = hit.transform.InverseTransformDirection(hit.normal);
+                focusDetails.PointLocalSpace = result.gameObject.transform.InverseTransformPoint(hit.point);
+                focusDetails.NormalLocalSpace = result.gameObject.transform.InverseTransformDirection(hit.normal);
             }
 
             public void ClearHits()
@@ -277,15 +276,14 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                     pointerWasLocked = true;
                 }
 
-                if(focusDetails.Object != null && focusDetails.Object.transform != null)
+                if (focusDetails.Object != null && focusDetails.Object.transform != null)
                 {
                     // In case the focused object is moving, we need to update the focus point based on the object's new transform.
                     focusDetails.Point = focusDetails.Object.transform.TransformPoint(focusDetails.PointLocalSpace);
                     focusDetails.Normal = focusDetails.Object.transform.TransformDirection(focusDetails.NormalLocalSpace);
                 }
 
-                StartPoint = Pointer.Rays[0].Origin;
-                
+                StartPoint = Pointer.Rays[0].Origin;                
 
                 for (int i = 0; i < Pointer.Rays.Length; i++)
                 {
@@ -383,8 +381,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         /// <inheritdoc />
         public GameObject GetFocusedObject(IMixedRealityPointer pointingSource)
         {
-            if (OverrideFocusedObject != null) { return OverrideFocusedObject; }
-
             if (pointingSource == null)
             {
                 Debug.LogError("No Pointer passed to get focused object");
@@ -500,17 +496,21 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             // If our input source does not have any pointers, then skip.
             if (inputSource.Pointers == null) { return; }
 
-            IMixedRealityPointerBehavior pointerBehavior = null;
+            IMixedRealityPointerMediator mediator = null;
 
-            if (MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.PointerProfile.PointerBehavior.Type != null)
+            if (MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.PointerProfile.PointerMediator.Type != null)
             {
-                pointerBehavior = Activator.CreateInstance(MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.PointerProfile.PointerBehavior.Type) as IMixedRealityPointerBehavior;
+                mediator = Activator.CreateInstance(MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.PointerProfile.PointerMediator.Type) as IMixedRealityPointerMediator;
             }
-
-            if (pointerBehavior != null)
+            
+            if (mediator != null)
             {
-                pointerBehavior.RegisterPointers(inputSource.Pointers);
-                pointerBehaviors.Add(inputSource.SourceId, pointerBehavior);
+                mediator.RegisterPointers(inputSource.Pointers);
+
+                if (!pointerMediators.ContainsKey(inputSource.SourceId))
+                {
+                    pointerMediators.Add(inputSource.SourceId, mediator);
+                }
             }
 
             for (int i = 0; i < inputSource.Pointers.Length; i++)
@@ -560,6 +560,22 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             return true;
         }
 
+        /// <inheritdoc />
+        public IEnumerable<T> GetPointers<T>() where T : class, IMixedRealityPointer
+        {
+            List<T> typePointers = new List<T>();
+            foreach (var pointer in pointers)
+            {
+                T typePointer = pointer.Pointer as T;
+                if (typePointer != null)
+                {
+                    typePointers.Add(typePointer);
+                }
+            }
+
+            return typePointers;
+        }
+
         /// <summary>
         /// Returns the registered PointerData for the provided pointing input source.
         /// </summary>
@@ -587,9 +603,9 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
             int pointerCount = 0;
 
-            foreach (var pointerGroup in pointerBehaviors)
+            foreach (var pointerMediator in pointerMediators)
             {
-                pointerGroup.Value.UpdatePointers();
+                pointerMediator.Value.UpdatePointers();
             }
 
             foreach (var pointer in pointers)
@@ -678,8 +694,17 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             var gazePointer = gazeProviderPointingData?.Pointer as GenericPointer;
             if (gazePointer != null)
             {
-                bool enableGaze = pointers.Count == 1;
-                gazePointer.IsInteractionEnabled = enableGaze;
+                int numFarCursors = 0;
+                foreach (var p in pointers)
+                {
+                    if (p.Pointer != null && p.Pointer.BaseCursor != null && !(p.Pointer is IMixedRealityNearPointer))
+                    {
+                        numFarCursors++;
+                    }
+                }
+                // The gaze cursor's visibility is controlled by IsInteractionEnabled 
+                // Show the gaze cursor if there are no other pointers that are showing a cursor
+                gazePointer.IsInteractionEnabled = numFarCursors == 1;
             }
         }
 
@@ -875,7 +900,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         }
 
         /// <summary>
-        /// Raycasts each graphic <see cref="RayStep"/>
+        /// Raycasts each graphic <see cref="Microsoft.MixedReality.Toolkit.Core.Definitions.Physics.RayStep"/>
         /// </summary>
         /// <param name="pointerData"></param>
         /// <param name="step"></param>
@@ -1033,7 +1058,14 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             // If the input source does not have pointers, then skip.
             if (eventData.InputSource.Pointers == null) { return; }
 
-            pointerBehaviors.Remove(eventData.SourceId);
+            // Let the pointer behavior know that the pointer has been lost
+            IMixedRealityPointerMediator mediator;
+            if (pointerMediators.TryGetValue(eventData.SourceId, out mediator))
+            {
+                mediator.UnregisterPointers(eventData.InputSource.Pointers);
+            }
+
+            pointerMediators.Remove(eventData.SourceId);
 
             for (var i = 0; i < eventData.InputSource.Pointers.Length; i++)
             {

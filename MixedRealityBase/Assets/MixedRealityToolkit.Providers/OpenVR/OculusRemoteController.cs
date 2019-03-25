@@ -5,7 +5,6 @@ using Microsoft.MixedReality.Toolkit.Core.Attributes;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.Providers.OpenVR
@@ -13,7 +12,7 @@ namespace Microsoft.MixedReality.Toolkit.Providers.OpenVR
     [MixedRealityController(
         SupportedControllerType.OculusRemote,
         new[] { Handedness.None },
-        "Resources/Textures/OculusRemoteController")]
+        "StandardAssets/Textures/OculusRemoteController")]
     public class OculusRemoteController : GenericOpenVRController
     {
         /// <summary>

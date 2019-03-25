@@ -110,7 +110,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Providers
 
         /// <inheritdoc />
         public RaycastMode RaycastMode { get; set; } = RaycastMode.Simple;
-
+        
         /// <inheritdoc />
         public float SphereCastRadius { get; set; }
 
@@ -197,7 +197,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Providers
                 return hashCode;
             }
         }
-
 
         #endregion IEquality Implementation
     }

@@ -3,12 +3,10 @@
 
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Physics;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
+using Microsoft.MixedReality.Toolkit.Core.Devices.Hands;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Services;
-using Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.DataProviders;
-using Microsoft.MixedReality.Toolkit.Core.Utilities.Physics;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
@@ -48,6 +46,11 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         /// <inheritdoc />
         public override void OnPreRaycast()
         {
+            if (Rays == null)
+            {
+                Rays = new RayStep[1];
+            }
+
             Vector3 pointerPosition;
             if (TryGetNearGraspPoint(out pointerPosition))
             {
@@ -63,7 +66,8 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                     debugSphere.position = pointerPosition;
                 }
 
-                Rays[0] = new RayStep(pointerPosition, Vector3.forward * SphereCastRadius);
+                Vector3 endPoint = Vector3.forward * SphereCastRadius;
+                Rays[0].UpdateRayStep(ref pointerPosition, ref endPoint);
             }
         }
 
@@ -77,15 +81,14 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             // For now, assume that anything that is a sphere pointer is a hand
             // TODO: have a way to determine if this is a fully articulated hand and return 
             // ray origin if it's a sixdof
-            IMixedRealityHandJointService handJointService = MixedRealityToolkit.Instance.GetService<IMixedRealityHandJointService>();
-            if (handJointService != null && Controller != null && Controller.Visualizer is IMixedRealityHandVisualizer)
+            if (Controller != null && Controller is IMixedRealityHand)
             {
-                Transform index = handJointService.RequestJoint(TrackedHandJoint.IndexTip, Controller.ControllerHandedness);
-                Transform thumb = handJointService.RequestJoint(TrackedHandJoint.ThumbTip, Controller.ControllerHandedness);
+                HandJointUtils.TryGetJointPose(TrackedHandJoint.IndexTip, Controller.ControllerHandedness, out MixedRealityPose index);
+                HandJointUtils.TryGetJointPose(TrackedHandJoint.ThumbTip, Controller.ControllerHandedness, out MixedRealityPose thumb);
                 if (index != null && thumb != null)
                 {
                     // result = 0.5f * (index.position + thumb.position);
-                    result = index.position;
+                    result = index.Position;
                     return true;
                 }
             }
@@ -98,6 +101,39 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             return false;
         }
 
+        /// <inheritdoc />
+        public bool TryGetDistanceToNearestSurface(out float distance)
+        {
+            var focusProvider = MixedRealityToolkit.InputSystem?.FocusProvider;
+            if (focusProvider != null)
+            {
+                FocusDetails focusDetails;
+                if (focusProvider.TryGetFocusDetails(this, out focusDetails))
+                {
+                    distance = focusDetails.RayDistance;
+                }
+            }
+
+            distance = 0.0f;
+            return false;
+        }
+
+        /// <inheritdoc />
+        public bool TryGetNormalToNearestSurface(out Vector3 normal)
+        {
+            var focusProvider = MixedRealityToolkit.InputSystem?.FocusProvider;
+            if (focusProvider != null)
+            {
+                FocusDetails focusDetails;
+                if (focusProvider.TryGetFocusDetails(this, out focusDetails))
+                {
+                    normal = focusDetails.Normal;
+                }
+            }
+
+            normal = Vector3.forward;
+            return false;
+        }
 
         private void OnDestroy()
         {

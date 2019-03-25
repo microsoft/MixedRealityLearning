@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Collections;
+using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
+using Microsoft.MixedReality.Toolkit.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.MixedReality.Toolkit.Core.Extensions;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
@@ -23,7 +23,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         [UnityEditor.CustomEditor(typeof(NearInteractionTouchable))]
         public class Editor : UnityEditor.Editor
         {
-            private readonly Color handleColor = Color.blue;
+            private readonly Color handleColor = Color.white;
             private readonly Color fillColor = new Color(0, 0, 0, 0);
 
             protected virtual void OnSceneGUI()
@@ -34,20 +34,21 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 {
                     UnityEditor.Handles.color = handleColor;
 
-                    float arrowSize = UnityEditor.HandleUtility.GetHandleSize(t.transform.position) * 0.75f;
-                    UnityEditor.Handles.ArrowHandleCap(0, t.transform.position, Quaternion.LookRotation(t.transform.rotation * t.localForward), arrowSize, EventType.Repaint);
+                    Vector3 center = t.transform.TransformPoint(t.localCenter);
 
-                    Vector3 rightDelta = t.transform.localToWorldMatrix.MultiplyVector(t.localRight * t.bounds.x / 2);
+                    float arrowSize = UnityEditor.HandleUtility.GetHandleSize(center) * 0.75f;
+                    UnityEditor.Handles.ArrowHandleCap(0, center, Quaternion.LookRotation(t.transform.rotation * t.localForward), arrowSize, EventType.Repaint);
+
+                    Vector3 rightDelta = t.transform.localToWorldMatrix.MultiplyVector(t.LocalRight * t.bounds.x / 2);
                     Vector3 upDelta = t.transform.localToWorldMatrix.MultiplyVector(t.localUp * t.bounds.y / 2);
 
                     Vector3[] points = new Vector3[4];
-                    points[0] = t.transform.position + rightDelta + upDelta;
-                    points[1] = t.transform.position - rightDelta + upDelta;
-                    points[2] = t.transform.position - rightDelta - upDelta;
-                    points[3] = t.transform.position + rightDelta - upDelta;
+                    points[0] = center + rightDelta + upDelta;
+                    points[1] = center - rightDelta + upDelta;
+                    points[2] = center - rightDelta - upDelta;
+                    points[3] = center + rightDelta - upDelta;
 
                     UnityEditor.Handles.DrawSolidRectangleWithOutline(points, fillColor, handleColor);
-
                 }
             }
 
@@ -56,7 +57,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 base.OnInspectorGUI();
 
                 NearInteractionTouchable t = (NearInteractionTouchable)target;
-
                 RectTransform rt = t.GetComponent<RectTransform>();
                 if (rt != null)
                 {
@@ -85,6 +85,13 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         }
 #endif
 
+        private enum TouchableSurface
+        {
+            BoxCollider,
+            UnityUI,
+            Custom = 100
+        }
+
         public static IReadOnlyCollection<NearInteractionTouchable> Instances { get { return instances.AsReadOnly(); } }
         private static readonly List<NearInteractionTouchable> instances = new List<NearInteractionTouchable>();
 
@@ -100,9 +107,28 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         [SerializeField]
         protected Vector3 localUp = Vector3.up;
 
-        protected Vector3 localRight { get { return Vector3.Cross(localUp, localForward); } }
+        /// <summary>
+        /// Local space object center
+        /// </summary>
+        [SerializeField]
+        protected Vector3 localCenter = Vector3.zero;
 
-        public Vector3 Forward { get { return transform.TransformDirection(localForward); } }
+
+        [SerializeField]
+        private TouchableEventType eventsToReceive = TouchableEventType.Touch;
+
+        /// <summary>
+        /// The type of event to receive.
+        /// </summary>
+        public TouchableEventType EventsToReceive => eventsToReceive;
+
+        [SerializeField]
+        [Tooltip("The type of surface to calculate the touch point on.")]
+        private TouchableSurface touchableSurface = TouchableSurface.BoxCollider;
+
+        protected Vector3 LocalRight => Vector3.Cross(localUp, localForward);
+
+        public Vector3 Forward => transform.TransformDirection(localForward);
 
         /// <summary>
         /// Local space forward direction
@@ -130,12 +156,28 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             // Check initial setup
             if (bounds == Vector2.zero)
             {
-                RectTransform rt = GetComponent<RectTransform>();
-                if (rt != null)
+                if (touchableSurface == TouchableSurface.UnityUI)
                 {
-                    // Initilize bounds to RectTransform SizeDelta
-                    bounds = rt.sizeDelta;
-                    localForward = new Vector3(0, 0, -1);
+                    RectTransform rt = GetComponent<RectTransform>();
+                    if (rt != null)
+                    {
+                        // Initialize bounds to RectTransform SizeDelta
+                        bounds = rt.sizeDelta;
+                        localForward = new Vector3(0, 0, -1);
+                    }
+                }
+            }
+
+            if (touchableSurface == TouchableSurface.BoxCollider)
+            {
+                BoxCollider bc = GetComponent<BoxCollider>();
+                if (bc != null)
+                {
+                    float x = Vector3.Project(bc.size, LocalRight).magnitude;
+                    float y = Vector3.Project(bc.size, localUp).magnitude;
+
+                    bounds = new Vector2(x, y);
+                    localCenter = bc.center + Vector3.Scale(bc.size / 2.0f, localForward);
                 }
             }
 
@@ -148,7 +190,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
         public virtual float DistanceToSurface(Vector3 samplePoint)
         {
-            Vector3 localPoint = transform.InverseTransformPoint(samplePoint);
+            Vector3 localPoint = transform.InverseTransformPoint(samplePoint) - localCenter;
 
             // Get point on plane
             Plane plane = new Plane(localForward, Vector3.zero);
@@ -156,7 +198,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
             // Get plane coordinates
             Vector2 planeSpacePoint = new Vector2(
-                Vector3.Dot(pointOnPlane, localRight),
+                Vector3.Dot(pointOnPlane, LocalRight),
                 Vector3.Dot(pointOnPlane, localUp));
 
             // Clamp to bounds
@@ -165,7 +207,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 Mathf.Clamp(planeSpacePoint.y, -bounds.y / 2, bounds.y / 2));
 
             // Convert back to 3D space
-            Vector3 clampedPoint = transform.TransformPoint(localRight * planeSpacePoint.x + localUp * planeSpacePoint.y);
+            Vector3 clampedPoint = transform.TransformPoint((LocalRight * planeSpacePoint.x) + (localUp * planeSpacePoint.y) + localCenter);
 
             return (samplePoint - clampedPoint).magnitude;
         }

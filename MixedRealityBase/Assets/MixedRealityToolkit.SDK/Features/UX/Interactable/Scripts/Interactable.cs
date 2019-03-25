@@ -19,7 +19,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Interactable
 {
     /// <summary>
     /// Uses input and action data to declare a set of states
-    /// Maintains a collection of themes that react to state changes and provide scensory feedback
+    /// Maintains a collection of themes that react to state changes and provide sensory feedback
     /// Passes state information and input data on to receivers that detect patterns and does stuff.
     /// </summary>
 
@@ -30,7 +30,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Interactable
 
     [System.Serializable]
 
-    public class Interactable : MonoBehaviour, IMixedRealityFocusHandler, IMixedRealityInputHandler, IMixedRealityPointerHandler, IMixedRealitySpeechHandler, IMixedRealityHandTrackHandler
+    public class Interactable : MonoBehaviour, IMixedRealityFocusHandler, IMixedRealityInputHandler, IMixedRealityPointerHandler, IMixedRealitySpeechHandler, IMixedRealityTouchHandler
     {
         /// <summary>
         /// Setup the input system
@@ -1072,29 +1072,18 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Interactable
 
         #endregion VoiceCommands
 
-        public void OnTouchStarted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchStarted(HandTrackingInputEventData eventData)
         {
             SetPress(true);
             eventData.Use();
         }
 
-        public void OnTouchUpdated(HandTrackingInputEventData eventData)
-        {
-        }
-        public void OnTouchCompleted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
         {
             SetPress(false);
             eventData.Use();
         }
 
-        public void OnHandPressTriggered()
-        {
-
-        }
-
-        public void OnHandPressCompleted()
-        {
-
-        }
+        void IMixedRealityTouchHandler.OnTouchUpdated(HandTrackingInputEventData eventData) { }
     }
 }

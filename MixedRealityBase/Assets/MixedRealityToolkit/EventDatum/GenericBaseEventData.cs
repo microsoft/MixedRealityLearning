@@ -18,17 +18,14 @@ namespace Microsoft.MixedReality.Toolkit.Core.EventDatum
         public IMixedRealityEventSource EventSource { get; private set; }
 
         /// <summary>
-        /// The time at which the event occurred.
+        /// The UTC time at which the event occurred.
         /// </summary>
-        /// <remarks>
-        /// The value will be in the device's configured time zone.
-        /// </remarks>
         public DateTime EventTime { get; private set; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="eventSystem">Usually <see cref="EventSystem.current"/></param>
+        /// <param name="eventSystem">Usually <see href="https://docs.unity3d.com/ScriptReference/EventSystems.EventSystem-current.html">EventSystems.EventSystem.current</see></param>
         public GenericBaseEventData(EventSystem eventSystem) : base(eventSystem) { }
 
         /// <summary>
@@ -38,7 +35,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.EventDatum
         protected void BaseInitialize(IMixedRealityEventSource eventSource)
         {
             Reset();
-            EventTime = DateTime.Now;
+            EventTime = DateTime.UtcNow;
             EventSource = eventSource;
         }
     }

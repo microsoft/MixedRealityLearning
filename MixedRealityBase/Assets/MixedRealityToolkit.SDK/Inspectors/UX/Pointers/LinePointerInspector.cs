@@ -14,10 +14,17 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.UX.Pointers
         private SerializedProperty lineColorInvalid;
         private SerializedProperty lineColorNoTarget;
         private SerializedProperty lineColorLockFocus;
+        private SerializedProperty useContextSpecificRenderers;
+        private SerializedProperty lineRendererSelected;
+        private SerializedProperty lineRendererValid;
+        private SerializedProperty lineRendererInvalid;
+        private SerializedProperty lineRendererNoTarget;
+        private SerializedProperty lineRendererLockFocus;
         private SerializedProperty lineCastResolution;
         private SerializedProperty lineRenderers;
 
         private bool linePointerFoldout = true;
+        private const int maxRecommendedLinecastResolution = 20;
 
         protected override void OnEnable()
         {
@@ -28,6 +35,15 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.UX.Pointers
             lineColorInvalid = serializedObject.FindProperty("LineColorInvalid");
             lineColorNoTarget = serializedObject.FindProperty("LineColorNoTarget");
             lineColorLockFocus = serializedObject.FindProperty("LineColorLockFocus");
+
+            useContextSpecificRenderers = serializedObject.FindProperty("useContextSpecificRenderers");
+
+            lineRendererSelected = serializedObject.FindProperty("lineRendererSelected");
+            lineRendererValid = serializedObject.FindProperty("lineRendererValid");
+            lineRendererInvalid = serializedObject.FindProperty("lineRendererInvalid");
+            lineRendererNoTarget = serializedObject.FindProperty("lineRendererNoTarget");
+            lineRendererLockFocus = serializedObject.FindProperty("lineRendererLockFocus");
+
             lineCastResolution = serializedObject.FindProperty("LineCastResolution");
             lineRenderers = serializedObject.FindProperty("lineRenderers");
         }
@@ -42,12 +58,31 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.UX.Pointers
             if (linePointerFoldout)
             {
                 EditorGUI.indentLevel++;
+
+                int lineCastResolutionValue = lineCastResolution.intValue;
+                if (lineCastResolutionValue > maxRecommendedLinecastResolution)
+                {
+                    EditorGUILayout.LabelField("Note: values above " + maxRecommendedLinecastResolution + " should only be used when your line is expected to be highly non-uniform.", EditorStyles.miniLabel);
+                }
+
+                EditorGUILayout.PropertyField(lineCastResolution);
                 EditorGUILayout.PropertyField(lineColorSelected);
                 EditorGUILayout.PropertyField(lineColorValid);
                 EditorGUILayout.PropertyField(lineColorInvalid);
                 EditorGUILayout.PropertyField(lineColorNoTarget);
                 EditorGUILayout.PropertyField(lineColorLockFocus);
-                EditorGUILayout.PropertyField(lineCastResolution);
+
+                EditorGUILayout.PropertyField(useContextSpecificRenderers);
+
+                if (useContextSpecificRenderers.boolValue)
+                {
+                    EditorGUILayout.PropertyField(lineRendererSelected);
+                    EditorGUILayout.PropertyField(lineRendererValid);
+                    EditorGUILayout.PropertyField(lineRendererInvalid);
+                    EditorGUILayout.PropertyField(lineRendererNoTarget);
+                    EditorGUILayout.PropertyField(lineRendererLockFocus);
+                }
+
                 EditorGUILayout.PropertyField(lineRenderers, true);
                 EditorGUI.indentLevel--;
             }

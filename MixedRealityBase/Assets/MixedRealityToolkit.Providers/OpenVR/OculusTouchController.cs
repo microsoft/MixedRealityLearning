@@ -6,7 +6,6 @@ using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.Providers.OpenVR
@@ -14,7 +13,7 @@ namespace Microsoft.MixedReality.Toolkit.Providers.OpenVR
     [MixedRealityController(
         SupportedControllerType.OculusTouch,
         new[] { Handedness.Left, Handedness.Right },
-        "Resources/Textures/OculusControllersTouch")]
+        "StandardAssets/Textures/OculusControllersTouch")]
     public class OculusTouchController : GenericOpenVRController
     {
         /// <summary>

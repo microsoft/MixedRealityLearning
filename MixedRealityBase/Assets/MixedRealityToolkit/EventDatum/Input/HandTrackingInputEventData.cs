@@ -9,33 +9,8 @@ using UnityEngine.EventSystems;
 
 namespace Microsoft.MixedReality.Toolkit.Core.EventDatum.Input
 {
-    public class HandTrackingInputEventData : InputEventData
+    public class HandTrackingInputEventData : InputEventData<Vector3>
     {
-        /// <summary>
-        /// This property describes whether the Hand described by the HandTrackingInputSource
-        /// is currently grabbing.
-        /// </summary>
-        public bool IsHandGrabbing { get; private set; }
-
-        /// <summary>
-        /// This property describes whether the Hand described by the HandTrackingInputSource
-        /// is currently touching an object or any of its children.
-        /// </summary>
-        public bool IsHandTouching { get; private set; }
-
-        /// <summary>
-        /// This property describes the global position the Hand described by the HandTrackingInputSource
-        /// is currently grabbing.
-        /// </summary>
-        public Vector3 ActionPoint { get; private set; }
-
-        /// <summary>
-        /// Returns the ray corresponding to distant interaction for the hand.
-        /// </summary>
-        public Ray HandRay { get; private set; }
-
-        public GameObject TouchedObject { get; set; }
-
         /// <summary>
         /// Constructor creates a default EventData object.
         /// Requires initialization.
@@ -54,15 +29,10 @@ namespace Microsoft.MixedReality.Toolkit.Core.EventDatum.Input
         /// <param name="pressing">This is a the state (pressing or not pressing) of the HandTrackingInputSource that created the EventData</param>
         /// <param name="actionPoint">This is a the global position grabbed by the HandTrackingInputSource that created the EventData</param>
         /// <param name="touchedObject">This is a the global position of the HandTrackingInputSource that created the EventData</param>
-        public void Initialize(IMixedRealityInputSource inputSource, IMixedRealityController controller, bool grabbing, bool pressing, Vector3 actionPoint, GameObject touchedObject, Ray handRay)
+        public void Initialize(IMixedRealityInputSource inputSource, IMixedRealityController controller, Handedness sourceHandedness, Vector3 touchPoint)
         {
-            Initialize(inputSource, Definitions.InputSystem.MixedRealityInputAction.None);
+            Initialize(inputSource, Definitions.InputSystem.MixedRealityInputAction.None, touchPoint);
             Controller = controller;
-            IsHandGrabbing = grabbing;
-            IsHandTouching = pressing;
-            ActionPoint = actionPoint;
-            TouchedObject = touchedObject;
-            HandRay = handRay;
         }
     }
 }

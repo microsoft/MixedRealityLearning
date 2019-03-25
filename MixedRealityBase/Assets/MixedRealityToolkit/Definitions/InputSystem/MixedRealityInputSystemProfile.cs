@@ -194,19 +194,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
         }
 
         [SerializeField]
-        [Tooltip("Enable and configure hand tracking.")]
-        private bool enableHandTracking = false;
-
-        /// <summary>
-        /// Enable and configure the devices for your application.
-        /// </summary>
-        public bool IsHandTrackingEnabled
-        {
-            get { return handTrackingProfile != null && enableHandTracking; }
-            private set { enableHandTracking = value; }
-        }
-
-        [SerializeField]
         [Tooltip("Profile for configuring Hands tracking.")]
         private MixedRealityHandTrackingProfile handTrackingProfile;
 

@@ -10,17 +10,17 @@ using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
 using Microsoft.MixedReality.Toolkit.Core.Providers;
+using Microsoft.MixedReality.Toolkit.Core.Services;
 using Microsoft.MixedReality.Toolkit.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Microsoft.MixedReality.Toolkit.Core.Services;
 
 namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 {
     /// <summary>
-    /// The Mixed Reality Toolkit's specific implementation of the <see cref="IMixedRealityInputSystem"/>
+    /// The Mixed Reality Toolkit's specific implementation of the <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.IMixedRealityInputSystem"/>
     /// </summary>
     public class MixedRealityInputSystem : BaseEventSystem, IMixedRealityInputSystem
     {
@@ -74,6 +74,8 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
         private SpeechEventData speechEventData;
         private DictationEventData dictationEventData;
+
+        private HandTrackingInputEventData handTrackingInputEventData;
 
         private MixedRealityInputActionRulesProfile CurrentInputActionRulesProfile { get; set; }
 
@@ -167,6 +169,8 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
             speechEventData = new SpeechEventData(EventSystem.current);
             dictationEventData = new DictationEventData(EventSystem.current);
+
+            handTrackingInputEventData = new HandTrackingInputEventData(EventSystem.current);
         }
 
         /// <inheritdoc />
@@ -209,7 +213,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         public override void HandleEvent<T>(BaseEventData eventData, ExecuteEvents.EventFunction<T> eventHandler)
         {
             Debug.Assert(eventData != null);
-            Debug.Assert(!(eventData is  MixedRealityPointerEventData), "HandleEvent called with a pointer event. All events raised by pointer should call HandlePointerEvent");
+            Debug.Assert(!(eventData is MixedRealityPointerEventData), "HandleEvent called with a pointer event. All events raised by pointer should call HandlePointerEvent");
 
             if (disabledRefCount > 0)
             {
@@ -218,7 +222,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
             var baseInputEventData = ExecuteEvents.ValidateEventData<BaseInputEventData>(eventData);
             DispatchEventToGlobalListeners(baseInputEventData, eventHandler);
-            
+
             if (baseInputEventData.used)
             {
                 // All global listeners get a chance to see the event,
@@ -241,7 +245,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 DispatchEventToFallbackHandlers(baseInputEventData, eventHandler);
             }
         }
-        
+
         /// <summary>
         /// Handles a pointer event
         /// Assumption: We only send pointer events to the objects that pointers are focusing, except for global event listeners (which listen to everything)
@@ -269,7 +273,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
             Debug.Assert(pointerEventData.Pointer != null, "Trying to dispatch event on pointer but pointerEventData is null");
 
-            DispatchEventToObjectFocusedByPointer(pointerEventData.Pointer, baseInputEventData, false, eventHandler);                
+            DispatchEventToObjectFocusedByPointer(pointerEventData.Pointer, baseInputEventData, false, eventHandler);
 
             if (!baseInputEventData.used)
             {
@@ -288,7 +292,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             Debug.Assert(baseInputEventData.InputSource != null, $"Failed to find an input source for {baseInputEventData}");
 
             // Send the event to global listeners
-            base.HandleEvent(baseInputEventData, eventHandler);            
+            base.HandleEvent(baseInputEventData, eventHandler);
         }
 
         private void DispatchEventToFallbackHandlers<T>(BaseInputEventData baseInputEventData, ExecuteEvents.EventFunction<T> eventHandler) where T : IEventSystemHandler
@@ -301,12 +305,12 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             }
         }
 
-        
+
         /// <summary>
         /// Dispatch an input event to the object focused by the given IMixedRealityPointer.
         /// If a modal dialog is active, dispatch the pointer event to that modal dialog
         /// Returns true if the event was handled by a modal handler
-        private bool DispatchEventToObjectFocusedByPointer<T>(IMixedRealityPointer mixedRealityPointer, BaseInputEventData baseInputEventData, 
+        private bool DispatchEventToObjectFocusedByPointer<T>(IMixedRealityPointer mixedRealityPointer, BaseInputEventData baseInputEventData,
             bool modalEventHandled, ExecuteEvents.EventFunction<T> eventHandler) where T : IEventSystemHandler
         {
             GameObject focusedObject = FocusProvider?.GetFocusedObject(mixedRealityPointer);
@@ -350,9 +354,9 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         }
 
         /// <summary>
-        /// Register a <see cref="GameObject"/> to listen to events that will receive all input events, regardless
-        /// of which other <see cref="GameObject"/>s might have handled the event beforehand.
-        /// <remarks>Useful for listening to events when the <see cref="GameObject"/> is currently not being raycasted against by the <see cref="FocusProvider"/>.</remarks>
+        /// Register a <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see> to listen to events that will receive all input events, regardless
+        /// of which other <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see>s might have handled the event beforehand.
+        /// <remarks>Useful for listening to events when the <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see> is currently not being raycasted against by the <see cref="FocusProvider"/>.</remarks>
         /// </summary>
         /// <param name="listener">Listener to add.</param>
         public override void Register(GameObject listener)
@@ -361,7 +365,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         }
 
         /// <summary>
-        /// Unregister a <see cref="GameObject"/> from listening to input events.
+        /// Unregister a <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see> from listening to input events.
         /// </summary>
         /// <param name="listener"></param>
         public override void Unregister(GameObject listener)
@@ -1462,6 +1466,59 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
             // Pass handler through HandleEvent to perform modal/fallback logic
             HandleEvent(handMeshInputEventData, OnHandMeshUpdatedEventHandler);
+        }
+
+        private static readonly ExecuteEvents.EventFunction<IMixedRealityTouchHandler> OnTouchStartedEventHandler =
+            delegate (IMixedRealityTouchHandler handler, BaseEventData eventData)
+            {
+                var casted = ExecuteEvents.ValidateEventData<HandTrackingInputEventData>(eventData);
+                handler.OnTouchStarted(casted);
+            };
+
+        /// <inheritdoc />
+        public void RaiseOnTouchStarted(IMixedRealityInputSource source, IMixedRealityController controller, Handedness handedness, Vector3 touchPoint)
+        {
+            // Create input event
+            handTrackingInputEventData.Initialize(source, controller, handedness, touchPoint);
+
+            // Pass handler through HandleEvent to perform modal/fallback logic
+            HandleEvent(handTrackingInputEventData, OnTouchStartedEventHandler);
+        }
+
+        private static readonly ExecuteEvents.EventFunction<IMixedRealityTouchHandler> OnTouchCompletedEventHandler =
+            delegate (IMixedRealityTouchHandler handler, BaseEventData eventData)
+            {
+                var casted = ExecuteEvents.ValidateEventData<HandTrackingInputEventData>(eventData);
+                handler.OnTouchCompleted(casted);
+            };
+
+
+        /// <inheritdoc />
+        public void RaiseOnTouchCompleted(IMixedRealityInputSource source, IMixedRealityController controller, Handedness handedness, Vector3 touchPoint)
+        {
+            // Create input event
+            handTrackingInputEventData.Initialize(source, controller, handedness, touchPoint);
+
+            // Pass handler through HandleEvent to perform modal/fallback logic
+            HandleEvent(handTrackingInputEventData, OnTouchCompletedEventHandler);
+        }
+
+        private static readonly ExecuteEvents.EventFunction<IMixedRealityTouchHandler> OnTouchUpdatedEventHandler =
+            delegate (IMixedRealityTouchHandler handler, BaseEventData eventData)
+            {
+                var casted = ExecuteEvents.ValidateEventData<HandTrackingInputEventData>(eventData);
+                handler.OnTouchUpdated(casted);
+            };
+
+
+        /// <inheritdoc />
+        public void RaiseOnTouchUpdated(IMixedRealityInputSource source, IMixedRealityController controller, Handedness handedness, Vector3 touchPoint)
+        {
+            // Create input event
+            handTrackingInputEventData.Initialize(source, controller, handedness, touchPoint);
+
+            // Pass handler through HandleEvent to perform modal/fallback logic
+            HandleEvent(handTrackingInputEventData, OnTouchUpdatedEventHandler);
         }
 
         #endregion Hand Events

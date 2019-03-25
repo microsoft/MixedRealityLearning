@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
+using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.TeleportSystem;
 using Microsoft.MixedReality.Toolkit.Core.Services;
 using Microsoft.MixedReality.Toolkit.SDK.UX.Pointers;
@@ -11,7 +12,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Input.Handlers
 {
     /// <summary>
     /// SDK component handling teleportation to a specific position &amp; orientation when a user focuses
-    /// this <see cref="GameObject"/> and triggers the teleport action.
+    /// this <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see> and triggers the teleport action.
     /// </summary>
     public class TeleportHotSpot : BaseFocusHandler, IMixedRealityTeleportHotSpot
     {
@@ -24,11 +25,16 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Input.Handlers
 
             if (!(eventData.Pointer is TeleportPointer)) { return; }
 
+            IMixedRealityTeleportPointer teleportPointer = eventData.Pointer as IMixedRealityTeleportPointer;
+
+            if (teleportPointer == null)
+                return;
+
             if (eventData.NewFocusedObject == gameObject)
             {
-                eventData.Pointer.TeleportHotSpot = this;
+                teleportPointer.TeleportHotSpot = this;
 
-                if (eventData.Pointer.IsInteractionEnabled)
+                if (teleportPointer.IsInteractionEnabled)
                 {
                     MixedRealityToolkit.TeleportSystem?.RaiseTeleportCanceled(eventData.Pointer, this);
                     MixedRealityToolkit.TeleportSystem?.RaiseTeleportRequest(eventData.Pointer, this);
@@ -36,9 +42,9 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Input.Handlers
             }
             else if (eventData.OldFocusedObject == gameObject)
             {
-                eventData.Pointer.TeleportHotSpot = null;
+                teleportPointer.TeleportHotSpot = null;
 
-                if (eventData.Pointer.IsInteractionEnabled)
+                if (teleportPointer.IsInteractionEnabled)
                 {
                     MixedRealityToolkit.TeleportSystem?.RaiseTeleportCanceled(eventData.Pointer, this);
                 }

@@ -31,5 +31,25 @@ namespace Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem
         /// <param name="rotation">Out parameter filled with the grasp position if available, otherwise <see cref="Vector3.zero"/>.</param>
         /// <returns>True if a grasp point was retrieved, false if not.</returns>
         bool TryGetNearGraspPoint(out Vector3 position);
+
+        /// <summary>
+        /// Near pointers often interact with surfaces.
+        /// 
+        /// This method provides a mechanism to get the distance to the closest surface the near pointer is interacting with.
+        /// 
+        /// </summary>
+        /// <param name="distance">Out parameter filled with the distance along the surface normal from the surface to the pointer if available, otherwise 0.0f.</param>
+        /// <returns>True if a distance was retrieved, false if not.</returns>
+        bool TryGetDistanceToNearestSurface(out float distance);
+
+        /// <summary>
+        /// Near pointers often interact with surfaces.
+        /// 
+        /// This method provides a mechanism to get the normal of the closest surface the near pointer is interacting with.
+        /// 
+        /// </summary>
+        /// <param name="normal">Out parameter filled with the surface normal if available, otherwise <see cref="Vector3.zero"</param>
+        /// <returns>True if a normal was retrieved, false if not.</returns>
+        bool TryGetNormalToNearestSurface(out Vector3 normal);
     }
 }

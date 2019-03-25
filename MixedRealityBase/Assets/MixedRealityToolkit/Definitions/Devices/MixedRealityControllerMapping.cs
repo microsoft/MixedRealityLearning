@@ -155,12 +155,11 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Devices
         /// Synchronizes the Input Actions of the same physical controller of a different concrete type.
         /// </summary>
         /// <param name="otherControllerMapping"></param>
-        internal void SynchronizeInputActions(MixedRealityInteractionMapping[] otherControllerMapping)
+        internal void SynchronizeInputActions(MixedRealityInteractionMapping[] otherControllerMapping) 
         {
             if (otherControllerMapping.Length != interactions.Length)
             {
-                Debug.LogError("Controller Input Actions must be the same length!");
-                return;
+                throw new ArgumentException($"otherControllerMapping length {otherControllerMapping.Length} does not match this length {interactions.Length}.");
             }
 
             for (int i = 0; i < interactions.Length; i++)

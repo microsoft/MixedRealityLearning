@@ -14,7 +14,7 @@ using UnityEngine.EventSystems;
 namespace Microsoft.MixedReality.Toolkit.Services.SpatialAwarenessSystem
 {
     /// <summary>
-    /// Class providing the default implementation of the <see cref="IMixedRealitySpatialAwarenessSystem"/> interface.
+    /// Class providing the default implementation of the <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.SpatialAwarenessSystem.IMixedRealitySpatialAwarenessSystem"/> interface.
     /// </summary>
     public class MixedRealitySpatialAwarenessSystem : BaseEventSystem, IMixedRealitySpatialAwarenessSystem
     {
@@ -70,7 +70,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.SpatialAwarenessSystem
         public override void Reset()
         {
             base.Reset();
-            // todo: base Reset should likly call Disable, then Initialize
+            // todo: base Reset should likely call Disable, then Initialize
             InitializeInternal();
         }
 
@@ -118,7 +118,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.SpatialAwarenessSystem
         /// Creates the parent for spatial awareness objects so that the scene hierarchy does not get overly cluttered.
         /// </summary>
         /// <returns>
-        /// The <see cref="GameObject"/> to which spatial awareness created objects will be parented.
+        /// The <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see> to which spatial awareness created objects will be parented.
         /// </returns>
         private GameObject CreateSpatialAwarenessParent => new GameObject("Spatial Awareness System");
 
@@ -147,19 +147,19 @@ namespace Microsoft.MixedReality.Toolkit.Services.SpatialAwarenessSystem
         }
         
         /// <inheritdoc />
-        public IReadOnlyList<IMixedRealitySpatialAwarenessObserver> GetObservers<T>() where T : IMixedRealitySpatialAwarenessObserver
+        public IReadOnlyList<T> GetObservers<T>() where T : IMixedRealitySpatialAwarenessObserver
         {
-            List<IMixedRealitySpatialAwarenessObserver> selected = new List<IMixedRealitySpatialAwarenessObserver>();
+            List<T> selected = new List<T>();
 
             for (int i = 0; i < observers.Count; i++)
             {
                 if (observers[i] is T)
                 {
-                    selected.Add(observers[i]);
+                    selected.Add((T)observers[i]);
                 }
             }
 
-            return selected as IReadOnlyList<IMixedRealitySpatialAwarenessObserver>;
+            return selected;
         }
 
         /// <inheritdoc />
@@ -177,17 +177,17 @@ namespace Microsoft.MixedReality.Toolkit.Services.SpatialAwarenessSystem
         }
 
         /// <inheritdoc />
-        public IMixedRealitySpatialAwarenessObserver GetObserver<T>(string name) where T : IMixedRealitySpatialAwarenessObserver
+        public T GetObserver<T>(string name) where T : IMixedRealitySpatialAwarenessObserver
         {
             for (int i = 0; i < observers.Count; i++)
             {
                 if ((observers[i] is T) && (observers[i].Name == name))
                 {
-                    return observers[i];
+                    return (T)observers[i];
                 }
             }
 
-            return null;
+            return default(T);
         }
 
         /// <inheritdoc />

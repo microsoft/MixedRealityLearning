@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Microsoft.MixedReality.Toolkit.Core.Attributes;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities.Editor;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Utilities.Editor.Setup;
 using UnityEditor;
 using UnityEngine;
@@ -277,7 +276,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Devices
                 }
             }
 
-            return GetControllerTextureInternal("Resources/Textures/Generic_controller", Handedness.None, suffix);
+            return GetControllerTextureInternal("StandardAssets/Textures/Generic_controller", Handedness.None, suffix);
         }
 
         private static Texture2D GetControllerTextureInternal(string relativeTexturePath, Handedness handedness, string suffix)
