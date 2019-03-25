@@ -3,6 +3,7 @@
 
 using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Physics;
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Services;
 using Microsoft.MixedReality.Toolkit.Core.Utilities.Physics;
@@ -49,16 +50,12 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             get { return (closestProximityTouchable != null); }
         }
 
-        public override void OnPreRaycast()
+        public override void OnPreSceneQuery()
         {
             if (Rays == null)
             {
                 Rays = new RayStep[1];
             }
-
-            // Get pointer position
-            Vector3 pointerPosition;
-            TryGetPointerPosition(out pointerPosition);
 
             // Check proximity
             closestProximityTouchable = null;
@@ -66,7 +63,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                 float closestDist = distFront; // NOTE: Start at distFront for cutoff
                 foreach (var prox in NearInteractionTouchable.Instances)
                 {
-                    float dist = prox.DistanceToSurface(pointerPosition);
+                    float dist = prox.DistanceToSurface(Position);
                     if (dist < closestDist)
                     {
                         closestNormal = prox.Forward;
@@ -76,19 +73,19 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                 }
                 closestDistance = closestDist;
             }
-            SetActive(IsNearObject);
+            IsActive = IsNearObject;
             visuals.SetActive(IsNearObject);
 
             // Determine ray direction
-            Vector3 rayDirection = PointerDirection;
+            Vector3 rayDirection = Rotation * Vector3.forward;
             if (closestProximityTouchable != null)
             {
                 rayDirection = -closestProximityTouchable.Forward;
             }
 
             // Build ray (poke from in front to the back of the pointer position)
-            Vector3 start = pointerPosition - distBack * rayDirection;
-            Vector3 end = pointerPosition + distFront * rayDirection;
+            Vector3 start = Position - distBack * rayDirection;
+            Vector3 end = Position + distFront * rayDirection;
             Rays[0].UpdateRayStep(ref start, ref end);
 
             // Check if we are about to leave the currently focused object.
@@ -103,35 +100,29 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
 
                     // We need to raise the event now, since the pointer's focused object will change after we leave this function.
                     // This will make sure the correct object receives the Leave event.
-                    TryRaisePokeUp(pointerPosition);
+                    TryRaisePokeUp(Position);
                 }
             }
 
-            line.SetPosition(0, pointerPosition);
+            line.SetPosition(0, Position);
             line.SetPosition(1, end);
         }
 
-        public override void OnPostRaycast()
+        public override void OnPostSceneQuery()
         {
             if (Result?.CurrentPointerTarget != null)
             {
-                Vector3 touchPosition;
-                if (!TryGetPointerPosition(out touchPosition))
-                {
-                    touchPosition = Result.Details.Point;
-                }
-
                 float dist = Vector3.Distance(Result.StartPoint, Result.Details.Point) - distBack;
                 bool newIsDown = (dist < debounceThreshold);
 
                 // Send events
                 if (newIsDown)
                 {
-                    TryRaisePokeDown(Result.CurrentPointerTarget, touchPosition);
+                    TryRaisePokeDown(Result.CurrentPointerTarget, Position);
                 }
                 else
                 {
-                    TryRaisePokeUp(touchPosition);
+                    TryRaisePokeUp(Position);
                 }
             }
 

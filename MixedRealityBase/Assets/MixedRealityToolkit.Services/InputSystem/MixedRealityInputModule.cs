@@ -105,7 +105,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 if (pointersToUpdate[i].IsInteractionEnabled
                     && pointersToUpdate[i].Rays != null
                     && pointersToUpdate[i].Rays.Length > 0
-                    && pointersToUpdate[i].RaycastMode == Core.Definitions.Physics.RaycastMode.Simple)
+                    && pointersToUpdate[i].SceneQueryType == Core.Definitions.Physics.SceneQueryType.SimpleRaycast)
                 {
                     ProcessPointerEvent(pointersToUpdate[i]);
                 }

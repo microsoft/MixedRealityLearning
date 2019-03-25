@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
@@ -78,19 +79,16 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         }
 
         /// <inheritdoc />
-        public override void OnPreRaycast()
+        public override void OnPreSceneQuery()
         {
             transform.position = CameraCache.Main.transform.position;
 
-            Ray pointingRay;
-            if (TryGetPointingRay(out pointingRay))
-            {
-                Rays[0].CopyRay(pointingRay, PointerExtent);
+            Ray ray = new Ray(Position, Rotation * Vector3.forward);
+            Rays[0].CopyRay(ray, PointerExtent);
 
-                if (MixedRealityRaycaster.DebugEnabled)
-                {
-                    Debug.DrawRay(pointingRay.origin, pointingRay.direction * PointerExtent, Color.green);
-                }
+            if (MixedRealityRaycaster.DebugEnabled)
+            {
+                Debug.DrawRay(ray.origin, ray.direction * PointerExtent, Color.green);
             }
         }
 

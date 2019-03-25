@@ -239,7 +239,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Cursors
         private void TranslateToFinger(Transform target, float deltaTime, Vector3 fingerPosition, Quaternion fingerRoation, bool useFingerPad)
         {
             Vector3 targetPosition = (useFingerPad) ? fingerPosition + (fingerRoation * -Vector3.up) * skinSurfaceOffset :
-                                                      fingerPosition + (fingerRoation * -Vector3.forward) * skinSurfaceOffset;
+                                                      fingerPosition + (fingerRoation * Vector3.forward) * skinSurfaceOffset;
             target.position = Vector3.Lerp(target.position, targetPosition, deltaTime / PositionLerpTime);
         }
 

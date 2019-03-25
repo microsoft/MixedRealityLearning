@@ -143,9 +143,12 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Input.Handlers
         /// <inheritdoc />
         public virtual void OnSourcePoseChanged(SourcePoseEventData<MixedRealityPose> eventData)
         {
-            if (eventData.SourceId == Controller?.InputSource.SourceId)
+            if (eventData.SourceId == Controller?.InputSource.SourceId && UseSourcePoseData)
             {
-                if (UseSourcePoseData && TrackingState == TrackingState.Tracked)
+                TrackingState = eventData.Controller.TrackingState;
+                IsTracked = TrackingState == TrackingState.Tracked;
+
+                if (IsTracked)
                 {
                     transform.position = eventData.SourceData.Position;
                     transform.rotation = eventData.SourceData.Rotation;

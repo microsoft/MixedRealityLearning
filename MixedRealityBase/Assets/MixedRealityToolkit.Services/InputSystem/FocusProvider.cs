@@ -639,7 +639,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             // Call the pointer's OnPreRaycast function
             // This will give it a chance to prepare itself for raycasts
             // eg, by building its Rays array
-            pointer.Pointer.OnPreRaycast();
+            pointer.Pointer.OnPreSceneQuery();
 
             // If pointer interaction isn't enabled, clear its result object and return
             if (!pointer.Pointer.IsInteractionEnabled)
@@ -662,7 +662,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                     pointer.ClearHits();
 
                     // Perform raycast to determine focused object
-                    RaycastPhysics(pointer, prioritizedLayerMasks);
+                    QueryScene(pointer, prioritizedLayerMasks);
 
                     // If we have a unity event system, perform graphics raycasts as well to support Unity UI interactions
                     if (EventSystem.current != null)
@@ -680,10 +680,10 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 }
             }
 
-            // Call the pointer's OnPostRaycast function
+            // Call the pointer's OnPostSceneQuery function
             // This will give it a chance to respond to raycast results
             // eg by updating its appearance
-            pointer.Pointer.OnPostRaycast();
+            pointer.Pointer.OnPostSceneQuery();
         }
 
         /// <summary>
@@ -695,27 +695,38 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             if (gazePointer != null)
             {
                 int numFarCursors = 0;
+                int numNearPointersActive = 0;
                 foreach (var p in pointers)
                 {
-                    if (p.Pointer != null && p.Pointer.BaseCursor != null && !(p.Pointer is IMixedRealityNearPointer))
+                    if (p.Pointer != null)
                     {
-                        numFarCursors++;
+                        if (p.Pointer is IMixedRealityNearPointer)
+                        {
+                            if (p.Pointer.IsInteractionEnabled)
+                            {
+                                numNearPointersActive++;
+                            }
+                        }
+                        else if (p.Pointer.BaseCursor != null)
+                        {
+                            numFarCursors++;
+                        }
                     }
                 }
                 // The gaze cursor's visibility is controlled by IsInteractionEnabled 
                 // Show the gaze cursor if there are no other pointers that are showing a cursor
-                gazePointer.IsInteractionEnabled = numFarCursors == 1;
+                gazePointer.IsInteractionEnabled = numFarCursors == 1 && numNearPointersActive == 0;
             }
         }
 
         #region Physics Raycasting
 
         /// <summary>
-        /// Perform a Unity physics Raycast to determine which scene objects with a collider is currently being gazed at, if any.
+        /// Perform a scene query to determine which scene objects with a collider is currently being gazed at, if any.
         /// </summary>
         /// <param name="pointerData"></param>
         /// <param name="prioritizedLayerMasks"></param>
-        private static void RaycastPhysics(PointerData pointerData, LayerMask[] prioritizedLayerMasks)
+        private static void QueryScene(PointerData pointerData, LayerMask[] prioritizedLayerMasks)
         {
             bool isHit = false;
             int rayStepIndex = 0;
@@ -735,12 +746,12 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 return;
             }
 
-            // Check raycast for each step in the pointing source
+            // Perform query for each step in the pointing source
             for (int i = 0; i < pointerData.Pointer.Rays.Length; i++)
             {
-                switch (pointerData.Pointer.RaycastMode)
+                switch (pointerData.Pointer.SceneQueryType)
                 {
-                    case RaycastMode.Simple:
+                    case SceneQueryType.SimpleRaycast:
                         if (MixedRealityRaycaster.RaycastSimplePhysicsStep(pointerData.Pointer.Rays[i], prioritizedLayerMasks, out physicsHit))
                         {
                             // Set the pointer source's origin ray to this step
@@ -750,10 +761,10 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                             rayDistance += physicsHit.distance;
                         }
                         break;
-                    case RaycastMode.Box:
+                    case SceneQueryType.BoxRaycast:
                         Debug.LogWarning("Box Raycasting Mode not supported for pointers.");
                         break;
-                    case RaycastMode.Sphere:
+                    case SceneQueryType.SphereCast:
                         if (MixedRealityRaycaster.RaycastSpherePhysicsStep(pointerData.Pointer.Rays[i], pointerData.Pointer.SphereCastRadius, prioritizedLayerMasks, out physicsHit))
                         {
                             // Set the pointer source's origin ray to this step
@@ -763,7 +774,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                             rayDistance += physicsHit.distance;
                         }
                         break;
-                    case RaycastMode.SphereColliders:
+                    case SceneQueryType.SphereOverlap:
                         Collider[] colliders = Physics.OverlapSphere(pointerData.Pointer.Rays[i].Origin, pointerData.Pointer.SphereCastRadius, ~Physics.IgnoreRaycastLayer);
 
                         if (colliders.Length > 0)
@@ -797,7 +808,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                         }
                         break;
                     default:
-                        Debug.LogError($"Invalid raycast mode {pointerData.Pointer.RaycastMode} for {pointerData.Pointer.PointerName} pointer.");
+                        Debug.LogError($"Invalid raycast mode {pointerData.Pointer.SceneQueryType} for {pointerData.Pointer.PointerName} pointer.");
                         break;
                 }
 

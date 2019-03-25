@@ -1,27 +1,19 @@
-﻿using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.SDK.UX;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
 using Microsoft.MixedReality.Toolkit.SDK.UX.Interactable;
-using UnityEngine.Events;
+using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.Examples.Demos
 {
     ///<summary>
-    /// This class exists to route <see cref="PhysicalButtonMovement"/>/<see cref="HandInteractionPress"/> events through to Interactable.
+    /// This class exists to route <see cref="PushButton"/> events through to Interactable.
     /// The result is being able to have physical touch call Interactable.OnPointerClicked.
-    /// If this class does not suit your needs, it is recommended to copy it and write a custom one with better handling for your product's use cases.
     ///</summary>
-    public class PhysicalPressEventRouter : MonoBehaviour, IMixedRealityHandPressTriggerHandler
+    public class PhysicalPressEventRouter : MonoBehaviour
     {
+        [Tooltip("Interactable to which the press events are being routed. Defaults to the object of the component.")]
         public Interactable routingTarget;
 
-        /// This enum/the behavior it supports is far from finished.
-        /// I HIGHLY recommend you only use EventOnClickCompletion.
+        /// Enum specifying which button event causes a Click to be raised.
         public enum PhysicalPressEventBehavior
         {
             EventOnClickCompletion = 0,
@@ -30,15 +22,16 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
         }
         public PhysicalPressEventBehavior InteractableOnClick = PhysicalPressEventBehavior.EventOnClickCompletion;
 
-        public AudioSource source;
-        public AudioClip touchClip;
-        public AudioClip pressClip;
-        public AudioClip clickClip;
+        private void Awake()
+        {
+            if (routingTarget == null)
+            {
+                routingTarget = GetComponent<Interactable>();
+            }
+        }
 
         public void OnHandPressTouched()
         {
-            PlayClip(touchClip);
-
             if (routingTarget != null)
             {
                 routingTarget.SetPhysicalTouch(true);
@@ -63,8 +56,6 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
 
         public void OnHandPressTriggered()
         {
-            PlayClip(pressClip);
-
             if (routingTarget != null)
             {
                 routingTarget.SetPhysicalTouch(true);
@@ -78,8 +69,6 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
 
         public void OnHandPressCompleted()
         {
-            PlayClip(clickClip);
-
             if (routingTarget != null)
             {
                 routingTarget.SetPhysicalTouch(true);
@@ -89,14 +78,6 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
                     routingTarget.OnPointerClicked(null);
                 }
                 routingTarget.SetPress(false);
-            }
-        }
-
-        private void PlayClip(AudioClip clip)
-        {
-            if (source != null && clip != null)
-            {
-                source.PlayOneShot(clip);
             }
         }
     }

@@ -3,6 +3,7 @@
 
 using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Physics;
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.DataProviders;
 using Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers;
 using UnityEngine;
@@ -109,22 +110,19 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         #region IMixedRealityPointer Implementation
 
         /// <inheritdoc />
-        public override void OnPreRaycast()
+        public override void OnPreSceneQuery()
         {
             Debug.Assert(lineBase != null);
-
-            Vector3 pointerPosition;
-            TryGetPointerPosition(out pointerPosition);
 
             // Set our first and last points
             if (IsFocusLocked && Result?.Details != null)
             {
                 // Make the final point 'stick' to the target at the distance of the target
-                SetLinePoints(pointerPosition, Result.Details.Point, Result.Details.RayDistance);
+                SetLinePoints(Position, Result.Details.Point, Result.Details.RayDistance);
             }
             else
             {
-                SetLinePoints(pointerPosition, pointerPosition + PointerDirection * DefaultPointerExtent, DefaultPointerExtent);
+                SetLinePoints(Position, Position + Rotation * Vector3.forward * DefaultPointerExtent, DefaultPointerExtent);
             }
 
             // Make sure our array will hold
@@ -144,7 +142,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         }
 
         /// <inheritdoc />
-        public override void OnPostRaycast()
+        public override void OnPostSceneQuery()
         {
             Gradient lineColor = LineColorNoTarget;
 

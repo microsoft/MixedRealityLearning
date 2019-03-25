@@ -175,8 +175,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         /// <inheritdoc />
         public override bool IsInteractionEnabled => !isTeleportRequestActive && teleportEnabled;
 
+        [SerializeField]
+        [Range(0f, 360f)]
+        [Tooltip("The Y orientation of the pointer - used for rotation and navigation")]
+        private float pointerOrientation = 0f;
+
         /// <inheritdoc />
-        public override float PointerOrientation
+        public float PointerOrientation
         {
             get
             {
@@ -187,15 +192,17 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                     return TeleportHotSpot.TargetOrientation;
                 }
 
-                return base.PointerOrientation;
+                return pointerOrientation + (raycastOrigin != null ? raycastOrigin.eulerAngles.y : transform.eulerAngles.y);
             }
             set
             {
-                base.PointerOrientation = value;
+                pointerOrientation = value < 0
+                    ? Mathf.Clamp(value, -360f, 0f)
+                    : Mathf.Clamp(value, 0f, 360f);
             }
         }
 
-        public override void OnPreRaycast()
+        public override void OnPreSceneQuery()
         {
             if (LineBase == null)
             {
@@ -226,7 +233,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             GravityDistorter.enabled = (TeleportSurfaceResult == TeleportSurfaceResult.HotSpot);
         }
 
-        public override void OnPostRaycast()
+        public override void OnPostSceneQuery()
         {
             // Use the results from the last update to set our NavigationResult
             float clearWorldLength = 0f;

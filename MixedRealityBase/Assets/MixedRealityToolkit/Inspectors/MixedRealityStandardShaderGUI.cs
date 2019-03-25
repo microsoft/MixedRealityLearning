@@ -114,7 +114,8 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             public static GUIContent clippingBorder = new GUIContent("Clipping Border", "Enable a Border Along the Clipping Primitive's Edge");
             public static GUIContent clippingBorderWidth = new GUIContent("Width", "Width of the Clipping Border");
             public static GUIContent clippingBorderColor = new GUIContent("Color", "Interpolated Color of the Clipping Border");
-            public static GUIContent nearPlaneFade = new GUIContent("Near Plane Fade", "Objects Disappear (Turn to Black/Transparent) as the Camera Nears Them");
+            public static GUIContent nearPlaneFade = new GUIContent("Near Fade", "Objects Disappear (Turn to Black/Transparent) as the Camera (or Hover/Proximity Light) Nears Them");
+            public static GUIContent nearLightFade = new GUIContent("Use Light", "A Hover or Proximity Light (Rather Than the Camera) Determines Near Fade Distance");
             public static GUIContent fadeBeginDistance = new GUIContent("Fade Begin", "Distance From Camera to Begin Fade In");
             public static GUIContent fadeCompleteDistance = new GUIContent("Fade Complete", "Distance From Camera When Fade is Fully In");
             public static GUIContent hoverLight = new GUIContent("Hover Light", "Enable utilization of Hover Light(s)");
@@ -199,6 +200,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
         protected MaterialProperty clippingBorderWidth;
         protected MaterialProperty clippingBorderColor;
         protected MaterialProperty nearPlaneFade;
+        protected MaterialProperty nearLightFade;
         protected MaterialProperty fadeBeginDistance;
         protected MaterialProperty fadeCompleteDistance;
         protected MaterialProperty hoverLight;
@@ -282,6 +284,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             clippingBorderWidth = FindProperty("_ClippingBorderWidth", props);
             clippingBorderColor = FindProperty("_ClippingBorderColor", props);
             nearPlaneFade = FindProperty("_NearPlaneFade", props);
+            nearLightFade = FindProperty("_NearLightFade", props);
             fadeBeginDistance = FindProperty("_FadeBeginDistance", props);
             fadeCompleteDistance = FindProperty("_FadeCompleteDistance", props);
             hoverLight = FindProperty("_HoverLight", props);
@@ -617,6 +620,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
 
             if (PropertyEnabled(nearPlaneFade))
             {
+                materialEditor.ShaderProperty(nearLightFade, Styles.nearLightFade, 2);
                 materialEditor.ShaderProperty(fadeBeginDistance, Styles.fadeBeginDistance, 2);
                 materialEditor.ShaderProperty(fadeCompleteDistance, Styles.fadeCompleteDistance, 2);
             }

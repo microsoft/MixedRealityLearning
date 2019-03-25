@@ -51,7 +51,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
 
         [SerializeField]
         [Tooltip("Surface raycast mode")]
-        private RaycastMode raycastMode = RaycastMode.Simple;
+        private SceneQueryType raycastMode = SceneQueryType.SimpleRaycast;
 
         [SerializeField]
         [Tooltip("Number of rays per edge, should be odd. Total casts is n^2")]
@@ -167,7 +167,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
         {
             base.OnValidate();
 
-            if (raycastMode == RaycastMode.Box)
+            if (raycastMode == SceneQueryType.BoxRaycast)
             {
                 boxCollider = gameObject.GetComponent<BoxCollider>();
 
@@ -180,14 +180,14 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
 
         private void Start()
         {
-            if (raycastMode == RaycastMode.Box && boxCollider == null)
+            if (raycastMode == SceneQueryType.BoxRaycast && boxCollider == null)
             {
                 boxCollider = gameObject.GetComponent<BoxCollider>();
 
                 if (boxCollider == null)
                 {
                     Debug.LogError($"Box raycast mode requires a BoxCollider, but none was found on {name}! Defaulting to Simple raycast mode.");
-                    raycastMode = RaycastMode.Simple;
+                    raycastMode = SceneQueryType.SimpleRaycast;
                 }
             }
         }
@@ -256,13 +256,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers
 
             switch (raycastMode)
             {
-                case RaycastMode.Simple:
+                case SceneQueryType.SimpleRaycast:
                     SimpleRaycastStepUpdate(rayStep);
                     break;
-                case RaycastMode.Box:
+                case SceneQueryType.BoxRaycast:
                     BoxRaycastStepUpdate(rayStep);
                     break;
-                case RaycastMode.Sphere:
+                case SceneQueryType.SphereCast:
                     SphereRaycastStepUpdate(rayStep);
                     break;
             }

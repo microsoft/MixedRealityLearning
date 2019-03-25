@@ -42,6 +42,7 @@ Shader "Mixed Reality Toolkit/Standard"
         _ClippingBorderWidth("Clipping Border Width", Range(0.005, 1.0)) = 0.025
         _ClippingBorderColor("Clipping Border Color", Color) = (1.0, 0.2, 0.0, 1.0)
         [Toggle(_NEAR_PLANE_FADE)] _NearPlaneFade("Near Plane Fade", Float) = 0.0
+        [Toggle(_NEAR_LIGHT_FADE)] _NearLightFade("Near Light Fade", Float) = 0.0
         _FadeBeginDistance("Fade Begin Distance", Range(0.01, 10.0)) = 0.85
         _FadeCompleteDistance("Fade Complete Distance", Range(0.01, 10.0)) = 0.5
 
@@ -210,6 +211,7 @@ Shader "Mixed Reality Toolkit/Standard"
             #pragma shader_feature _CLIPPING_BOX
             #pragma shader_feature _CLIPPING_BORDER
             #pragma shader_feature _NEAR_PLANE_FADE
+            #pragma shader_feature _NEAR_LIGHT_FADE
             #pragma shader_feature _HOVER_LIGHT
             #pragma shader_feature _HOVER_COLOR_OVERRIDE
             #pragma shader_feature _PROXIMITY_LIGHT
@@ -420,7 +422,7 @@ Shader "Mixed Reality Toolkit/Standard"
             float _FadeCompleteDistance;
 #endif
 
-#if defined(_HOVER_LIGHT)
+#if defined(_HOVER_LIGHT) || defined(_NEAR_LIGHT_FADE)
 #if defined(_MULTI_HOVER_LIGHT)
 #define HOVER_LIGHT_COUNT 3
 #else
@@ -433,7 +435,7 @@ Shader "Mixed Reality Toolkit/Standard"
 #endif
 #endif
 
-#if defined(_PROXIMITY_LIGHT)
+#if defined(_PROXIMITY_LIGHT) || defined(_NEAR_LIGHT_FADE)
 #define PROXIMITY_LIGHT_COUNT 2
 #define PROXIMITY_LIGHT_DATA_SIZE 5
             float4 _ProximityLightData[PROXIMITY_LIGHT_COUNT * PROXIMITY_LIGHT_DATA_SIZE];
@@ -483,22 +485,31 @@ Shader "Mixed Reality Toolkit/Standard"
 #endif
 
 #if defined(_SPECULAR_HIGHLIGHTS)
-            static const fixed _Shininess = 800.0;
+            static const float _Shininess = 800.0;
 #endif
 
 #if defined(_FRESNEL)
-            static const fixed _FresnelPower = 8.0;
+            static const float _FresnelPower = 8.0;
+#endif
+
+#if defined(_NEAR_LIGHT_FADE)
+            static const float _MaxNearLightDistance = 10.0;
+
+            inline float NearLightDistance(float4 light, float3 worldPosition)
+            {
+                return distance(worldPosition, light.xyz) + ((1.0 - light.w) * _MaxNearLightDistance);
+            }
 #endif
 
 #if defined(_HOVER_LIGHT)
-            inline fixed HoverLight(float4 hoverLight, float3 worldPosition, float enabled)
+            inline float HoverLight(float4 hoverLight, float radius, float3 worldPosition)
             {
-                return (1.0 - saturate(length(hoverLight.xyz - worldPosition) / hoverLight.w)) * enabled;
+                return (1.0 - saturate(length(hoverLight.xyz - worldPosition) / radius)) * hoverLight.w;
             }
 #endif
 
 #if defined(_PROXIMITY_LIGHT)
-            inline fixed ProximityLight(float4 proximityLight, float4 proximityLightParams, float3 worldPosition, float3 worldNormal)
+            inline float ProximityLight(float4 proximityLight, float4 proximityLightParams, float3 worldPosition, float3 worldNormal)
             {
                 float3 diff = proximityLight.xyz - worldPosition;
                 float normalDistance = dot(diff, worldNormal);
@@ -587,8 +598,26 @@ Shader "Mixed Reality Toolkit/Standard"
 
 #if defined(_NEAR_PLANE_FADE)
                 float rangeInverse = 1.0 / (_FadeBeginDistance - _FadeCompleteDistance);
-                float distanceToCamera = -UnityObjectToViewPos(v.vertex.xyz).z;
-                o.worldPosition.w = saturate(mad(distanceToCamera, rangeInverse, -_FadeCompleteDistance * rangeInverse));
+#if defined(_NEAR_LIGHT_FADE)
+                float fadeDistance = _MaxNearLightDistance;
+
+                [unroll]
+                for (int hoverLightIndex = 0; hoverLightIndex < HOVER_LIGHT_COUNT; ++hoverLightIndex)
+                {
+                    int dataIndex = hoverLightIndex * HOVER_LIGHT_DATA_SIZE;
+                    fadeDistance = min(fadeDistance, NearLightDistance(_HoverLightData[dataIndex], o.worldPosition));
+                }
+
+                [unroll]
+                for (int proximityLightIndex = 0; proximityLightIndex < PROXIMITY_LIGHT_COUNT; ++proximityLightIndex)
+                {
+                    int dataIndex = proximityLightIndex * PROXIMITY_LIGHT_DATA_SIZE;
+                    fadeDistance = min(fadeDistance, NearLightDistance(_ProximityLightData[dataIndex], o.worldPosition));
+                }
+#else
+                float fadeDistance = -UnityObjectToViewPos(v.vertex.xyz).z;
+#endif
+                o.worldPosition.w = saturate(mad(fadeDistance, rangeInverse, -_FadeCompleteDistance * rangeInverse));
 #endif
 
 #if defined(_SCALE)
@@ -824,7 +853,7 @@ Shader "Mixed Reality Toolkit/Standard"
                 for (int hoverLightIndex = 0; hoverLightIndex < HOVER_LIGHT_COUNT; ++hoverLightIndex)
                 {
                     int dataIndex = hoverLightIndex * HOVER_LIGHT_DATA_SIZE;
-                    fixed hoverValue = HoverLight(_HoverLightData[dataIndex], i.worldPosition.xyz, _HoverLightData[dataIndex + 1].a);
+                    fixed hoverValue = HoverLight(_HoverLightData[dataIndex], _HoverLightData[dataIndex + 1].w, i.worldPosition.xyz);
                     pointToLight += hoverValue;
 #if !defined(_HOVER_COLOR_OVERRIDE)
                     lightColor += lerp(fixed3(0.0, 0.0, 0.0), _HoverLightData[dataIndex + 1].rgb, hoverValue);

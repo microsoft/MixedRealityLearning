@@ -9,11 +9,11 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
     {
         [SerializeField]
         [Tooltip("Used when a focus target exists, or when select is pressed")]
-        private BaseMixedRealityLineRenderer lineRendererSelected;
-        
+        private BaseMixedRealityLineRenderer lineRendererSelected = null;
+
         [SerializeField]
         [Tooltip("Used when no focus target exists and select is not pressed")]
-        private BaseMixedRealityLineRenderer lineRendererNoTarget;
+        private BaseMixedRealityLineRenderer lineRendererNoTarget = null;
 
         [Header("Inertia Settings")]
         [SerializeField]
@@ -37,7 +37,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         }
 
         /// <inheritdoc />
-        public override void OnPostRaycast()
+        public override void OnPostSceneQuery()
         {
             Gradient lineColor = LineColorNoTarget;
             BaseMixedRealityLineRenderer contextRenderer = null;
@@ -121,7 +121,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             {
                 inertia.enabled = false;
                 // Project forward based on pointer direction to get an 'expected' position of the first control point
-                Vector3 expectedPoint = startPoint + PointerDirection * distance;
+                Vector3 expectedPoint = startPoint + Rotation * Vector3.forward * distance;
                 // Lerp between the expected position and the expected point
                 LineBase.SetPoint(1, Vector3.Lerp(startPoint, expectedPoint, startPointLerp));
                 // Get our next 'expected' position by lerping between the expected point and the end point

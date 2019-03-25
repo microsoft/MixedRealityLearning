@@ -203,10 +203,10 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSimulation
             switch (simulationMode)
             {
                 case HandSimulationMode.Articulated:
-                    controller = new SimulatedArticulatedHand(TrackingState.NotTracked, handedness, inputSource);
+                    controller = new SimulatedArticulatedHand(TrackingState.Tracked, handedness, inputSource);
                     break;
                 case HandSimulationMode.Gestures:
-                    controller = new SimulatedGestureHand(TrackingState.NotTracked, handedness, inputSource);
+                    controller = new SimulatedGestureHand(TrackingState.Tracked, handedness, inputSource);
                     break;
                 default:
                     controller = null;

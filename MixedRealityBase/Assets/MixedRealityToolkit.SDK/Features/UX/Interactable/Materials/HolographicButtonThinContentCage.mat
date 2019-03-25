@@ -10,7 +10,8 @@ Material:
   m_Name: HolographicButtonThinContentCage
   m_Shader: {fileID: 4800000, guid: 5bdea20278144b11916d77503ba1467a, type: 3}
   m_ShaderKeywords: _ALPHABLEND_ON _BORDER_LIGHT _BORDER_LIGHT_USES_HOVER_COLOR _DISABLE_ALBEDO_MAP
-    _HOVER_LIGHT _INNER_GLOW _METALLIC_TEXTURE_ALBEDO_CHANNEL_A _PROXIMITY_LIGHT
+    _HOVER_LIGHT _INNER_GLOW _METALLIC_TEXTURE_ALBEDO_CHANNEL_A _NEAR_PLANE_FADE _NEAR_LIGHT_FADE
+    _PROXIMITY_LIGHT
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -114,8 +115,8 @@ Material:
     - _EnvironmentColorIntensity: 0.5
     - _EnvironmentColorThreshold: 1.5
     - _EnvironmentColoring: 0
-    - _FadeBeginDistance: 0.85
-    - _FadeCompleteDistance: 0.5
+    - _FadeBeginDistance: 0.01
+    - _FadeCompleteDistance: 0.25
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -130,7 +131,8 @@ Material:
     - _IridescenceThreshold: 0.05
     - _Metallic: 0
     - _Mode: 4
-    - _NearPlaneFade: 0
+    - _NearPlaneFade: 1
+    - _NearLightFade: 1
     - _NormalMapScale: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02

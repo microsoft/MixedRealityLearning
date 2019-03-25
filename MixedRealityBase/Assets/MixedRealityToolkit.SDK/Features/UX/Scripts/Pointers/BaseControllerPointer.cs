@@ -3,6 +3,7 @@
 
 using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Physics;
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
@@ -37,7 +38,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
 
         [SerializeField]
         [Tooltip("Source transform for raycast origin - leave null to use default transform")]
-        private Transform raycastOrigin = null;
+        protected Transform raycastOrigin = null;
 
         [SerializeField]
         [Tooltip("The hold action that will enable the raise the input event for this pointer.")]
@@ -66,11 +67,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         protected bool HasSelectPressedOnce = false;
 
         protected bool IsHoldPressed = false;
-
-        /// <summary>
-        /// The forward direction of the targeting ray
-        /// </summary>
-        public virtual Vector3 PointerDirection => raycastOrigin != null ? raycastOrigin.forward : transform.forward;
 
         /// <summary>
         /// Set a new cursor for this <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.IMixedRealityPointer"/>
@@ -165,7 +161,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
 
         protected override void OnDisable()
         {
-            if (IsSelectPressed)
+            if (IsSelectPressed && MixedRealityToolkit.InputSystem != null)
             {
                 MixedRealityToolkit.InputSystem.RaisePointerUp(this, pointerAction, Handedness);
             }
@@ -268,12 +264,8 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             }
         }
 
-        protected bool IsActive = true;
+        public virtual bool IsActive { get; set; }
 
-        public virtual void SetActive(bool isActive)
-        {
-            IsActive = isActive;
-        }
 
         /// <inheritdoc />
         public bool IsFocusLocked { get; set; }
@@ -330,11 +322,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         /// <inheritdoc />
         public IPointerResult Result { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Ray stabilizer used when calculating position of pointer end point.
+        /// </summary>
         public IBaseRayStabilizer RayStabilizer { get; set; }
 
         /// <inheritdoc />
-        public virtual RaycastMode RaycastMode { get; set; } = RaycastMode.Simple;
+        public virtual SceneQueryType SceneQueryType { get; set; } = SceneQueryType.SimpleRaycast;
 
         [SerializeField]
         [Tooltip("The radius to use when RaycastMode is set to Sphere or SphereColliders.")]
@@ -347,71 +341,29 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             set { sphereCastRadius = value; }
         }
 
-        [SerializeField]
-        [Range(0f, 360f)]
-        [Tooltip("The Y orientation of the pointer - used for rotation and navigation")]
-        private float pointerOrientation = 0f;
-
         /// <inheritdoc />
-        public virtual float PointerOrientation
+        public virtual Vector3 Position
         {
             get
             {
-                return pointerOrientation + (raycastOrigin != null ? raycastOrigin.eulerAngles.y : transform.eulerAngles.y);
-            }
-            set
-            {
-                pointerOrientation = value < 0
-                    ? Mathf.Clamp(value, -360f, 0f)
-                    : Mathf.Clamp(value, 0f, 360f);
+                return (raycastOrigin != null) ? raycastOrigin.position : transform.position;
             }
         }
 
         /// <inheritdoc />
-        public virtual void OnPreRaycast() { }
-
-        /// <inheritdoc />
-        public virtual void OnPostRaycast() { }
-
-        /// <inheritdoc />
-        public virtual bool TryGetPointerPosition(out Vector3 position)
+        public virtual Quaternion Rotation
         {
-            if (this == null || gameObject == null)
+            get
             {
-                position = Vector3.zero;
-                return false;
+                return raycastOrigin != null ? raycastOrigin.rotation : transform.rotation;
             }
-
-            if (raycastOrigin != null)
-            {
-                position = raycastOrigin.position;
-                return true;
-            }
-
-            position = transform.position;
-            return true;
         }
 
         /// <inheritdoc />
-        public virtual bool TryGetPointingRay(out Ray pointingRay)
-        {
-            Vector3 pointerPosition;
-            TryGetPointerPosition(out pointerPosition);
-            pointingRay = pointerRay;
-            pointingRay.origin = pointerPosition;
-            pointingRay.direction = PointerDirection;
-            return true;
-        }
-
-        private readonly Ray pointerRay = new Ray();
+        public virtual void OnPreSceneQuery() { }
 
         /// <inheritdoc />
-        public virtual bool TryGetPointerRotation(out Quaternion rotation)
-        {
-            Vector3 pointerRotation = raycastOrigin != null ? raycastOrigin.eulerAngles : transform.eulerAngles;
-            rotation = Quaternion.Euler(pointerRotation.x, PointerOrientation, pointerRotation.z);
-            return true;
-        }
+        public virtual void OnPostSceneQuery() { }
 
         #endregion IMixedRealityPointer Implementation
 
@@ -506,10 +458,8 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                 {
                     IsSelectPressed = false;
 
-                    {
-                        MixedRealityToolkit.InputSystem.RaisePointerClicked(this, pointerAction, 0, Handedness);
-                        MixedRealityToolkit.InputSystem.RaisePointerUp(this, pointerAction, Handedness);
-                    }
+                    MixedRealityToolkit.InputSystem.RaisePointerClicked(this, pointerAction, 0, Handedness);
+                    MixedRealityToolkit.InputSystem.RaisePointerUp(this, pointerAction, Handedness);
                 }
             }
         }

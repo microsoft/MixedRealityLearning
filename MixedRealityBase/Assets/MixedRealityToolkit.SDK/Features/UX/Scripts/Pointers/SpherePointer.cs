@@ -13,9 +13,9 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
 {
     public class SpherePointer : BaseControllerPointer, IMixedRealityNearPointer
     {
-        private RaycastMode raycastMode = RaycastMode.SphereColliders;
+        private SceneQueryType raycastMode = SceneQueryType.SphereOverlap;
 
-        public override RaycastMode RaycastMode { get { return raycastMode; } set { raycastMode = value; } }
+        public override SceneQueryType SceneQueryType { get { return raycastMode; } set { raycastMode = value; } }
 
         [SerializeField]
         private bool debugMode = false;
@@ -43,8 +43,10 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             }
         }
 
+        public override bool IsInteractionEnabled => IsFocusLocked || (IsNearObject && base.IsInteractionEnabled);
+
         /// <inheritdoc />
-        public override void OnPreRaycast()
+        public override void OnPreSceneQuery()
         {
             if (Rays == null)
             {
@@ -92,8 +94,9 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                     return true;
                 }
             }
-            else if (TryGetPointerPosition(out result))
+            else
             {
+                result = Position;
                 return true;
             }
 

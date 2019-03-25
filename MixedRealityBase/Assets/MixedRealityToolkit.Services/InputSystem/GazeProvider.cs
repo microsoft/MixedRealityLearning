@@ -186,7 +186,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             }
 
             /// <inheritdoc />
-            public override void OnPreRaycast()
+            public override void OnPreSceneQuery()
             {
                 Vector3 newGazeOrigin = gazeTransform.position;
                 Vector3 newGazeNormal = gazeTransform.forward;
@@ -205,7 +205,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 gazeProvider.HitPosition = Rays[0].Origin + (gazeProvider.lastHitDistance * Rays[0].Direction);
             }
 
-            public override void OnPostRaycast()
+            public override void OnPostSceneQuery()
             {
                 if (Result != null)
                 {
@@ -221,22 +221,22 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 }
             }
 
-            public override bool TryGetPointerPosition(out Vector3 position)
+            /// <inheritdoc />
+            public override Vector3 Position
             {
-                position = gazeTransform.position;
-                return true;
+                get
+                {
+                    return gazeTransform.position;
+                }
             }
 
-            public override bool TryGetPointingRay(out Ray pointingRay)
+            /// <inheritdoc />
+            public override Quaternion Rotation
             {
-                pointingRay = new Ray(gazeProvider.GazeOrigin, gazeProvider.GazeDirection);
-                return true;
-            }
-
-            public override bool TryGetPointerRotation(out Quaternion rotation)
-            {
-                rotation = gazeTransform.rotation;
-                return true;
+                get
+                {
+                    return gazeTransform.rotation;
+                }
             }
 
             #endregion IMixedRealityPointer Implementation

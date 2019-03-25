@@ -80,13 +80,13 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities
         }
 
         /// The Z axis of the pose in world space
-        public Vector3 Forward => rotation * Vector3.forward + position;
+        public Vector3 Forward => rotation * Vector3.forward;
 
         /// The Y axis of the pose in world space
-        public Vector3 Up => rotation * Vector3.up + position;
+        public Vector3 Up => rotation * Vector3.up;
 
         /// The X axis of the pose in world space
-        public Vector3 Right => rotation * Vector3.right + position;
+        public Vector3 Right => rotation * Vector3.right;
 
         #region IEqualityComparer Implementation
 

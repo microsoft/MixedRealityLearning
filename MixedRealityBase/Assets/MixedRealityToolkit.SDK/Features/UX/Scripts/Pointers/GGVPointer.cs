@@ -92,7 +92,9 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
 
         public IMixedRealityTeleportHotSpot TeleportHotSpot { get; set; }
 
-        public bool IsInteractionEnabled => true;
+        public bool IsInteractionEnabled => IsActive;
+
+        public bool IsActive { get; set; }
 
         /// <inheritdoc />
         public bool IsFocusLocked { get; set; }
@@ -119,7 +121,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         public IBaseRayStabilizer RayStabilizer { get; set; }
 
         /// <inheritdoc />
-        public virtual RaycastMode RaycastMode { get; set; } = RaycastMode.Simple;
+        public virtual SceneQueryType SceneQueryType { get; set; } = SceneQueryType.SimpleRaycast;
         public float SphereCastRadius
         {
             get
@@ -131,15 +133,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                 throw new System.NotImplementedException();
             }
         }
-
-        public float PointerOrientation
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-        }
-
 
         private static bool Equals(IMixedRealityPointer left, IMixedRealityPointer right)
         {
@@ -182,32 +175,34 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             }
         }
 
-        public void OnPostRaycast()
+        public void OnPostSceneQuery()
         {
 
         }
 
-        public void OnPreRaycast()
+        public void OnPreSceneQuery()
         {
             Rays[0] = gazeProvider.GazePointer.Rays[0];
         }
 
-        public bool TryGetPointerPosition(out Vector3 position)
+        /// <inheritdoc />
+        public virtual Vector3 Position
         {
-            position = sourcePosition;
-            return true;
+            get
+            {
+                return sourcePosition;
+            }
         }
 
-        public bool TryGetPointerRotation(out Quaternion rotation)
+        /// <inheritdoc />
+        public virtual Quaternion Rotation
         {
-            rotation = Quaternion.identity;
-            return false;
+            get
+            {
+                return Quaternion.LookRotation(gazeProvider.GazePointer.Rays[0].Direction);
+            }
         }
 
-        public bool TryGetPointingRay(out Ray pointingRay)
-        {
-            return gazeProvider.GazePointer.TryGetPointingRay(out pointingRay);
-        }
         #endregion
 
         #region IMixedRealityInputHandler Implementation

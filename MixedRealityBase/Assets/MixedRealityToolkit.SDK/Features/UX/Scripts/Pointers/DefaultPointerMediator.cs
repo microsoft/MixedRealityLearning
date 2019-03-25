@@ -13,7 +13,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         private readonly HashSet<IMixedRealityNearPointer> nearInteractPointers = new HashSet<IMixedRealityNearPointer>();
         private readonly HashSet<IMixedRealityTeleportPointer> teleportPointers = new HashSet<IMixedRealityTeleportPointer>();
         private readonly Dictionary<IMixedRealityInputSource, HashSet<IMixedRealityPointer>> pointerByInputSourceParent = new Dictionary<IMixedRealityInputSource, HashSet<IMixedRealityPointer>>();
-        private readonly HashSet<IMixedRealityPointer> unPrioritizedPointers = new HashSet<IMixedRealityPointer>();
 
         public void RegisterPointers(IMixedRealityPointer[] pointers)
         {
@@ -23,9 +22,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
 
                 allPointers.Add(pointer);
 
-                BaseControllerPointer basePointer = pointer as BaseControllerPointer;
-                if (basePointer != null)
-                    basePointer.SetActive(true);
+                pointer.IsActive = true;
 
                 if (pointer is IMixedRealityTeleportPointer)
                 {
@@ -75,52 +72,43 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             {
                 if (pointer.TeleportRequestRaised)
                 {
-                    BaseControllerPointer basePointer = pointer as BaseControllerPointer;
-                    if (basePointer != null)
-                        basePointer.SetActive(true);
+                    pointer.IsActive = true;
 
                     foreach (IMixedRealityPointer otherPointer in allPointers)
                     {
                         if (otherPointer.PointerId == pointer.PointerId)
+                        {
                             continue;
+                        }
 
-                        BaseControllerPointer otherBasePointer = otherPointer as BaseControllerPointer;
-                        if (otherBasePointer != null)
-                            otherBasePointer.SetActive(false);
+                        otherPointer.IsActive = false;
                     }
                     // Don't do any further checks
                     return;
                 }
             }
-            
-            unPrioritizedPointers.Clear();
-            foreach (IMixedRealityPointer pointer in allPointers)
-                unPrioritizedPointers.Add(pointer);
-                        
-            // If any pointers are locked, they have priority. Other pointers associated with the same controller are subordinate.
+
+            // pointers whose active state has not yet been set this frame
+            HashSet<IMixedRealityPointer> unassignedPointers = new HashSet<IMixedRealityPointer>(allPointers);
+
+            // If any pointers are locked, they have priority. 
+            // Deactivate all other pointers that are on that input source
             foreach (IMixedRealityPointer pointer in allPointers)
             {
                 if (pointer.IsFocusLocked)
                 {
-                    BaseControllerPointer basePointer = pointer as BaseControllerPointer;
-                    if (basePointer != null)
-                        basePointer.SetActive(true);
-
-                    unPrioritizedPointers.Remove(pointer);
+                    pointer.IsActive = true;
+                    unassignedPointers.Remove(pointer);
 
                     foreach (IMixedRealityPointer otherPointer in pointerByInputSourceParent[pointer.InputSourceParent])
                     {
-                        if (!unPrioritizedPointers.Contains(otherPointer))
+                        if (!unassignedPointers.Contains(otherPointer))
+                        {
                             continue;
+                        }
 
-                        if (otherPointer.PointerId == pointer.PointerId)
-                            continue;
-
-                        BaseControllerPointer otherBasePointer = otherPointer as BaseControllerPointer;
-                        if (otherBasePointer != null)
-                            otherBasePointer.SetActive(false);
-
-                        unPrioritizedPointers.Remove(otherPointer);
+                        otherPointer.IsActive = false;
+                        unassignedPointers.Remove(otherPointer);
                     }
                 }
             }
@@ -129,39 +117,34 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             // Any far interact pointers become disabled when a near pointer is near an object
             foreach (IMixedRealityNearPointer pointer in nearInteractPointers)
             {
-                if (!unPrioritizedPointers.Contains(pointer))
+                if (!unassignedPointers.Contains(pointer))
+                {
                     continue;
+                }
 
                 if (pointer.IsNearObject)
                 {
-                    BaseControllerPointer basePointer = pointer as BaseControllerPointer;
-                    if (basePointer != null)
-                        basePointer.SetActive(true);
+                    pointer.IsActive = true;
+                    unassignedPointers.Remove(pointer);
 
-                    unPrioritizedPointers.Remove(pointer);
                     foreach (IMixedRealityPointer otherPointer in pointerByInputSourceParent[pointer.InputSourceParent])
                     {
-                        if (otherPointer == pointer)
+                        if (!unassignedPointers.Contains(otherPointer))
+                        {
                             continue;
+                        }
 
-                        if (!unPrioritizedPointers.Contains(otherPointer))
-                            continue;
-
-                        BaseControllerPointer otherBasePointer = otherPointer as BaseControllerPointer;
-                        if (otherBasePointer != null)
-                            otherBasePointer.SetActive(false);
-
-                        unPrioritizedPointers.Remove(otherPointer);
+                        otherPointer.IsActive = false;
+                        unassignedPointers.Remove(otherPointer);
                     }
                 }
             }
 
-            // If we have any pointers whose priority has not been assigned, set them to none
-            foreach (IMixedRealityPointer unassignedPointer in unPrioritizedPointers)
+            // All other pointers that have not been assigned this frame
+            // have no reason to be disabled, so make sure they are active
+            foreach (IMixedRealityPointer unassignedPointer in unassignedPointers)
             {
-                BaseControllerPointer unassignedBasePointer = unassignedPointer as BaseControllerPointer;
-                if (unassignedBasePointer != null)
-                    unassignedBasePointer.SetActive(true);
+                unassignedPointer.IsActive = true;
             }
         }
     }

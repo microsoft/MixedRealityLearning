@@ -3,21 +3,21 @@
 
 using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.SDK.Input.Events;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Microsoft.MixedReality.Toolkit.Examples.Demos
 {
     public class HandInteractionTouchRotate : HandInteractionTouch, IMixedRealityTouchHandler
     {
         [SerializeField]
-        private Transform TargetObjectTransform;
-
+        [FormerlySerializedAs("TargetObjectTransform")]
+        private Transform targetObjectTransform = null;
         void IMixedRealityTouchHandler.OnTouchUpdated(HandTrackingInputEventData eventData)
         {
-            if (TargetObjectTransform != null)
+            if (targetObjectTransform != null)
             {
-                TargetObjectTransform.Rotate(Vector3.up * (300.0f * Time.deltaTime));
+                targetObjectTransform.Rotate(Vector3.up * (300.0f * Time.deltaTime));
             }
         }
     }

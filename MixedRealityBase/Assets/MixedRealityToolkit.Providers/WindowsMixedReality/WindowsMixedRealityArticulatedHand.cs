@@ -5,6 +5,7 @@ using Microsoft.MixedReality.Toolkit.Core.Attributes;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
 using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
+using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
 
 #if UNITY_WSA
@@ -32,7 +33,7 @@ namespace Microsoft.MixedReality.Toolkit.Providers.WindowsMixedReality
     [MixedRealityController(
         SupportedControllerType.ArticulatedHand,
         new[] { Handedness.Left, Handedness.Right })]
-    public class WindowsMixedRealityArticulatedHand : WindowsMixedRealityController
+    public class WindowsMixedRealityArticulatedHand : WindowsMixedRealityController, IMixedRealityHand
     {
     /// <summary>
         /// Constructor.
@@ -64,6 +65,21 @@ namespace Microsoft.MixedReality.Toolkit.Providers.WindowsMixedReality
             new MixedRealityInteractionMapping(3, "Grab", AxisType.SingleAxis, DeviceInputType.TriggerPress, MixedRealityInputAction.None),
             new MixedRealityInteractionMapping(4, "Index Finger Pose", AxisType.SixDof, DeviceInputType.IndexFinger, MixedRealityInputAction.None)
         };
+
+        #region IMixedRealityHand Implementation
+
+        /// <inheritdoc/>
+        public bool TryGetJoint(TrackedHandJoint joint, out MixedRealityPose pose)
+        {
+#if WINDOWS_UWP
+            return unityJointPoses.TryGetValue(joint, out pose);
+#else
+            pose = MixedRealityPose.ZeroIdentity;
+            return false;
+#endif
+        }
+
+        #endregion IMixedRealityHand Implementation
 
         public override bool IsInPointingPose
         {
@@ -469,7 +485,7 @@ namespace Microsoft.MixedReality.Toolkit.Providers.WindowsMixedReality
         {
             currentIndexPose.Rotation = unityJointOrientations[(int)HandJointKind.IndexTip];
 
-            var skinOffsetFromBone = (currentIndexPose.Rotation * (-Vector3.forward) * lastIndexTipRadius);
+            var skinOffsetFromBone = (currentIndexPose.Rotation * Vector3.forward * lastIndexTipRadius);
             currentIndexPose.Position = (unityJointPositions[(int)HandJointKind.IndexTip] + skinOffsetFromBone);
         }
 

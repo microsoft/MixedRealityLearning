@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Events.Handlers;
@@ -150,11 +151,8 @@ public class HandInteractionPan : BaseFocusHandler, IMixedRealityTouchHandler, I
             controller.InputSource.Pointers != null &&
             controller.InputSource.Pointers.Length > 0)
         {
-            if (true == controller.InputSource.Pointers[0].TryGetPointerPosition(out point))
-            {
-                handPoint = point;
-                return true;
-            }
+            handPoint = controller.InputSource.Pointers[0].Position;
+            return true;
         }
 
         handPoint = point;
@@ -191,7 +189,7 @@ public class HandInteractionPan : BaseFocusHandler, IMixedRealityTouchHandler, I
     }
     private void ValidityCheck()
     {
-        //check for boxcollider
+        //check for box collider
         Collider collider = GetComponent<Collider>();
         if (collider == null)
         {
@@ -479,8 +477,8 @@ public class HandInteractionPan : BaseFocusHandler, IMixedRealityTouchHandler, I
                 currentPointer = eventData.InputSource.Pointers[0];
                 currentController = eventData.Controller;
                 touchingSource = eventData.InputSource;
-                currentPointer.TryGetPointerPosition(out touchingPoint);
-                touchingPoint = SnapFingerToQuad(touchingPoint);
+                
+                Vector3 touchingPoint = SnapFingerToQuad(currentPointer.Position);
                 touchingInitialPt = touchingPoint;
                 touchingUV = GetUVFromPoint(touchingPoint);
                 touchingInitialUV = touchingUV;

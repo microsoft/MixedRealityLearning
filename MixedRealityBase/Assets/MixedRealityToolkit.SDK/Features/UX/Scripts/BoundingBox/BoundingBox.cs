@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
 using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
 using Microsoft.MixedReality.Toolkit.Core.Extensions;
 using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
@@ -501,11 +502,10 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX
 
         private void TransformTarget()
         {
-            Vector3 pointerPosition;
-            if (currentHandleType != HandleType.None && currentPointer.TryGetPointerPosition(out pointerPosition))
+            if (currentHandleType != HandleType.None)
             {
                 Vector3 prevGrabPoint = currentGrabPoint;
-                currentGrabPoint = initialGrabPoint + pointerPosition - initialPointerPosition;
+                currentGrabPoint = initialGrabPoint + currentPointer.Position - initialPointerPosition;
 
                 if (currentHandleType == HandleType.Rotation)
                 {
@@ -1493,13 +1493,12 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX
                 Transform grabbedHandleTransform = grabbedHandle.transform;
                 currentHandleType = GetHandleType(grabbedHandleTransform);
 
-                Vector3 pointerPosition;
-                if (currentHandleType != HandleType.None && eventData.Pointer.TryGetPointerPosition(out pointerPosition))
+                if (currentHandleType != HandleType.None)
                 {
                     currentPointer = eventData.Pointer;
                     initialGrabPoint = currentPointer.Result.Details.Point;
                     currentGrabPoint = initialGrabPoint;
-                    initialPointerPosition = pointerPosition;
+                    initialPointerPosition = eventData.Pointer.Position;
                     initialScale = Target.transform.localScale;
                     initialPosition = Target.transform.position;
 
@@ -1532,6 +1531,14 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX
 
                     eventData.Use();
                 }
+            }
+
+            if (currentPointer != null)
+            {
+                // Always mark the pointer data as used to prevent any other behavior to handle pointer events
+                // as long as BoundingBox manipulation is active.
+                // This is due to us reacting to both "Select" and "Grip" events.
+                eventData.Use();
             }
         }
 
