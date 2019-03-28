@@ -13,6 +13,7 @@ public class PartAssemblyDemo : MonoBehaviour
     public float farDistance = 0.2f;
 
     public GameObject toolTipObject;
+    public AudioSource audioSource;
 
     bool isSnapped;
 
@@ -26,6 +27,7 @@ public class PartAssemblyDemo : MonoBehaviour
     {
         //Get the manipulation handler that is attached to the current object
         manipulationHandler = GetComponent<ManipulationHandler>();
+        audioSource = GetComponent<AudioSource>();
 
         //Save original placement of object
         originalObjectPlacementPosition = objectToPlace.position;
@@ -64,10 +66,13 @@ public class PartAssemblyDemo : MonoBehaviour
                 //Set parent to target location so that when rocket launches, parts go with it
                 objectToPlace.SetParent(locationToPlace.parent);
 
+                //Play audio snapping sound
+                audioSource.Play();
+
                 //turn off tool tips
                 toolTipObject.SetActive(false);
 
-                isSnapped = true;          
+                //isSnapped = true;          
 
                 //Turn manipulaiton handler back on so that we can grab it again if needed
                 //manipulationHandler.enabled = true;
