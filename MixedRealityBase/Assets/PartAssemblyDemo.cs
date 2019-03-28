@@ -11,6 +11,9 @@ public class PartAssemblyDemo : MonoBehaviour
 
     public float nearDistance = 0.1f;
     public float farDistance = 0.2f;
+
+    public GameObject toolTipObject;
+
     bool isSnapped;
 
     private Vector3 originalObjectPlacementPosition;
@@ -37,6 +40,9 @@ public class PartAssemblyDemo : MonoBehaviour
         //reset object placement
         objectToPlace.position = originalObjectPlacementPosition;
         objectToPlace.rotation = originalObjectPlacementRotation;
+
+        //turn on tool tips again
+        toolTipObject.SetActive(true);
     }
 
     //Co routine to check if object is close enough to target location. If so snap to it.
@@ -57,6 +63,9 @@ public class PartAssemblyDemo : MonoBehaviour
 
                 //Set parent to target location so that when rocket launches, parts go with it
                 objectToPlace.SetParent(locationToPlace.parent);
+
+                //turn off tool tips
+                toolTipObject.SetActive(false);
 
                 isSnapped = true;          
 
