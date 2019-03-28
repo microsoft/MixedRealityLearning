@@ -20,13 +20,10 @@ public class PartAssemblyDemo : MonoBehaviour
     private Vector3 originalObjectPlacementPosition;
     private Quaternion originalObjectPlacementRotation;
 
-    private ManipulationHandler manipulationHandler;
-
     // Start is called before the first frame update
     void Start()
     {
-        //Get the manipulation handler that is attached to the current object
-        manipulationHandler = GetComponent<ManipulationHandler>();
+        //Get the audio source component to play audio when snapping objects into place
         audioSource = GetComponent<AudioSource>();
 
         //Save original placement of object
@@ -54,10 +51,8 @@ public class PartAssemblyDemo : MonoBehaviour
         {
             yield return new WaitForSeconds(0.01f);
 
-            if (!isSnapped && Vector3.Distance(objectToPlace.position, locationToPlace.position) != 0 && Vector3.Distance(objectToPlace.position,locationToPlace.position) < nearDistance)
-            {
-                //Disable manipulation handler to stop continued manipulation of object
-                //manipulationHandler.enabled = false;                
+            if (!isSnapped && Vector3.Distance(objectToPlace.position, locationToPlace.position) > 0.01 && Vector3.Distance(objectToPlace.position,locationToPlace.position) < nearDistance)
+            {        
 
                 //Place object at target location
                 objectToPlace.position = locationToPlace.position;
@@ -67,15 +62,15 @@ public class PartAssemblyDemo : MonoBehaviour
                 objectToPlace.SetParent(locationToPlace.parent);
 
                 //Play audio snapping sound
-                audioSource.Play();
+                //TODO: Need to take into account whether manipulation handler is currently being held
+                //if (!audioSource.isPlaying)
+                    audioSource.Play();
 
                 //turn off tool tips
-                toolTipObject.SetActive(false);
+                toolTipObject.SetActive(false);        
 
                 //isSnapped = true;          
 
-                //Turn manipulaiton handler back on so that we can grab it again if needed
-                //manipulationHandler.enabled = true;
             }
 
             if (isSnapped && Vector3.Distance(objectToPlace.position, locationToPlace.position) > farDistance)
