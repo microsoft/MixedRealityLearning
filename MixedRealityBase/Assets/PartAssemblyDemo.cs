@@ -15,6 +15,7 @@ public class PartAssemblyDemo : MonoBehaviour
     public GameObject toolTipObject;
     public AudioSource audioSource;
 
+    public bool isManipulating;
     bool isSnapped;
 
     private Vector3 originalObjectPlacementPosition;
@@ -42,6 +43,11 @@ public class PartAssemblyDemo : MonoBehaviour
 
         //turn on tool tips again
         toolTipObject.SetActive(true);
+    }
+
+    public void setIsManipulating(bool value)
+    {
+        isManipulating = value;
     }
 
     //Co routine to check if object is close enough to target location. If so snap to it.
