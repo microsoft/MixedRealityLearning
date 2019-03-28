@@ -54,7 +54,7 @@ public class PartAssemblyDemo : MonoBehaviour
         {
             yield return new WaitForSeconds(0.01f);
 
-            if (!isSnapped && Vector3.Distance(objectToPlace.position,locationToPlace.position) < nearDistance)
+            if (!isSnapped && Vector3.Distance(objectToPlace.position, locationToPlace.position) != 0 && Vector3.Distance(objectToPlace.position,locationToPlace.position) < nearDistance)
             {
                 //Disable manipulation handler to stop continued manipulation of object
                 //manipulationHandler.enabled = false;                
