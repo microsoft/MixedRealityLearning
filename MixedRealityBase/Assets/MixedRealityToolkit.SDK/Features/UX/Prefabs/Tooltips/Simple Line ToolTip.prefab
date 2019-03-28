@@ -128,10 +128,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c169a39f8e430d869bbc5d938b0e5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineStartClamp: 0
-  lineEndClamp: 1
+  lineStartClamp: 0.0001
+  lineEndClamp: 0.9999
   customLineTransform: {fileID: 0}
   loops: 0
+  transformMode: 1
   rotationMode: 1
   flipUpVector: 0
   originOffset: {x: 0, y: 0, z: 0}
@@ -142,6 +143,7 @@ MonoBehaviour:
   - {x: 0, y: 1, z: 0}
   velocitySearchRange: 0.02
   distorters: []
+  distortionEnabled: 1
   distortionMode: 0
   distortionStrength:
     serializedVersion: 2
@@ -244,7 +246,33 @@ MonoBehaviour:
   colorOffset: 0
   widthOffset: 0
   stepMode: 0
-  lineStepCount: 16
+  lineStepCount: 2
+  pointDistributionMode: 1
+  customPointDistributionLength: 0.1
+  customPointDistributionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   lineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   roundedEdges: 1
   roundedCaps: 1
@@ -288,20 +316,6 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0.000021699707, z: 0}
-  - {x: 0, y: 0.014485278, z: 0}
-  - {x: 0, y: 0.028948857, z: 0}
-  - {x: 0, y: 0.043412432, z: 0}
-  - {x: 0, y: 0.057876017, z: 0}
-  - {x: 0, y: 0.07233959, z: 0}
-  - {x: 0, y: 0.08680317, z: 0}
-  - {x: 0, y: 0.10126674, z: 0}
-  - {x: 0, y: 0.11573033, z: 0}
-  - {x: 0, y: 0.1301939, z: 0}
-  - {x: 0, y: 0.1446575, z: 0}
-  - {x: 0, y: 0.15912107, z: 0}
-  - {x: 0, y: 0.17358464, z: 0}
-  - {x: 0, y: 0.18804821, z: 0}
-  - {x: 0, y: 0.2025118, z: 0}
   - {x: 0, y: 0.21697538, z: 0}
   m_Parameters:
     serializedVersion: 3
@@ -587,6 +601,7 @@ MonoBehaviour:
   lineEndClamp: 1
   customLineTransform: {fileID: 0}
   loops: 1
+  transformMode: 1
   rotationMode: 1
   flipUpVector: 0
   originOffset: {x: 0, y: 0, z: 0}
@@ -597,6 +612,7 @@ MonoBehaviour:
   - {x: 0, y: 1, z: 0}
   velocitySearchRange: 0.02
   distorters: []
+  distortionEnabled: 1
   distortionMode: 0
   distortionStrength:
     serializedVersion: 2
@@ -828,7 +844,33 @@ MonoBehaviour:
   colorOffset: 0
   widthOffset: 0
   stepMode: 1
-  lineStepCount: 16
+  lineStepCount: 2
+  pointDistributionMode: 1
+  customPointDistributionLength: 0.1
+  customPointDistributionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   lineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   roundedEdges: 1
   roundedCaps: 1
