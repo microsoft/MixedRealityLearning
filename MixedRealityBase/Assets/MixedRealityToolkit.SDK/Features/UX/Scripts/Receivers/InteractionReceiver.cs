@@ -1,15 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.SDK.Input.Handlers;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using Microsoft.MixedReality.Toolkit.Input;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
+namespace Microsoft.MixedReality.Toolkit.UI
 {
     /// <summary>
     /// An interaction receiver is simply a component that attached to a list of interactable objects and does something
@@ -37,7 +35,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         public List<GameObject> Interactables
         {
             get { return interactables; }
-            private set { value = interactables; }
+            private set { interactables = value; }
         }
 
         [Tooltip("Targets for the receiver to affect")]
@@ -49,7 +47,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         public List<GameObject> Targets
         {
             get { return targets; }
-            private set { value = targets; }
+            private set { targets = value; }
         }
 
         #endregion Public Members
@@ -198,26 +196,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        [Obsolete("Use IMixedRealityInputHandler<float>.OnInputChanged instead.")]
-        void IMixedRealityInputHandler.OnInputPressed(InputEventData<float> eventData)
-        {
-            Debug.LogWarning("Obsolete. Use IMixedRealityInputHandler<float>.OnInputChanged instead.");
-        }
-
         /// <inheritdoc />
         void IMixedRealityInputHandler<float>.OnInputChanged(InputEventData<float> eventData)
         {
             if (IsInteractable(eventData.selectedObject))
             {
-                InputPressed(eventData.selectedObject, eventData);
+                FloatInputChanged(eventData.selectedObject, eventData);
             }
-        }
-
-        /// <inheritdoc />
-        [Obsolete("Use IMixedRealityInputHandler<Vector2>.OnInputChanged instead.")]
-        void IMixedRealityInputHandler.OnPositionInputChanged(InputEventData<Vector2> eventData)
-        {
-            Debug.LogWarning("Obsolete. Use IMixedRealityInputHandler<Vector2>.OnInputChanged instead.");
         }
 
         /// <inheritdoc />
@@ -383,11 +368,11 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         protected virtual void InputUp(GameObject targetObject, InputEventData eventData) { }
 
         /// <summary>
-        /// Raised when the target interactable object receives an input pressed event.
+        /// Raised when the target interactable object receives a float input changed event.
         /// </summary>
         /// <param name="targetObject"></param>
         /// <param name="eventData"></param>
-        protected virtual void InputPressed(GameObject targetObject, InputEventData<float> eventData) { }
+        protected virtual void FloatInputChanged(GameObject targetObject, InputEventData<float> eventData) { }
 
         /// <summary>
         /// Raised when the target interactable object receives an input changed event.

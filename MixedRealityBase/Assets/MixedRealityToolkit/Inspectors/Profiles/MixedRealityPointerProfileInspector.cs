@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.﻿
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Inspectors.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Services;
-using Microsoft.MixedReality.Toolkit.Core.Utilities;
+using Microsoft.MixedReality.Toolkit.Utilities.Editor;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Microsoft.MixedReality.Toolkit.Editor;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
+namespace Microsoft.MixedReality.Toolkit.Input.Editor
 {
     [CustomEditor(typeof(MixedRealityPointerProfile))]
     public class MixedRealityPointerProfileInspector : BaseMixedRealityToolkitConfigurationProfileInspector
@@ -28,6 +27,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
         private static bool showGazeProperties = true;
         private SerializedProperty gazeCursorPrefab;
         private SerializedProperty gazeProviderType;
+        private SerializedProperty showCursorWithEyeGaze;
         private SerializedProperty pointerMediator;
 
         private int currentlySelectedPointerOption = -1;
@@ -48,6 +48,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
             debugDrawPointingRayColors = serializedObject.FindProperty("debugDrawPointingRayColors");
             gazeCursorPrefab = serializedObject.FindProperty("gazeCursorPrefab");
             gazeProviderType = serializedObject.FindProperty("gazeProviderType");
+            showCursorWithEyeGaze = serializedObject.FindProperty("showCursorWithEyeGaze");
             pointerMediator = serializedObject.FindProperty("pointerMediator");
 
             pointerOptionList = new ReorderableList(serializedObject, pointerOptions, false, false, true, true)
@@ -126,6 +127,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors.Profiles
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(gazeCursorPrefab);
                     EditorGUILayout.PropertyField(gazeProviderType);
+                    EditorGUILayout.PropertyField(showCursorWithEyeGaze);
 
                     EditorGUILayout.Space();
                     if (GUILayout.Button("Customize Gaze Provider Settings"))

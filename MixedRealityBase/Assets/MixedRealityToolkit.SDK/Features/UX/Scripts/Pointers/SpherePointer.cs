@@ -1,15 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Physics;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Devices.Hands;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Services;
+using Microsoft.MixedReality.Toolkit.Physics;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     public class SpherePointer : BaseControllerPointer, IMixedRealityNearPointer
     {
@@ -36,7 +32,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                 Vector3 position;
                 if (TryGetNearGraspPoint(out position))
                 {
-                    return Physics.CheckSphere(position, SphereCastRadius + 0.05f, ~Physics.IgnoreRaycastLayer);
+                    return UnityEngine.Physics.CheckSphere(position, SphereCastRadius + 0.05f, ~UnityEngine.Physics.IgnoreRaycastLayer);
                 }
 
                 return false;

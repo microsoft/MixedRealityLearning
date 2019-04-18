@@ -1,14 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.﻿
 
-using Microsoft.MixedReality.Toolkit.Core.Attributes;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Defines a pointer option to assign to a controller.
@@ -29,6 +26,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
             this.pointerPrefab = pointerPrefab;
         }
 
+        [EnumFlags]
         [SerializeField]
         [Tooltip("The controller this pointer will attach itself to at runtime.")]
         private SupportedControllerType controllerType;
@@ -36,7 +34,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
         /// <summary>
         /// The type of Controller this pointer will attach itself to at runtime.
         /// </summary>
-        /// <remarks>If <see cref="Utilities.Handedness.None"/> is selected, then it will attach to any controller type</remarks>
+        /// <remarks>If <see cref="Microsoft.MixedReality.Toolkit.Utilities.Handedness.None"/> is selected, then it will attach to any controller type</remarks>
         public SupportedControllerType ControllerType => controllerType;
 
         [SerializeField]

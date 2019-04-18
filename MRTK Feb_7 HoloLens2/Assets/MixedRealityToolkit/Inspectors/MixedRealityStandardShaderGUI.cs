@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.MixedReality.Toolkit.Core.Utilities;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
+namespace Microsoft.MixedReality.Toolkit.Editor
 {
     /// <summary>
     /// A custom shader inspector for the "Mixed Reality Toolkit/Standard" shader.
@@ -114,13 +114,15 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             public static GUIContent clippingBorder = new GUIContent("Clipping Border", "Enable a Border Along the Clipping Primitive's Edge");
             public static GUIContent clippingBorderWidth = new GUIContent("Width", "Width of the Clipping Border");
             public static GUIContent clippingBorderColor = new GUIContent("Color", "Interpolated Color of the Clipping Border");
-            public static GUIContent nearPlaneFade = new GUIContent("Near Plane Fade", "Objects Disappear (Turn to Black/Transparent) as the Camera Nears Them");
+            public static GUIContent nearPlaneFade = new GUIContent("Near Fade", "Objects Disappear (Turn to Black/Transparent) as the Camera (or Hover/Proximity Light) Nears Them");
+            public static GUIContent nearLightFade = new GUIContent("Use Light", "A Hover or Proximity Light (Rather Than the Camera) Determines Near Fade Distance");
             public static GUIContent fadeBeginDistance = new GUIContent("Fade Begin", "Distance From Camera to Begin Fade In");
             public static GUIContent fadeCompleteDistance = new GUIContent("Fade Complete", "Distance From Camera When Fade is Fully In");
             public static GUIContent hoverLight = new GUIContent("Hover Light", "Enable utilization of Hover Light(s)");
             public static GUIContent enableHoverColorOverride = new GUIContent("Override Color", "Override Global Hover Light Color");
             public static GUIContent hoverColorOverride = new GUIContent("Color", "Override Hover Light Color");
             public static GUIContent proximityLight = new GUIContent("Proximity Light", "Enable utilization of Proximity Light(s)");
+            public static GUIContent proximityLightTwoSided = new GUIContent("Two Sided", "Proximity Lights Apply to Both Sides of a Surface");
             public static GUIContent roundCorners = new GUIContent("Round Corners", "(Assumes UVs Specify Borders of Surface, Works Best on Unity Cube, Quad, and Plane)");
             public static GUIContent roundCornerRadius = new GUIContent("Unit Radius", "Rounded Rectangle Corner Unit Sphere Radius");
             public static GUIContent roundCornerMargin = new GUIContent("Margin %", "Distance From Geometry Edge");
@@ -131,6 +133,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             public static GUIContent borderWidth = new GUIContent("Width %", "Uniform Width Along Border as a % of the Smallest XYZ Dimension");
             public static GUIContent borderMinValue = new GUIContent("Brightness", "Brightness Scaler");
             public static GUIContent edgeSmoothingValue = new GUIContent("Edge Smoothing Value", "Smooths Edges When Round Corners and Transparency Is Enabled");
+            public static GUIContent borderLightOpaqueAlpha = new GUIContent("Alpha", "Alpha value of \"opaque\" borders.");
             public static GUIContent innerGlow = new GUIContent("Inner Glow", "Enable Inner Glow (Assumes UVs Specify Borders of Surface, Works Best on Unity Cube, Quad, and Plane)");
             public static GUIContent innerGlowColor = new GUIContent("Color", "Inner Glow Color (RGB) and Intensity (A)");
             public static GUIContent innerGlowPower = new GUIContent("Power", "Power Exponent to Control Glow");
@@ -198,12 +201,14 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
         protected MaterialProperty clippingBorderWidth;
         protected MaterialProperty clippingBorderColor;
         protected MaterialProperty nearPlaneFade;
+        protected MaterialProperty nearLightFade;
         protected MaterialProperty fadeBeginDistance;
         protected MaterialProperty fadeCompleteDistance;
         protected MaterialProperty hoverLight;
         protected MaterialProperty enableHoverColorOverride;
         protected MaterialProperty hoverColorOverride;
         protected MaterialProperty proximityLight;
+        protected MaterialProperty proximityLightTwoSided;
         protected MaterialProperty roundCorners;
         protected MaterialProperty roundCornerRadius;
         protected MaterialProperty roundCornerMargin;
@@ -214,6 +219,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
         protected MaterialProperty borderWidth;
         protected MaterialProperty borderMinValue;
         protected MaterialProperty edgeSmoothingValue;
+        protected MaterialProperty borderLightOpaqueAlpha;
         protected MaterialProperty innerGlow;
         protected MaterialProperty innerGlowColor;
         protected MaterialProperty innerGlowPower;
@@ -280,12 +286,14 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             clippingBorderWidth = FindProperty("_ClippingBorderWidth", props);
             clippingBorderColor = FindProperty("_ClippingBorderColor", props);
             nearPlaneFade = FindProperty("_NearPlaneFade", props);
+            nearLightFade = FindProperty("_NearLightFade", props);
             fadeBeginDistance = FindProperty("_FadeBeginDistance", props);
             fadeCompleteDistance = FindProperty("_FadeCompleteDistance", props);
             hoverLight = FindProperty("_HoverLight", props);
             enableHoverColorOverride = FindProperty("_EnableHoverColorOverride", props);
             hoverColorOverride = FindProperty("_HoverColorOverride", props);
             proximityLight = FindProperty("_ProximityLight", props);
+            proximityLightTwoSided = FindProperty("_ProximityLightTwoSided", props);
             roundCorners = FindProperty("_RoundCorners", props);
             roundCornerRadius = FindProperty("_RoundCornerRadius", props);
             roundCornerMargin = FindProperty("_RoundCornerMargin", props);
@@ -296,6 +304,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             borderWidth = FindProperty("_BorderWidth", props);
             borderMinValue = FindProperty("_BorderMinValue", props);
             edgeSmoothingValue = FindProperty("_EdgeSmoothingValue", props);
+            borderLightOpaqueAlpha = FindProperty("_BorderLightOpaqueAlpha", props);
             innerGlow = FindProperty("_InnerGlow", props);
             innerGlowColor = FindProperty("_InnerGlowColor", props);
             innerGlowPower = FindProperty("_InnerGlowPower", props);
@@ -614,6 +623,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
 
             if (PropertyEnabled(nearPlaneFade))
             {
+                materialEditor.ShaderProperty(nearLightFade, Styles.nearLightFade, 2);
                 materialEditor.ShaderProperty(fadeBeginDistance, Styles.fadeBeginDistance, 2);
                 materialEditor.ShaderProperty(fadeCompleteDistance, Styles.fadeCompleteDistance, 2);
             }
@@ -644,10 +654,11 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
 
             if (PropertyEnabled(proximityLight))
             {
+                materialEditor.ShaderProperty(proximityLightTwoSided, Styles.proximityLightTwoSided, 2);
                 GUILayout.Box(string.Format(Styles.propertiesComponentHelp, nameof(ProximityLight), Styles.proximityLight.text), EditorStyles.helpBox, new GUILayoutOption[0]);
             }
 
-                materialEditor.ShaderProperty(roundCorners, Styles.roundCorners);
+            materialEditor.ShaderProperty(roundCorners, Styles.roundCorners);
 
             if (PropertyEnabled(roundCorners))
             {
@@ -675,6 +686,11 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
                     (mode == RenderingMode.Custom && customMode == CustomRenderingMode.Transparent))
                 {
                     materialEditor.ShaderProperty(borderLightOpaque, Styles.borderLightOpaque, 2);
+
+                    if (PropertyEnabled(borderLightOpaque))
+                    {
+                        materialEditor.ShaderProperty(borderLightOpaqueAlpha, Styles.borderLightOpaqueAlpha, 4);
+                    }
                 }
             }
 

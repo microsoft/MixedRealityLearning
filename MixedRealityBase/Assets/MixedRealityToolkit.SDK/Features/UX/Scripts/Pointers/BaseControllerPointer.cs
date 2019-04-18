@@ -1,21 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Physics;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Physics;
-using Microsoft.MixedReality.Toolkit.Core.Services;
-using Microsoft.MixedReality.Toolkit.Core.Utilities.Async;
-using Microsoft.MixedReality.Toolkit.SDK.Input.Handlers;
+using Microsoft.MixedReality.Toolkit.Physics;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System.Collections;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Base Pointer class for pointers that exist in the scene as GameObjects.
@@ -69,9 +60,9 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         protected bool IsHoldPressed = false;
 
         /// <summary>
-        /// Set a new cursor for this <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.IMixedRealityPointer"/>
+        /// Set a new cursor for this <see cref="Microsoft.MixedReality.Toolkit.Input.IMixedRealityPointer"/>
         /// </summary>
-        /// <remarks>This <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see> must have a <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.IMixedRealityCursor"/> attached to it.</remarks>
+        /// <remarks>This <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see> must have a <see cref="Microsoft.MixedReality.Toolkit.Input.IMixedRealityCursor"/> attached to it.</remarks>
         /// <param name="newCursor">The new cursor</param>
         public virtual void SetCursor(GameObject newCursor = null)
         {
@@ -127,7 +118,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             var renderers = GetComponentsInChildren<Renderer>();
             if (renderers != null)
             {
-                foreach(var renderer in renderers)
+                foreach (var renderer in renderers)
                 {
                     renderer.enabled = false;
                 }
@@ -137,7 +128,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         protected override async void Start()
         {
             base.Start();
-                       
+
             if (MixedRealityToolkit.InputSystem == null)
             {
                 await WaitUntilInputSystemValid;
@@ -221,7 +212,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
                 pointerName = value;
                 if (this != null)
                 {
-                   gameObject.name = value;
+                    gameObject.name = value;
                 }
             }
         }
@@ -242,7 +233,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
             {
                 if (IsFocusLocked)
                 {
-                    return true; 
+                    return true;
                 }
 
                 if (!IsActive)
@@ -331,7 +322,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         public virtual SceneQueryType SceneQueryType { get; set; } = SceneQueryType.SimpleRaycast;
 
         [SerializeField]
-        [Tooltip("The radius to use when RaycastMode is set to Sphere or SphereColliders.")]
+        [Tooltip("The radius to use when SceneQueryType is set to Sphere or SphereColliders.")]
         private float sphereCastRadius = 0.1f;
 
         /// <inheritdoc />
@@ -342,28 +333,19 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Pointers
         }
 
         /// <inheritdoc />
-        public virtual Vector3 Position
-        {
-            get
-            {
-                return (raycastOrigin != null) ? raycastOrigin.position : transform.position;
-            }
-        }
+        public virtual Vector3 Position => raycastOrigin != null ? raycastOrigin.position : transform.position;
 
         /// <inheritdoc />
-        public virtual Quaternion Rotation
-        {
-            get
-            {
-                return raycastOrigin != null ? raycastOrigin.rotation : transform.rotation;
-            }
-        }
+        public virtual Quaternion Rotation => raycastOrigin != null ? raycastOrigin.rotation : transform.rotation;
 
         /// <inheritdoc />
         public virtual void OnPreSceneQuery() { }
 
         /// <inheritdoc />
         public virtual void OnPostSceneQuery() { }
+
+        ///  <inheritdoc />
+        public virtual void OnPreCurrentPointerTargetChange() { }
 
         #endregion IMixedRealityPointer Implementation
 

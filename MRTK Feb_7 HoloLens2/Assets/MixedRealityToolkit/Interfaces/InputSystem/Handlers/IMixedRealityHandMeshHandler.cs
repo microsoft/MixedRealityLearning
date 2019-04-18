@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
 using UnityEngine.EventSystems;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Interface to implement for hand mesh information.
@@ -16,7 +14,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers
         void OnHandMeshUpdated(InputEventData<HandMeshInfo> eventData);
     }
 
-    // See BaseHandVisualizer::OnHandMeshUpdated for an example of how to use the
+    // See BaseHandVisualizer.OnHandMeshUpdated for an example of how to use the
     // hand mesh info to render a mesh.
     public class HandMeshInfo
     {
@@ -24,7 +22,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers
         public Vector3[] vertices;
 
         // Mesh triangle indices
-        public ushort[] triangles;
+        public int[] triangles;
 
         // Hand mesh normals, in initial coordinate system
         public Vector3[] normals;

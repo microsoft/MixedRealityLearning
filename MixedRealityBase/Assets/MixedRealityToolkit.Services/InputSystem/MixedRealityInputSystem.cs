@@ -1,29 +1,42 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
-using Microsoft.MixedReality.Toolkit.Core.Extensions;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.Core.Providers;
-using Microsoft.MixedReality.Toolkit.Core.Services;
-using Microsoft.MixedReality.Toolkit.Core.Utilities;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using Microsoft.MixedReality.Toolkit.Input;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
-    /// The Mixed Reality Toolkit's specific implementation of the <see cref="Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.IMixedRealityInputSystem"/>
+    /// The Mixed Reality Toolkit's specific implementation of the <see cref="Microsoft.MixedReality.Toolkit.Input.IMixedRealityInputSystem"/>
     /// </summary>
-    public class MixedRealityInputSystem : BaseEventSystem, IMixedRealityInputSystem
+    public class MixedRealityInputSystem : BaseCoreSystem, IMixedRealityInputSystem
     {
+        public MixedRealityInputSystem(
+            IMixedRealityServiceRegistrar registrar,
+            MixedRealityInputSystemProfile profile,
+            Transform playspace) : base(registrar, profile)
+        {
+            if (registrar == null)
+            {
+                Debug.LogError("The MixedRealityInputSystem object requires a valid IMixedRealityServiceRegistrar instance.");
+            }
+
+            if (playspace == null)
+            {
+                Debug.LogError("The MixedRealityInputSystem object requires a valid playspace Transform.");
+            }
+            Playspace = playspace;
+        }
+
+        /// <summary>
+        /// The transform of the playspace scene object.
+        /// </summary>
+        private Transform Playspace = null;
+
         /// <inheritdoc />
         public event Action InputEnabled;
 
@@ -39,10 +52,13 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         private IMixedRealityFocusProvider focusProvider = null;
 
         /// <inheritdoc />
-        public IMixedRealityFocusProvider FocusProvider => focusProvider ?? (focusProvider = MixedRealityToolkit.Instance.GetService<IMixedRealityFocusProvider>());
+        public IMixedRealityFocusProvider FocusProvider => focusProvider ?? (focusProvider = Registrar.GetService<IMixedRealityFocusProvider>());
 
         /// <inheritdoc />
         public IMixedRealityGazeProvider GazeProvider { get; private set; }
+
+        /// <inheritdoc />
+        public IMixedRealityEyeGazeProvider EyeGazeProvider { get; private set; }
 
         private readonly Stack<GameObject> modalInputStack = new Stack<GameObject>();
         private readonly Stack<GameObject> fallbackInputStack = new Stack<GameObject>();
@@ -79,7 +95,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
         private MixedRealityInputActionRulesProfile CurrentInputActionRulesProfile { get; set; }
 
-        #region IMixedRealityManager Implementation
+        #region IMixedRealityService Implementation
 
         /// <inheritdoc />
         /// <remarks>
@@ -90,6 +106,13 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         /// <inheritdoc />
         public override void Initialize()
         {
+            MixedRealityInputSystemProfile profile = ConfigurationProfile as MixedRealityInputSystemProfile;
+            if (profile == null)
+            {
+                Debug.LogError("The Input system is missing the required Input System Profile!");
+                return;
+            }
+
             if (!Application.isPlaying)
             {
                 CameraCache.Main.transform.position = Vector3.zero;
@@ -118,9 +141,9 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 return;
             }
 
-            if (MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.InputActionRulesProfile != null)
+            if (profile.InputActionRulesProfile != null)
             {
-                CurrentInputActionRulesProfile = MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.InputActionRulesProfile;
+                CurrentInputActionRulesProfile = profile.InputActionRulesProfile;
             }
             else
             {
@@ -128,11 +151,16 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 return;
             }
 
-            if (MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.PointerProfile != null)
+            if (profile.PointerProfile != null)
             {
-                if (MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.PointerProfile.GazeProviderType?.Type != null)
+                if (profile.PointerProfile.GazeProviderType?.Type != null)
                 {
-                    GazeProvider = CameraCache.Main.gameObject.EnsureComponent(MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.PointerProfile.GazeProviderType.Type) as IMixedRealityGazeProvider;
+                    GazeProvider = CameraCache.Main.gameObject.EnsureComponent(profile.PointerProfile.GazeProviderType.Type) as IMixedRealityGazeProvider;
+                    GazeProvider.InputSystem = this;
+                    GazeProvider.Playspace = Playspace;
+                    GazeProvider.GazeCursorPrefab = profile.PointerProfile.GazeCursorPrefab;
+                    // Current implementation implements both provider types in one concrete class.
+                    EyeGazeProvider = GazeProvider as IMixedRealityEyeGazeProvider;
                 }
                 else
                 {
@@ -173,9 +201,31 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             handTrackingInputEventData = new HandTrackingInputEventData(EventSystem.current);
         }
 
+        private List<IMixedRealityInputDeviceManager> deviceManagers = new List<IMixedRealityInputDeviceManager>();
+
         /// <inheritdoc />
         public override void Enable()
         {
+            MixedRealityInputSystemProfile profile = ConfigurationProfile as MixedRealityInputSystemProfile;
+
+            if ((deviceManagers.Count == 0) && (profile != null))
+            {
+                // Register the input device managers.
+                for (int i = 0; i < profile.DataProviderConfigurations.Length; i++)
+                {
+                    MixedRealityInputDataProviderConfiguration configuration = profile.DataProviderConfigurations[i];
+                    object[] args = { Registrar, this, profile, Playspace, configuration.ComponentName, configuration.Priority, configuration.DeviceManagerProfile };
+
+                    if (Registrar.RegisterDataProvider<IMixedRealityInputDeviceManager>(
+                        configuration.ComponentType.Type,
+                        configuration.RuntimePlatform,
+                        args))
+                    {
+                        deviceManagers.Add(Registrar.GetDataProvider<IMixedRealityInputDeviceManager>(configuration.ComponentName));
+                    }
+                }
+            }
+
             InputEnabled?.Invoke();
         }
 
@@ -202,23 +252,36 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 }
             }
 
+            if (deviceManagers.Count > 0)
+            {
+                // Unregister the input device managers.
+                for (int i = 0; i < deviceManagers.Count; i++)
+                {
+                    if (deviceManagers[i] != null)
+                    {
+                        Registrar.UnregisterDataProvider<IMixedRealityInputDeviceManager>(deviceManagers[i]);
+                    }
+                }
+            }
+            deviceManagers.Clear();
+
             InputDisabled?.Invoke();
         }
 
-        #endregion IMixedRealityManager Implementation
+        #endregion IMixedRealityService Implementation
 
-        #region IEventSystemManager Implementation
+        #region IMixedRealityEventSystem Implementation
 
         /// <inheritdoc />
         public override void HandleEvent<T>(BaseEventData eventData, ExecuteEvents.EventFunction<T> eventHandler)
         {
-            Debug.Assert(eventData != null);
-            Debug.Assert(!(eventData is MixedRealityPointerEventData), "HandleEvent called with a pointer event. All events raised by pointer should call HandlePointerEvent");
-
             if (disabledRefCount > 0)
             {
                 return;
             }
+
+            Debug.Assert(eventData != null);
+            Debug.Assert(!(eventData is MixedRealityPointerEventData), "HandleEvent called with a pointer event. All events raised by pointer should call HandlePointerEvent");
 
             var baseInputEventData = ExecuteEvents.ValidateEventData<BaseInputEventData>(eventData);
             DispatchEventToGlobalListeners(baseInputEventData, eventHandler);
@@ -270,7 +333,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 return;
             }
 
-
             Debug.Assert(pointerEventData.Pointer != null, "Trying to dispatch event on pointer but pointerEventData is null");
 
             DispatchEventToObjectFocusedByPointer(pointerEventData.Pointer, baseInputEventData, false, eventHandler);
@@ -305,11 +367,11 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             }
         }
 
-
         /// <summary>
         /// Dispatch an input event to the object focused by the given IMixedRealityPointer.
         /// If a modal dialog is active, dispatch the pointer event to that modal dialog
         /// Returns true if the event was handled by a modal handler
+        /// </summary>
         private bool DispatchEventToObjectFocusedByPointer<T>(IMixedRealityPointer mixedRealityPointer, BaseInputEventData baseInputEventData,
             bool modalEventHandled, ExecuteEvents.EventFunction<T> eventHandler) where T : IEventSystemHandler
         {
@@ -373,7 +435,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             base.Unregister(listener);
         }
 
-        #endregion IEventSystemManager Implementation
+        #endregion IMixedRealityEventSystem Implementation
 
         #region Input Disabled Options
 
@@ -523,9 +585,9 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         }
 
         /// <inheritdoc />
-        public IMixedRealityInputSource RequestNewGenericInputSource(string name, IMixedRealityPointer[] pointers = null)
+        public IMixedRealityInputSource RequestNewGenericInputSource(string name, IMixedRealityPointer[] pointers = null, InputSourceType sourceType = InputSourceType.Other)
         {
-            return new BaseGenericInputSource(name, pointers);
+            return new BaseGenericInputSource(name, pointers, sourceType);
         }
 
         #region Input Source State Events
@@ -804,16 +866,12 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             };
 
         /// <inheritdoc />
-        public void RaisePointerDown(IMixedRealityPointer pointer, Handedness handedness, MixedRealityInputAction inputAction)
-        {
-            RaisePointerDown(pointer, inputAction, handedness);
-        }
-
-        /// <inheritdoc />
         public void RaisePointerDown(IMixedRealityPointer pointer, MixedRealityInputAction inputAction, Handedness handedness = Handedness.None, IMixedRealityInputSource inputSource = null)
         {
             pointerEventData.Initialize(pointer, inputAction, handedness, inputSource);
+            
             HandlePointerEvent(pointerEventData, OnPointerDownEventHandler);
+            
             if (pointer.Result?.Details.Object != null)
             {
                 pointer.IsFocusLocked = true;
@@ -830,15 +888,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                     var casted = ExecuteEvents.ValidateEventData<MixedRealityPointerEventData>(eventData);
                     handler.OnPointerClicked(casted);
                 };
-
-        /// <inheritdoc />
-        public void RaisePointerClicked(IMixedRealityPointer pointer, Handedness handedness, MixedRealityInputAction inputAction, int count)
-        {
-            // Create input event
-            pointerEventData.Initialize(pointer, handedness, inputAction, count);
-
-            HandleClick();
-        }
 
         /// <inheritdoc />
         public void RaisePointerClicked(IMixedRealityPointer pointer, MixedRealityInputAction inputAction, int count, Handedness handedness = Handedness.None, IMixedRealityInputSource inputSource = null)
@@ -869,16 +918,12 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             };
 
         /// <inheritdoc />
-        public void RaisePointerUp(IMixedRealityPointer pointer, Handedness handedness, MixedRealityInputAction inputAction)
-        {
-            RaisePointerUp(pointer, inputAction, handedness);
-        }
-
-        /// <inheritdoc />
         public void RaisePointerUp(IMixedRealityPointer pointer, MixedRealityInputAction inputAction, Handedness handedness = Handedness.None, IMixedRealityInputSource inputSource = null)
         {
             pointerEventData.Initialize(pointer, inputAction, handedness, inputSource);
+
             HandlePointerEvent(pointerEventData, OnPointerUpEventHandler);
+            
             pointer.IsFocusLocked = false;
         }
 
@@ -898,18 +943,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             };
 
         /// <inheritdoc />
-        public void RaiseOnInputDown(IMixedRealityInputSource source, MixedRealityInputAction inputAction)
-        {
-            inputAction = ProcessRules(inputAction, true);
-
-            // Create input event
-            inputEventData.Initialize(source, inputAction);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(inputEventData, OnInputDownEventHandler);
-        }
-
-        /// <inheritdoc />
         public void RaiseOnInputDown(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction)
         {
             inputAction = ProcessRules(inputAction, true);
@@ -923,65 +956,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
         #endregion Input Down
 
-        #region Input Pressed
-
-        private static readonly ExecuteEvents.EventFunction<IMixedRealityInputHandler<float>> OnInputPressedEventHandler =
-            delegate (IMixedRealityInputHandler<float> handler, BaseEventData eventData)
-            {
-                var casted = ExecuteEvents.ValidateEventData<InputEventData<float>>(eventData);
-                handler.OnInputChanged(casted);
-            };
-
-        /// <inheritdoc />
-        public void RaiseOnInputPressed(IMixedRealityInputSource source, MixedRealityInputAction inputAction)
-        {
-            inputAction = ProcessRules(inputAction, true);
-
-            // Create input event
-            floatInputEventData.Initialize(source, inputAction);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(floatInputEventData, OnInputPressedEventHandler);
-        }
-
-        /// <inheritdoc />
-        public void RaiseOnInputPressed(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction)
-        {
-            inputAction = ProcessRules(inputAction, true);
-
-            // Create input event
-            floatInputEventData.Initialize(source, handedness, inputAction);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(floatInputEventData, OnInputPressedEventHandler);
-        }
-
-        /// <inheritdoc />
-        public void RaiseOnInputPressed(IMixedRealityInputSource source, MixedRealityInputAction inputAction, float pressAmount)
-        {
-            inputAction = ProcessRules(inputAction, pressAmount);
-
-            // Create input event
-            floatInputEventData.Initialize(source, inputAction, pressAmount);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(floatInputEventData, OnInputPressedEventHandler);
-        }
-
-        /// <inheritdoc />
-        public void RaiseOnInputPressed(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction, float pressAmount)
-        {
-            inputAction = ProcessRules(inputAction, pressAmount);
-
-            // Create input event
-            floatInputEventData.Initialize(source, handedness, inputAction, pressAmount);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(floatInputEventData, OnInputPressedEventHandler);
-        }
-
-        #endregion Input Pressed
-
         #region Input Up
 
         private static readonly ExecuteEvents.EventFunction<IMixedRealityInputHandler> OnInputUpEventHandler =
@@ -990,18 +964,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 var casted = ExecuteEvents.ValidateEventData<InputEventData>(eventData);
                 handler.OnInputUp(casted);
             };
-
-        /// <inheritdoc />
-        public void RaiseOnInputUp(IMixedRealityInputSource source, MixedRealityInputAction inputAction)
-        {
-            inputAction = ProcessRules(inputAction, false);
-
-            // Create input event
-            inputEventData.Initialize(source, inputAction);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(inputEventData, OnInputUpEventHandler);
-        }
 
         /// <inheritdoc />
         public void RaiseOnInputUp(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction)
@@ -1017,6 +979,29 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
 
         #endregion Input Up
 
+        #region Float Input Changed
+
+        private static readonly ExecuteEvents.EventFunction<IMixedRealityInputHandler<float>> OnFloatInputChanged =
+            delegate (IMixedRealityInputHandler<float> handler, BaseEventData eventData)
+            {
+                var casted = ExecuteEvents.ValidateEventData<InputEventData<float>>(eventData);
+                handler.OnInputChanged(casted);
+            };
+
+        /// <inheritdoc />
+        public void RaiseFloatInputChanged(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction, float inputValue)
+        {
+            inputAction = ProcessRules(inputAction, inputValue);
+
+            // Create input event
+            floatInputEventData.Initialize(source, handedness, inputAction, inputValue);
+
+            // Pass handler through HandleEvent to perform modal/fallback logic
+            HandleEvent(floatInputEventData, OnFloatInputChanged);
+        }
+
+        #endregion Float Input Changed
+
         #region Input Position Changed
 
         private static readonly ExecuteEvents.EventFunction<IMixedRealityInputHandler<Vector2>> OnTwoDoFInputChanged =
@@ -1025,18 +1010,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 var casted = ExecuteEvents.ValidateEventData<InputEventData<Vector2>>(eventData);
                 handler.OnInputChanged(casted);
             };
-
-        /// <inheritdoc />
-        public void RaisePositionInputChanged(IMixedRealityInputSource source, MixedRealityInputAction inputAction, Vector2 inputPosition)
-        {
-            inputAction = ProcessRules(inputAction, inputPosition);
-
-            // Create input event
-            vector2InputEventData.Initialize(source, inputAction, inputPosition);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(vector2InputEventData, OnTwoDoFInputChanged);
-        }
 
         /// <inheritdoc />
         public void RaisePositionInputChanged(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction, Vector2 inputPosition)
@@ -1056,18 +1029,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 var casted = ExecuteEvents.ValidateEventData<InputEventData<Vector3>>(eventData);
                 handler.OnInputChanged(casted);
             };
-
-        /// <inheritdoc />
-        public void RaisePositionInputChanged(IMixedRealityInputSource source, MixedRealityInputAction inputAction, Vector3 position)
-        {
-            inputAction = ProcessRules(inputAction, position);
-
-            // Create input event
-            positionInputEventData.Initialize(source, inputAction, position);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(positionInputEventData, OnPositionInputChanged);
-        }
 
         /// <inheritdoc />
         public void RaisePositionInputChanged(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction, Vector3 position)
@@ -1093,18 +1054,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
             };
 
         /// <inheritdoc />
-        public void RaiseRotationInputChanged(IMixedRealityInputSource source, MixedRealityInputAction inputAction, Quaternion rotation)
-        {
-            inputAction = ProcessRules(inputAction, rotation);
-
-            // Create input event
-            rotationInputEventData.Initialize(source, inputAction, rotation);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(positionInputEventData, OnRotationInputChanged);
-        }
-
-        /// <inheritdoc />
         public void RaiseRotationInputChanged(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction, Quaternion rotation)
         {
             inputAction = ProcessRules(inputAction, rotation);
@@ -1126,18 +1075,6 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                 var casted = ExecuteEvents.ValidateEventData<InputEventData<MixedRealityPose>>(eventData);
                 handler.OnInputChanged(casted);
             };
-
-        /// <inheritdoc />
-        public void RaisePoseInputChanged(IMixedRealityInputSource source, MixedRealityInputAction inputAction, MixedRealityPose inputData)
-        {
-            inputAction = ProcessRules(inputAction, inputData);
-
-            // Create input event
-            poseInputEventData.Initialize(source, inputAction, inputData);
-
-            // Pass handler through HandleEvent to perform modal/fallback logic
-            HandleEvent(poseInputEventData, OnPoseInputChanged);
-        }
 
         /// <inheritdoc />
         public void RaisePoseInputChanged(IMixedRealityInputSource source, Handedness handedness, MixedRealityInputAction inputAction, MixedRealityPose inputData)

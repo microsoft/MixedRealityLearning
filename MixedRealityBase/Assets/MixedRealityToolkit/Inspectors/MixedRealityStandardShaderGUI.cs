@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.MixedReality.Toolkit.Core.Utilities;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
+namespace Microsoft.MixedReality.Toolkit.Editor
 {
     /// <summary>
     /// A custom shader inspector for the "Mixed Reality Toolkit/Standard" shader.
@@ -122,6 +122,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             public static GUIContent enableHoverColorOverride = new GUIContent("Override Color", "Override Global Hover Light Color");
             public static GUIContent hoverColorOverride = new GUIContent("Color", "Override Hover Light Color");
             public static GUIContent proximityLight = new GUIContent("Proximity Light", "Enable utilization of Proximity Light(s)");
+            public static GUIContent proximityLightTwoSided = new GUIContent("Two Sided", "Proximity Lights Apply to Both Sides of a Surface");
             public static GUIContent roundCorners = new GUIContent("Round Corners", "(Assumes UVs Specify Borders of Surface, Works Best on Unity Cube, Quad, and Plane)");
             public static GUIContent roundCornerRadius = new GUIContent("Unit Radius", "Rounded Rectangle Corner Unit Sphere Radius");
             public static GUIContent roundCornerMargin = new GUIContent("Margin %", "Distance From Geometry Edge");
@@ -207,6 +208,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
         protected MaterialProperty enableHoverColorOverride;
         protected MaterialProperty hoverColorOverride;
         protected MaterialProperty proximityLight;
+        protected MaterialProperty proximityLightTwoSided;
         protected MaterialProperty roundCorners;
         protected MaterialProperty roundCornerRadius;
         protected MaterialProperty roundCornerMargin;
@@ -291,6 +293,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
             enableHoverColorOverride = FindProperty("_EnableHoverColorOverride", props);
             hoverColorOverride = FindProperty("_HoverColorOverride", props);
             proximityLight = FindProperty("_ProximityLight", props);
+            proximityLightTwoSided = FindProperty("_ProximityLightTwoSided", props);
             roundCorners = FindProperty("_RoundCorners", props);
             roundCornerRadius = FindProperty("_RoundCornerRadius", props);
             roundCornerMargin = FindProperty("_RoundCornerMargin", props);
@@ -651,10 +654,11 @@ namespace Microsoft.MixedReality.Toolkit.Core.Inspectors
 
             if (PropertyEnabled(proximityLight))
             {
+                materialEditor.ShaderProperty(proximityLightTwoSided, Styles.proximityLightTwoSided, 2);
                 GUILayout.Box(string.Format(Styles.propertiesComponentHelp, nameof(ProximityLight), Styles.proximityLight.text), EditorStyles.helpBox, new GUILayoutOption[0]);
             }
 
-                materialEditor.ShaderProperty(roundCorners, Styles.roundCorners);
+            materialEditor.ShaderProperty(roundCorners, Styles.roundCorners);
 
             if (PropertyEnabled(roundCorners))
             {

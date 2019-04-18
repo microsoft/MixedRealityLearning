@@ -1,22 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.SDK.Input.Handlers;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using Microsoft.MixedReality.Toolkit.Input;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
+namespace Microsoft.MixedReality.Toolkit.UI
 {
     /// <summary>
     /// An interaction receiver is simply a component that attached to a list of interactable objects and does something
     /// based on events from those interactable objects. This is the base abstract class to extend from.
     /// </summary>
     public abstract class InteractionReceiver : BaseInputHandler,
-        IMixedRealityHandTrackHandler,
+        IMixedRealityTouchHandler,
         IMixedRealityFocusChangedHandler,
         IMixedRealityInputHandler,
         IMixedRealityInputHandler<float>,
@@ -37,7 +35,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         public List<GameObject> Interactables
         {
             get { return interactables; }
-            private set { value = interactables; }
+            private set { interactables = value; }
         }
 
         [Tooltip("Targets for the receiver to affect")]
@@ -49,7 +47,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         public List<GameObject> Targets
         {
             get { return targets; }
-            private set { value = targets; }
+            private set { targets = value; }
         }
 
         #endregion Public Members
@@ -58,7 +56,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         [Tooltip("When true, this interaction receiver will draw connections in the editor to Interactables and Targets")]
         private bool drawEditorConnections = true;
 
-        #region MonoBehaviour implementation
+        #region MonoBehaviour Implementation
 
         /// <summary>
         /// On enable, set the BaseInputHandler's IsFocusRequired to false to receive all events.
@@ -106,7 +104,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        #endregion MonoBehaviour implementation
+        #endregion MonoBehaviour Implementation
 
         /// <summary>
         /// Register an interactable with this receiver.
@@ -178,7 +176,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
 
         #endregion IMixedRealityFocusChangedHandler Implementation
 
-        #region IMixedRealityInputHandler Impmentations
+        #region IMixedRealityInputHandler Implementation
 
         /// <inheritdoc />
         void IMixedRealityInputHandler.OnInputUp(InputEventData eventData)
@@ -198,26 +196,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        [Obsolete("Use IMixedRealityInputHandler<float>.OnInputChanged instead.")]
-        void IMixedRealityInputHandler.OnInputPressed(InputEventData<float> eventData)
-        {
-            Debug.LogWarning("Obsolete. Use IMixedRealityInputHandler<float>.OnInputChanged instead.");
-        }
-
         /// <inheritdoc />
         void IMixedRealityInputHandler<float>.OnInputChanged(InputEventData<float> eventData)
         {
             if (IsInteractable(eventData.selectedObject))
             {
-                InputPressed(eventData.selectedObject, eventData);
+                FloatInputChanged(eventData.selectedObject, eventData);
             }
-        }
-
-        /// <inheritdoc />
-        [Obsolete("Use IMixedRealityInputHandler<Vector2>.OnInputChanged instead.")]
-        void IMixedRealityInputHandler.OnPositionInputChanged(InputEventData<Vector2> eventData)
-        {
-            Debug.LogWarning("Obsolete. Use IMixedRealityInputHandler<Vector2>.OnInputChanged instead.");
         }
 
         /// <inheritdoc />
@@ -229,9 +214,9 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        #endregion IMixedRealityInputHandler Impmentations
+        #endregion IMixedRealityInputHandler Implementation
 
-        #region IMixedRealityGestureHandler Impmentations
+        #region IMixedRealityGestureHandler Implementation
 
         /// <inheritdoc />
         void IMixedRealityGestureHandler.OnGestureStarted(InputEventData eventData)
@@ -323,18 +308,16 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
             }
         }
 
-        #endregion IMixedRealityGestureHandler Impmentations
+        #endregion IMixedRealityGestureHandler Implementation
 
         #region IMixedRealityHandTrackingHandler Implementation
 
         /// <inheritdoc />
-        void IMixedRealityHandTrackHandler.OnTouchStarted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchStarted(HandTrackingInputEventData eventData)
         {
-            Debug.Log("touched in IR");
-            if (IsInteractable(eventData.TouchedObject))
+            if (IsInteractable(eventData.selectedObject))
             {
-                Debug.Log("touched object: " + eventData.TouchedObject);
-                TouchStarted(eventData.TouchedObject, eventData);
+                TouchStarted(eventData.selectedObject, eventData);
             }
         }
 
@@ -343,11 +326,11 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         }
 
         /// <inheritdoc />
-        void IMixedRealityHandTrackHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
         {
-            if (IsInteractable(eventData.TouchedObject))
+            if (IsInteractable(eventData.selectedObject))
             {
-                TouchCompleted(eventData.TouchedObject, eventData);
+                TouchCompleted(eventData.selectedObject, eventData);
             }
 
         }
@@ -385,11 +368,11 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX.Receivers
         protected virtual void InputUp(GameObject targetObject, InputEventData eventData) { }
 
         /// <summary>
-        /// Raised when the target interactable object receives an input pressed event.
+        /// Raised when the target interactable object receives a float input changed event.
         /// </summary>
         /// <param name="targetObject"></param>
         /// <param name="eventData"></param>
-        protected virtual void InputPressed(GameObject targetObject, InputEventData<float> eventData) { }
+        protected virtual void FloatInputChanged(GameObject targetObject, InputEventData<float> eventData) { }
 
         /// <summary>
         /// Raised when the target interactable object receives an input changed event.

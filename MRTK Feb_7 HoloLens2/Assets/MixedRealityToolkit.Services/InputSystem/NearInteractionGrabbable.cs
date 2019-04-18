@@ -5,20 +5,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Add a NearInteractionGrabbable component to any GameObject that has a collidable
     /// on it in order to make that collidable near grabbable.
     /// 
-    /// Any IMixedRealityNearPointer will then send pointer events to all IMixedRealityPointerHandler
-    /// objects when the pointer is close enough to grab the object.
+    /// Any IMixedRealityNearPointer will then dispatch pointer events
+    /// to the closest near grabbable objects.
     ///
-    /// Additionally, the near pointer will send focus enter and exit events when the near pointer
-    /// is focusing this grabbable object (when this is the closes grabbable to the pointer).
+    /// Additionally, the near pointer will send focus enter and exit events when the 
+    /// decorated object is the closest object to the near pointer
     /// </summary>
     public class NearInteractionGrabbable : MonoBehaviour
     {
-
+        [Tooltip("Check to show a tether from the position where object was grabbed to the hand when manipulating. Useful for things like bounding boxes where resizing/rotating might be constrained.")]
+        public bool ShowTetherWhenManipulating = false;
     }
 }

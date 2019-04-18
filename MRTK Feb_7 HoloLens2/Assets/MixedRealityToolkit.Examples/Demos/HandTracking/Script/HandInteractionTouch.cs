@@ -1,36 +1,86 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
 
 namespace Microsoft.MixedReality.Toolkit.Examples.Demos
 {
-    public class HandInteractionTouch : MonoBehaviour, IMixedRealityHandTrackHandler
+    public class HandInteractionTouch : MonoBehaviour, IMixedRealityTouchHandler
     {
-        public TextMesh debugMessage;
+        [SerializeField]
+        private TextMesh debugMessage = null;
+        [SerializeField]
+        private TextMesh debugMessage2 = null;
 
-        public void OnTouchCompleted(HandTrackingInputEventData eventData)
+        #region Event handlers
+        public TouchEvent OnTouchCompleted;
+        public TouchEvent OnTouchStarted;
+        public TouchEvent OnTouchUpdated;
+        #endregion
+
+        private Renderer TargetRenderer;
+        private Color originalColor;
+        private Color highlightedColor;
+
+        protected float duration = 1.5f;
+        protected float t = 0;
+
+        private void Start()
         {
-            if(debugMessage != null)
+            TargetRenderer = GetComponentInChildren<Renderer>();
+            if ((TargetRenderer != null) && (TargetRenderer.sharedMaterial != null))
             {
-                debugMessage.text = "OnTouchCompleted: " + Time.unscaledTime.ToString();
+                originalColor = TargetRenderer.sharedMaterial.color;
+                highlightedColor = new Color(originalColor.r + 0.2f, originalColor.g + 0.2f, originalColor.b + 0.2f);
             }
         }
 
-        public void OnTouchStarted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
         {
+            OnTouchCompleted.Invoke(new TouchEventData { });
+
+            if (debugMessage != null)
+            {
+                debugMessage.text = "OnTouchCompleted: " + Time.unscaledTime.ToString();
+            }
+
+            if ((TargetRenderer != null) && (TargetRenderer.material != null))
+            {
+                TargetRenderer.material.color = originalColor;
+            }
+        }
+
+        void IMixedRealityTouchHandler.OnTouchStarted(HandTrackingInputEventData eventData)
+        {
+            OnTouchStarted.Invoke(new TouchEventData { });
+
             if (debugMessage != null)
             {
                 debugMessage.text = "OnTouchStarted: " + Time.unscaledTime.ToString();
             }
 
+            if (TargetRenderer != null)
+            {
+                TargetRenderer.sharedMaterial.color = Color.Lerp(originalColor, highlightedColor, 2.0f);
+            }
         }
 
-        public void OnTouchUpdated(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchUpdated(HandTrackingInputEventData eventData)
         {
-        }
+            OnTouchUpdated.Invoke(new TouchEventData { });
 
+            if (debugMessage2 != null)
+            {
+                debugMessage2.text = "OnTouchUpdated: " + Time.unscaledTime.ToString();
+            }
+
+            if ((TargetRenderer != null) && (TargetRenderer.material != null))
+            {
+                TargetRenderer.material.color = Color.Lerp(Color.green, Color.red, t);
+                t = Mathf.PingPong(Time.time, duration) / duration;
+            }
+        }
     }
 }

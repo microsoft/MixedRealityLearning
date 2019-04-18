@@ -6,7 +6,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Services.InputSystem.Utilities
+namespace Microsoft.MixedReality.Toolkit.Input.Utilities
 {
     /// <summary>
     /// Helper class to get CanvasUtility onto Canvas objects.

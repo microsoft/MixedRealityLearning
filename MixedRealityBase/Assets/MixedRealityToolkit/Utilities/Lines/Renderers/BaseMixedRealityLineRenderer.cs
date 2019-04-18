@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Lines;
-using Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.DataProviders;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
+namespace Microsoft.MixedReality.Toolkit.Utilities
 {
     /// <summary>
     /// Base class for Mixed Reality Line Renderers.
@@ -225,6 +223,13 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
 
             return normalizedDistance;
         }
+
+        private void LateUpdate()
+        {
+            UpdateLine();
+        }
+
+        protected abstract void UpdateLine();
 
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()

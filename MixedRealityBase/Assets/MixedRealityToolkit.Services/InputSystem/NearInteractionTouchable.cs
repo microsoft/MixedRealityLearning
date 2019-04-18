@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Add a NearInteractionTouchable to your scene and configure a touchable surface
@@ -95,6 +94,8 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         public static IReadOnlyCollection<NearInteractionTouchable> Instances { get { return instances.AsReadOnly(); } }
         private static readonly List<NearInteractionTouchable> instances = new List<NearInteractionTouchable>();
 
+        public bool ColliderEnabled { get { return !usesCollider || touchableCollider.enabled && touchableCollider.gameObject.activeInHierarchy; } }
+
         /// <summary>
         /// Local space forward direction
         /// </summary>
@@ -135,6 +136,19 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
         /// </summary>
         [SerializeField]
         protected Vector2 bounds = Vector2.zero;
+
+        /// <summary>
+        /// False if no collider is found on validate.
+        /// This is used to avoid the perf cost of a null check with the collider.
+        /// </summary>
+        private bool usesCollider = false;
+
+        /// <summary>
+        /// The collider used by this touchable.
+        /// </summary>
+        [SerializeField]
+        [FormerlySerializedAs("collider")]
+        private Collider touchableCollider;
 
         protected void OnEnable()
         {
@@ -180,6 +194,9 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem
                     localCenter = bc.center + Vector3.Scale(bc.size / 2.0f, localForward);
                 }
             }
+
+            touchableCollider = GetComponent<Collider>();
+            usesCollider = touchableCollider != null;
 
             localForward = localForward.normalized;
             localUp = localUp.normalized;

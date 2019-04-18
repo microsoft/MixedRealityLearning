@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Data structure for mapping Voice and Keyboard input to <see cref="MixedRealityInputAction"/>s that can be raised by the Input System.
@@ -46,7 +46,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
                 {
                     try
                     {
-                        var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
+                        var resourceLoader = global::Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
                         localizedKeyword = resourceLoader.GetString(localizationKey);
                     }
                     catch(System.Exception e)
