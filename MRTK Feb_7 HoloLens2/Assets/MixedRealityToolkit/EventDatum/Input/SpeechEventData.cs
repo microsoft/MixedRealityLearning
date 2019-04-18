@@ -1,13 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using UnityEngine.EventSystems;
 
-namespace Microsoft.MixedReality.Toolkit.Core.EventDatum.Input
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Describes an input event that involves keyword recognition.
@@ -20,7 +18,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.EventDatum.Input
         public TimeSpan PhraseDuration { get; private set; }
 
         /// <summary>
-        /// The moment in time when uttering of the phrase began.
+        /// The moment in UTC time when uttering of the phrase began.
         /// </summary>
         public DateTime PhraseStartTime { get; private set; }
 

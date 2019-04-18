@@ -1,18 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
+using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.EventSystems;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
-    // Implementation of this interface causes a script to receive notifications of Grab and Touch events from HandTrackingInputSources
+    /// Implementation of this interface causes a script to receive notifications of Touch events from HandTrackingInputSources
     /// </summary>
-    public interface IMixedRealityHandTrackHandler : IEventSystemHandler
+    public interface IMixedRealityTouchHandler : IEventSystemHandler
     {
         /// <summary>
         /// When a Touch motion has occurred, this handler receives the event.
+        /// </summary>
         /// <remarks>
         /// A Touch motion is defined as occurring within the bounds of an object (transitive).
         /// </remarks>

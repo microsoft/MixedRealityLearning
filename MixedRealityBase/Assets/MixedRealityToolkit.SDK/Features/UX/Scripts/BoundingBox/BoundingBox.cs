@@ -1,22 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
-using Microsoft.MixedReality.Toolkit.Core.Extensions;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.Examples.Demos;
-using Microsoft.MixedReality.Toolkit.SDK.Input.Events;
-using Microsoft.MixedReality.Toolkit.SDK.Input.Handlers;
-using Microsoft.MixedReality.Toolkit.Services.InputSystem;
+using Microsoft.MixedReality.Toolkit.Input;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using UnityPhysics = UnityEngine.Physics;
 
-namespace Microsoft.MixedReality.Toolkit.SDK.UX
+namespace Microsoft.MixedReality.Toolkit.UI
 {
     public class BoundingBox : BaseFocusHandler,
         IMixedRealityPointerHandler,
@@ -370,6 +362,11 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX
             }
         }
 
+        public BoxCollider TargetBounds
+        {
+            get { return cachedTargetCollider; }
+        }
+
         // True if this game object is a child of the Target one
         private bool isChildOfTarget = false;
 
@@ -379,7 +376,8 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX
 
         /// <summary>
         /// Allows to manually enable wire (edge) highlighting (edges) of the bounding box.
-        /// This is useful if connected to the Manipulation events of a <see cref="ManipulationHandler"/> 
+        /// This is useful if connected to the Manipulation events of a
+        /// <see cref="Microsoft.MixedReality.Toolkit.UI.ManipulationHandler"/> 
         /// when used in conjunction with this MonoBehavior.
         /// </summary>
         public void HighlightWires()
@@ -1238,13 +1236,13 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX
                 // are computed when the object is in its 'axis aligned orientation'.
                 Quaternion currentRotation = Target.transform.rotation;
                 Target.transform.rotation = Quaternion.identity;
-                Physics.SyncTransforms(); // Update collider bounds
+                UnityPhysics.SyncTransforms(); // Update collider bounds
 
                 Vector3 boundsExtents = cachedTargetCollider.bounds.extents;
 
                 // After bounds are computed, restore rotation...
                 Target.transform.rotation = currentRotation;
-                Physics.SyncTransforms();
+                UnityPhysics.SyncTransforms();
 
                 if (boundsExtents != Vector3.zero)
                 {
@@ -1486,8 +1484,7 @@ namespace Microsoft.MixedReality.Toolkit.SDK.UX
 
         void IMixedRealityPointerHandler.OnPointerDown(MixedRealityPointerEventData eventData)
         {
-            if (currentPointer == null && !eventData.used &&
-                (eventData.MixedRealityInputAction.Description == "Grip Press" || eventData.MixedRealityInputAction.Description == "Select"))
+            if (currentPointer == null && !eventData.used)
             {
                 GameObject grabbedHandle = eventData.Pointer.Result.CurrentPointerTarget;
                 Transform grabbedHandleTransform = grabbedHandle.transform;

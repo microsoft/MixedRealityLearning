@@ -1,10 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.﻿
 
-using Microsoft.MixedReality.Toolkit.SDK.UX.Pointers;
+using Microsoft.MixedReality.Toolkit.Input.Editor;
+using Microsoft.MixedReality.Toolkit.Input;
 using UnityEditor;
 
-namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.UX.Pointers
+namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
 {
     [CustomEditor(typeof(LinePointer))]
     public class LinePointerInspector : BaseControllerPointerInspector
@@ -14,12 +15,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.UX.Pointers
         private SerializedProperty lineColorInvalid;
         private SerializedProperty lineColorNoTarget;
         private SerializedProperty lineColorLockFocus;
-        private SerializedProperty useContextSpecificRenderers;
-        private SerializedProperty lineRendererSelected;
-        private SerializedProperty lineRendererValid;
-        private SerializedProperty lineRendererInvalid;
-        private SerializedProperty lineRendererNoTarget;
-        private SerializedProperty lineRendererLockFocus;
         private SerializedProperty lineCastResolution;
         private SerializedProperty lineRenderers;
 
@@ -35,15 +30,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.UX.Pointers
             lineColorInvalid = serializedObject.FindProperty("LineColorInvalid");
             lineColorNoTarget = serializedObject.FindProperty("LineColorNoTarget");
             lineColorLockFocus = serializedObject.FindProperty("LineColorLockFocus");
-
-            useContextSpecificRenderers = serializedObject.FindProperty("useContextSpecificRenderers");
-
-            lineRendererSelected = serializedObject.FindProperty("lineRendererSelected");
-            lineRendererValid = serializedObject.FindProperty("lineRendererValid");
-            lineRendererInvalid = serializedObject.FindProperty("lineRendererInvalid");
-            lineRendererNoTarget = serializedObject.FindProperty("lineRendererNoTarget");
-            lineRendererLockFocus = serializedObject.FindProperty("lineRendererLockFocus");
-
             lineCastResolution = serializedObject.FindProperty("LineCastResolution");
             lineRenderers = serializedObject.FindProperty("lineRenderers");
         }
@@ -71,18 +57,6 @@ namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.UX.Pointers
                 EditorGUILayout.PropertyField(lineColorInvalid);
                 EditorGUILayout.PropertyField(lineColorNoTarget);
                 EditorGUILayout.PropertyField(lineColorLockFocus);
-
-                EditorGUILayout.PropertyField(useContextSpecificRenderers);
-
-                if (useContextSpecificRenderers.boolValue)
-                {
-                    EditorGUILayout.PropertyField(lineRendererSelected);
-                    EditorGUILayout.PropertyField(lineRendererValid);
-                    EditorGUILayout.PropertyField(lineRendererInvalid);
-                    EditorGUILayout.PropertyField(lineRendererNoTarget);
-                    EditorGUILayout.PropertyField(lineRendererLockFocus);
-                }
-
                 EditorGUILayout.PropertyField(lineRenderers, true);
                 EditorGUI.indentLevel--;
             }

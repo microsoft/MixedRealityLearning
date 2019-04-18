@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Services;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Microsoft.MixedReality.Toolkit.Services.InputSystem.Utilities
+namespace Microsoft.MixedReality.Toolkit.Input.Utilities
 {
     /// <summary>
     /// Helper class for setting up canvases for use in the MRTK.
@@ -29,7 +28,7 @@ namespace Microsoft.MixedReality.Toolkit.Services.InputSystem.Utilities
                     return;
                 }
 
-                if (IsPartOfScene(canvas.gameObject) && CanSupportMrtkInput(canvas) && (canvas.worldCamera != null))
+                if (IsPartOfScene(canvas.gameObject) && CanSupportMrtkInput(canvas) && (canvas.worldCamera != null) && !Application.isPlaying)
                 {
                     UnityEditor.EditorGUILayout.HelpBox("World Space Canvas should have no camera set to work properly with Mixed Reality Toolkit. At runtime, they'll get their camera set automatically.", UnityEditor.MessageType.Error);
                     if (GUILayout.Button("Clear World Camera"))

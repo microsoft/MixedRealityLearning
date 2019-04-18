@@ -1,22 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Microsoft.MixedReality.Toolkit.Utilities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Devices
+namespace Microsoft.MixedReality.Toolkit.Input
 {
-    [CreateAssetMenu(menuName = "Mixed Reality Toolkit/Mixed Reality Hand Tracking Profile", fileName = "MixedRealityHandTrackingProfile", order = 4)]
+    [CreateAssetMenu(menuName = "Mixed Reality Toolkit/Mixed Reality Hand Tracking Profile", fileName = "MixedRealityHandTrackingProfile", order = (int)CreateProfileMenuItemIndices.HandTracking)]
     public class MixedRealityHandTrackingProfile : BaseMixedRealityProfile
     {
-        [SerializeField]
-        [Tooltip("A reference to the standard Hand API prefab.")]
-        private GameObject simulatedHandPrefab = null;
-
-        /// <summary>
-        /// A reference to the standard Hand API prefab.
-        /// </summary>
-        public GameObject SimulatedHandPrefab => simulatedHandPrefab;
-
         [SerializeField]
         [Tooltip("The joint prefab to use.")]
         private GameObject jointPrefab = null;
@@ -55,7 +48,37 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.Devices
 
         [SerializeField]
         [Tooltip("If true and the hand mesh is available, try to access the hand mesh from the system. Note: this could reduce performance")]
-        private bool enableHandMeshUpdates = false;
-        public bool EnableHandMeshUpdates => enableHandMeshUpdates;
+        [FormerlySerializedAs("enableHandMeshUpdates")]
+        private bool enableHandMeshVisualization = false;
+        public bool EnableHandMeshVisualization
+        {
+            get
+            {
+                return enableHandMeshVisualization;
+            }
+
+            set
+            {
+                enableHandMeshVisualization = value;
+            }
+        }
+
+        [SerializeField]
+        [Tooltip("Renders the hand joints. Note: this could reduce performance")]
+        private bool enableHandJointVisualization = false;
+        public bool EnableHandJointVisualization
+        {
+            get
+            {
+                return enableHandJointVisualization;
+            }
+
+            set
+            {
+                enableHandJointVisualization = value;
+            }
+        }
+
+        
     }
 }

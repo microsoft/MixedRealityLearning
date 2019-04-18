@@ -1,33 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.Physics;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
-using UnityEngine;
-using System.Linq;
-using UnityEngine.Assertions;
 using System.Collections.Generic;
-using Microsoft.MixedReality.Toolkit.Core.Attributes;
-using Microsoft.MixedReality.Toolkit.Core.EventDatum.Input;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Utilities.Physics;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem.Handlers;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Services;
-using Microsoft.MixedReality.Toolkit.SDK.Input.Events;
-using Microsoft.MixedReality.Toolkit.Core.Utilities;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Assertions;
 
-namespace Microsoft.MixedReality.Toolkit.Examples.Demos
+namespace Microsoft.MixedReality.Toolkit.UI
 {
     /// <summary>
     /// This script allows for an object to be movable, scalable, and rotatable with one or two hands. 
     /// You may also configure the script on only enable certain manipulations. The script works with 
     /// both HoloLens' gesture input and immersive headset's motion controller input.
-    /// See Assets/HoloToolkit-Examples/Input/Readme/README_TwoHandManipulationTest.md
-    /// for instructions on how to use the script.
     /// </summary>
-    /// 
     public class ManipulationHandler : MonoBehaviour, IMixedRealityPointerHandler, IMixedRealityFocusHandler
     {
         #region Public Enums
@@ -202,27 +191,6 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
         #endregion MonoBehaviour Functions
 
         #region Private Methods
-        private bool TryGetGripPositionAndOrientation(IMixedRealityPointer pointer, out Quaternion orientation, out Vector3 position)
-        {
-            var handController = pointer.Controller as IMixedRealityHand;
-            if (handController != null)
-            {
-                if (handController.TryGetJoint(TrackedHandJoint.Palm, out MixedRealityPose palm) &&
-                    handController.TryGetJoint(TrackedHandJoint.IndexTip, out MixedRealityPose tip))
-                {
-                    orientation = palm.Rotation;
-                    position = tip.Position;
-                    return true;
-                }
-            }
-            orientation = Quaternion.identity;
-            position = Vector3.zero;
-            return false;
-        }
-        private void SetManipulationMode(TwoHandedManipulation mode)
-        {
-            twoHandedManipulationType = mode;
-        }
         private Vector3 GetPointersCentroid()
         {
             Vector3 sum = Vector3.zero;
@@ -266,6 +234,7 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
             }
             return false;
         }
+
         private void UpdateStateMachine()
         {
             var handsPressedCount = pointerIdToPointerMap.Count;
@@ -332,6 +301,7 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
             InvokeStateUpdateFunctions(currentState, newState);
             currentState = newState;
         }
+
         private void InvokeStateUpdateFunctions(State oldState, State newState)
         {
             if (newState != oldState)
@@ -391,10 +361,6 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
         #endregion Private Methods
 
         #region Hand Event Handlers
-        private bool IsEventAGrabInteraction(MixedRealityPointerEventData eventData)
-        {
-            return eventData.MixedRealityInputAction.Description == "Grip Press" || eventData.MixedRealityInputAction.Description == "Select";
-        }
 
         private MixedRealityInteractionMapping GetSpatialGripInfoForController(IMixedRealityController controller)
         {
@@ -406,7 +372,6 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
             return controller.Interactions?.First(x => x.InputType == DeviceInputType.SpatialGrip);
         }
 
-        /// <inheritdoc />
         /// <inheritdoc />
         public void OnPointerDown(MixedRealityPointerEventData eventData)
         {
@@ -421,7 +386,6 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
                 uint id = eventData.Pointer.PointerId;
                 // Ignore poke pointer events
                 if (!eventData.used
-                    && IsEventAGrabInteraction(eventData)
                     && !pointerIdToPointerMap.ContainsKey(eventData.Pointer.PointerId))
                 {
                     if (pointerIdToPointerMap.Count == 0)
@@ -477,6 +441,7 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
             UpdateStateMachine();
             eventData.Use();
         }
+
         #endregion Hand Event Handlers
 
         #region Private Event Handlers
@@ -634,31 +599,21 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
         private void HandleManipulationStarted()
         {
             isNearManipulation = IsNearManipulation();
-            // TODO: If we are on Baraboo, push and pop modal input handler so that we can use old ggv manipulation
-            // for Sydney, we don't want to do this
+            // TODO: If we are on HoloLens 1, push and pop modal input handler so that we can use old
+            // gaze/gesture/voice manipulation. For HoloLens 2, we don't want to do this.
             OnManipulationStarted.Invoke(new ManipulationEventData { IsNearInteraction = isNearManipulation });
 
         }
         private void HandleManipulationEnded()
         {
-            // TODO: If we are on Baraboo, push and pop modal input handler so that we can use old ggv manipulation
-            // for Sydney, we don't want to do this
+            // TODO: If we are on HoloLens 1, push and pop modal input handler so that we can use old
+            // gaze/gesture/voice manipulation. For HoloLens 2, we don't want to do this.
             OnManipulationEnded.Invoke(new ManipulationEventData { IsNearInteraction = isNearManipulation });
 
         }
         #endregion Private Event Handlers
 
         #region Unused Event Handlers
-
-        /// <inheritdoc />
-        public void OnInputPressed(InputEventData<float> eventData) { }
-
-        /// <inheritdoc />
-        public void OnBeforeFocusChange(FocusEventData eventData) { }
-
-        /// <inheritdoc />
-        public void OnFocusChanged(FocusEventData eventData) { }
-
         /// <inheritdoc />
         public void OnPointerClicked(MixedRealityPointerEventData eventData) { }
         #endregion Unused Event Handlers

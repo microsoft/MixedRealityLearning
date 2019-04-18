@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Utilities
+namespace Microsoft.MixedReality.Toolkit.Utilities
 {
     /// <summary>
     /// Utility component to animate and visualize a light that can be used with 
@@ -16,10 +17,10 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
     {
         // Two proximity lights are supported at this time.
         private const int proximityLightCount = 2;
-        private const int proximityLightDataSize = 5;
+        private const int proximityLightDataSize = 6;
         private static List<ProximityLight> activeProximityLights = new List<ProximityLight>(proximityLightCount);
         private static Vector4[] proximityLightData = new Vector4[proximityLightCount * proximityLightDataSize];
-        private static int _ProximityLightDataID;
+        private static int proximityLightDataID;
         private static int lastProximityLightUpdate = -1;
 
         [Serializable]
@@ -69,18 +70,18 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
             private float nearDistance = 0.02f;
 
             /// <summary>
-            /// Specifies the distance a ProximityLight must be from a surface to be considered far.
+            /// When a ProximityLight is near, the smallest size percentage from the far size it can shrink to.
             /// </summary>
-            public float FarDistance
+            public float MinNearSizePercentage
             {
-                get { return farDistance; }
-                set { farDistance = value; }
+                get { return minNearSizePercentage; }
+                set { minNearSizePercentage = value; }
             }
 
-            [Tooltip("Specifies the distance a ProximityLight must be from a surface to be considered far.")]
+            [Tooltip("When a ProximityLight is near, the smallest size percentage from the far size it can shrink to.")]
             [SerializeField]
             [Range(0.0f, 1.0f)]
-            private float farDistance = 0.1f;
+            private float minNearSizePercentage = 0.35f;
 
             /// <summary>
             /// The color of the ProximityLight gradient at the center (RGB) and (A) is gradient extent.
@@ -95,7 +96,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
             [Tooltip("The color of the ProximityLight gradient at the center (RGB) and (A) is gradient extent.")]
             [ColorUsageAttribute(true, true)]
             [SerializeField]
-            private Color centerColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+            private Color centerColor = new Color(20.0f / 255.0f, 121.0f / 255.0f, 250.0f / 255.0f, 0.0f / 255.0f);
 
             /// <summary>
             /// The color of the ProximityLight gradient at the center (RGB) and (A) is gradient extent.
@@ -109,7 +110,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
             [Tooltip("The color of the ProximityLight gradient at the middle (RGB) and (A) is gradient extent.")]
             [SerializeField]
             [ColorUsageAttribute(true, true)]
-            private Color middleColor = new Color(0.01f, 0.63f, 1.0f, 0.75f);
+            private Color middleColor = new Color(3.0f / 255.0f, 111.0f / 255.0f, 255.0f / 255.0f, 84.0f / 255.0f);
 
             /// <summary>
             /// The color of the ProximityLight gradient at the center (RGB) and (A) is gradient extent.
@@ -123,7 +124,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
             [Tooltip("The color of the ProximityLight gradient at the outer (RGB) and (A) is gradient extent.")]
             [SerializeField]
             [ColorUsageAttribute(true, true)]
-            private Color outerColor = new Color(0.64f, 0.0f, 0.75f, 0.0f) * 3.5f;
+            private Color outerColor = new Color((70.0f * 5.0f) / 255.0f, (0.0f * 5.0f) / 255.0f, (191.0f * 5.0f) / 255.0f, 255.0f / 255.0f);
         }
 
         public LightSettings Settings
@@ -134,6 +135,23 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
 
         [SerializeField]
         private LightSettings settings = new LightSettings();
+
+        private float pulseTime;
+        private float pulseFade;
+
+        /// <summary>
+        /// Initiates a pulse, if one is not already occurring, which simulates a user touching a surface.
+        /// </summary>
+        /// <param name="pulseDuration">How long in seconds should the pulse animate over.</param>
+        /// <param name="fadeBegin">At what point during the pulseDuration should the pulse begin to fade out as a percentage. Range should be [0, 1].</param>
+        /// <param name="fadeSpeed">The speed to fade in and out.</param>
+        public void Pulse(float pulseDuration = 0.2f, float fadeBegin = 0.8f, float fadeSpeed = 10.0f)
+        {
+            if (pulseTime <= 0.0f)
+            {
+                StartCoroutine(PulseRoutine(pulseDuration, fadeBegin, fadeSpeed));
+            }
+        }
 
         private void OnEnable()
         {
@@ -190,7 +208,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
             }
         }
 
-        private void AddProximityLight(ProximityLight light)
+        private static void AddProximityLight(ProximityLight light)
         {
             if (activeProximityLights.Count >= proximityLightCount)
             {
@@ -200,17 +218,17 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
             activeProximityLights.Add(light);
         }
 
-        private void RemoveProximityLight(ProximityLight light)
+        private static void RemoveProximityLight(ProximityLight light)
         {
             activeProximityLights.Remove(light);
         }
 
-        private void Initialize()
+        private static void Initialize()
         {
-            _ProximityLightDataID = Shader.PropertyToID("_ProximityLightData");
+            proximityLightDataID = Shader.PropertyToID("_ProximityLightData");
         }
 
-        private void UpdateProximityLights(bool forceUpdate = false)
+        private static void UpdateProximityLights(bool forceUpdate = false)
         {
             if (lastProximityLightUpdate == -1)
             {
@@ -233,15 +251,18 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
                                                                 light.transform.position.y,
                                                                 light.transform.position.z,
                                                                 1.0f);
-                    // Precompute to avoid work in the shader.
-                    float distanceDelta = 1.0f / Mathf.Clamp(Settings.FarDistance - Settings.NearDistance, 0.01f, 1.0f);
-                    proximityLightData[dataIndex + 1] = new Vector4(light.Settings.NearRadius,
-                                                                    light.Settings.FarRadius,
-                                                                    light.Settings.NearDistance,
-                                                                    distanceDelta);
-                    proximityLightData[dataIndex + 2] = light.Settings.CenterColor;
-                    proximityLightData[dataIndex + 3] = light.Settings.MiddleColor;
-                    proximityLightData[dataIndex + 4] = light.Settings.OuterColor;
+                    float pulseScaler = 1.0f + light.pulseTime;
+                    proximityLightData[dataIndex + 1] = new Vector4(light.Settings.NearRadius * pulseScaler,
+                                                                    1.0f / Mathf.Clamp(light.Settings.FarRadius * pulseScaler, 0.001f, 1.0f),
+                                                                    1.0f / Mathf.Clamp(light.Settings.NearDistance* pulseScaler, 0.001f, 1.0f),
+                                                                    Mathf.Clamp01(light.Settings.MinNearSizePercentage));
+                    proximityLightData[dataIndex + 2] = new Vector4(light.Settings.NearDistance * light.pulseTime,
+                                                                    Mathf.Clamp01(1.0f - light.pulseFade),
+                                                                    0.0f,
+                                                                    0.0f);
+                    proximityLightData[dataIndex + 3] = light.Settings.CenterColor;
+                    proximityLightData[dataIndex + 4] = light.Settings.MiddleColor;
+                    proximityLightData[dataIndex + 5] = light.Settings.OuterColor;
                 }
                 else
                 {
@@ -249,9 +270,45 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities
                 }
             }
 
-            Shader.SetGlobalVectorArray(_ProximityLightDataID, proximityLightData);
+            Shader.SetGlobalVectorArray(proximityLightDataID, proximityLightData);
 
             lastProximityLightUpdate = Time.frameCount;
+        }
+
+        private IEnumerator PulseRoutine(float pulseDuration, float fadeBegin, float fadeSpeed)
+        {
+            float pulseTimer = 0.0f;
+
+            while (pulseTimer < pulseDuration)
+            {
+                pulseTimer += Time.deltaTime;
+                pulseTime = pulseTimer / pulseDuration;
+
+                if (pulseTime > fadeBegin)
+                {
+                    pulseFade += Time.deltaTime;
+                }
+
+                yield return null;
+            }
+
+            while (pulseFade < 1.0f)
+            {
+                pulseFade += Time.deltaTime * fadeSpeed;
+
+                yield return null;
+            }
+
+            pulseTime = 0.0f;
+
+            while (pulseFade > 0.0f)
+            {
+                pulseFade -= Time.deltaTime * fadeSpeed;
+
+                yield return null;
+            }
+
+            pulseFade = 0.0f;
         }
     }
 }

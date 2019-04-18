@@ -1,20 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Extensions;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
+namespace Microsoft.MixedReality.Toolkit.Utilities
 {
     /// <summary>
     /// Creates instances of a mesh along the line
     /// </summary>
     public class MeshLineRenderer : BaseMixedRealityLineRenderer
     {
-        private const string InvisibleShaderName = "Mixed Reality Toolkit/InvisibleShader";
-
         [Header("Instanced Mesh Settings")]
 
         [SerializeField]
@@ -50,9 +46,12 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
 
         [SerializeField]
         [Tooltip("How many line steps to skip before a mesh is drawn")]
-        [Range(0,10)]
+        [Range(0, 10)]
         private int lineStepSkip = 0;
-        
+
+        [SerializeField]
+        private bool useVertexColors = true;
+
         public string ColorProperty
         {
             get { return colorProperty; }
@@ -115,12 +114,13 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
             lineMaterial.enableInstancing = true;
         }
 
-        private void Update()
+        protected override void UpdateLine()
         {
             if (LineDataSource.enabled)
-            {                
+            {
                 meshTransforms.Clear();
                 colorValues.Clear();
+                linePropertyBlock.Clear();
 
                 int skipCount = 0;
 
@@ -140,9 +140,12 @@ namespace Microsoft.MixedReality.Toolkit.Core.Utilities.Lines.Renderers
                     meshTransforms.Add(Matrix4x4.TRS(LineDataSource.GetPoint(normalizedDistance), LineDataSource.GetRotation(normalizedDistance), Vector3.one * GetWidth(normalizedDistance)));
                 }
 
-                colorId = Shader.PropertyToID(colorProperty);
-                linePropertyBlock.Clear();
-                linePropertyBlock.SetVectorArray(colorId, colorValues);
+                if (useVertexColors)
+                {
+                    colorId = Shader.PropertyToID(colorProperty);
+                    linePropertyBlock.SetVectorArray(colorId, colorValues);
+                }
+
                 Graphics.DrawMeshInstanced(lineMesh, 0, lineMaterial, meshTransforms, linePropertyBlock);
             }
         }

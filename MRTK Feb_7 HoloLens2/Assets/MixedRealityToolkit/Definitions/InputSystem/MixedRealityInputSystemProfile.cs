@@ -1,26 +1,32 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Globalization;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System.Collections.Generic;
-using Microsoft.MixedReality.Toolkit.Core.Attributes;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.InputSystem;
-using Microsoft.MixedReality.Toolkit.Core.Services;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-[assembly: InternalsVisibleTo("Microsoft.MixedReality.Toolkit.Tests")]
-namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
+[assembly: InternalsVisibleTo("Microsoft.MixedReality.Toolkit.Tests.EditModeTests")]
+[assembly: InternalsVisibleTo("Microsoft.MixedReality.Toolkit.Tests.PlayModeTests")]
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
     /// Configuration profile settings for setting up controller pointers.
     /// </summary>
     [CreateAssetMenu(menuName = "Mixed Reality Toolkit/Mixed Reality Input System Profile", fileName = "MixedRealityInputSystemProfile", order = (int)CreateProfileMenuItemIndices.Input)]
+    [MixedRealityServiceProfile(typeof(IMixedRealityInputSystem))]
     public class MixedRealityInputSystemProfile : BaseMixedRealityProfile
     {
+        [SerializeField]
+        private MixedRealityInputDataProviderConfiguration[] dataProviderConfigurations = new MixedRealityInputDataProviderConfiguration[0];
+
+        public MixedRealityInputDataProviderConfiguration[] DataProviderConfigurations
+        {
+            get { return dataProviderConfigurations; }
+            internal set { dataProviderConfigurations = value; }
+        }
+
         [SerializeField]
         [Tooltip("The focus provider service concrete type to use when raycasting.")]
         [Implements(typeof(IMixedRealityFocusProvider), TypeGrouping.ByNamespaceFlat)]
@@ -191,19 +197,6 @@ namespace Microsoft.MixedReality.Toolkit.Core.Definitions.InputSystem
         {
             get { return controllerVisualizationProfile; }
             internal set { controllerVisualizationProfile = value; }
-        }
-
-        [SerializeField]
-        [Tooltip("Enable and configure hand tracking.")]
-        private bool enableHandTracking = false;
-
-        /// <summary>
-        /// Enable and configure the devices for your application.
-        /// </summary>
-        public bool IsHandTrackingEnabled
-        {
-            get { return handTrackingProfile != null && enableHandTracking; }
-            private set { enableHandTracking = value; }
         }
 
         [SerializeField]

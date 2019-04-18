@@ -1,89 +1,80 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Providers;
-using Microsoft.MixedReality.Toolkit.Core.Services;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
+namespace Microsoft.MixedReality.Toolkit.Input
 {
-    public class HandJointService : BaseDeviceManager, IMixedRealityHandJointService
+    [MixedRealityDataProvider(
+        typeof(IMixedRealityInputSystem),
+        (SupportedPlatforms)(-1), // All platforms supported by Unity
+        "Hand Joint Service")]
+    public class HandJointService : BaseInputDeviceManager, IMixedRealityHandJointService
     {
-        private IMixedRealityHandVisualizer leftHandVisualizer;
-        private IMixedRealityHandVisualizer rightHandVisualizer;
+        private IMixedRealityHand leftHand;
+        private IMixedRealityHand rightHand;
 
         private Dictionary<TrackedHandJoint, Transform> leftHandFauxJoints = new Dictionary<TrackedHandJoint, Transform>();
         private Dictionary<TrackedHandJoint, Transform> rightHandFauxJoints = new Dictionary<TrackedHandJoint, Transform>();
 
-        #region BaseDeviceManager Implementation
+        #region BaseInputDeviceManager Implementation
 
-        public HandJointService(string name, uint priority, BaseMixedRealityProfile profile) : base(name, priority, profile) { }
+        public HandJointService(
+            IMixedRealityServiceRegistrar registrar,
+            IMixedRealityInputSystem inputSystem,
+            MixedRealityInputSystemProfile inputSystemProfile,
+            Transform playspace,
+            string name,
+            uint priority,
+            BaseMixedRealityProfile profile) : base(registrar, inputSystem, inputSystemProfile, playspace, name, priority, profile) { }
 
         /// <inheritdoc />
-        public override void Update()
+        public override void LateUpdate()
         {
-            bool leftFound = false;
-            bool rightFound = false;
-
+            leftHand = null;
+            rightHand = null;
             foreach (var detectedController in MixedRealityToolkit.InputSystem.DetectedControllers)
             {
-                if (detectedController.Visualizer is IMixedRealityHandVisualizer)
+                var hand = detectedController as IMixedRealityHand;
+                if (hand != null)
                 {
                     if (detectedController.ControllerHandedness == Handedness.Left)
                     {
-                        leftFound = true;
-
-                        if (leftHandVisualizer == null)
+                        if (leftHand == null)
                         {
-                            leftHandVisualizer = detectedController.Visualizer as IMixedRealityHandVisualizer;
+                            leftHand = hand;
                         }
                     }
                     else if (detectedController.ControllerHandedness == Handedness.Right)
                     {
-                        rightFound = true;
-
-                        if (rightHandVisualizer == null)
+                        if (rightHand == null)
                         {
-                            rightHandVisualizer = detectedController.Visualizer as IMixedRealityHandVisualizer;
+                            rightHand = hand;
                         }
                     }
                 }
             }
 
-            if (!leftFound)
-            {
-                leftHandVisualizer = null;
-            }
-
-            if (!rightFound)
-            {
-                rightHandVisualizer = null;
-            }
-
-            if (leftHandVisualizer != null)
+            if (leftHand != null)
             {
                 foreach (var fauxJoint in leftHandFauxJoints)
                 {
-                    Transform realJoint;
-                    if (leftHandVisualizer.TryGetJoint(fauxJoint.Key, out realJoint))
+                    if (leftHand.TryGetJoint(fauxJoint.Key, out MixedRealityPose pose))
                     {
-                        fauxJoint.Value.SetPositionAndRotation(realJoint.position, realJoint.rotation);
+                        fauxJoint.Value.SetPositionAndRotation(pose.Position, pose.Rotation);
                     }
                 }
             }
 
-            if (rightHandVisualizer != null)
+            if (rightHand != null)
             {
                 foreach (var fauxJoint in rightHandFauxJoints)
                 {
-                    Transform realJoint;
-                    if (rightHandVisualizer.TryGetJoint(fauxJoint.Key, out realJoint))
+                    if (rightHand.TryGetJoint(fauxJoint.Key, out MixedRealityPose pose))
                     {
-                        fauxJoint.Value.SetPositionAndRotation(realJoint.position, realJoint.rotation);
+                        fauxJoint.Value.SetPositionAndRotation(pose.Position, pose.Rotation);
                     }
                 }
             }
@@ -120,62 +111,51 @@ namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
             }
         }
 
-        #endregion BaseDeviceManager Implementation
+        #endregion BaseInputDeviceManager Implementation
 
         #region IMixedRealityHandJointService Implementation
 
-        public Transform RequestJoint(TrackedHandJoint jointToEnable, Handedness handedness)
+        public Transform RequestJointTransform(TrackedHandJoint joint, Handedness handedness)
         {
-            Transform jointTransform = null;
+            IMixedRealityHand hand = null;
             Dictionary<TrackedHandJoint, Transform> fauxJoints = null;
-            IMixedRealityHandVisualizer handVisualizer = null;
-
             if (handedness == Handedness.Left)
             {
+                hand = leftHand;
                 fauxJoints = leftHandFauxJoints;
-                handVisualizer = leftHandVisualizer;
             }
             else if (handedness == Handedness.Right)
             {
+                hand = rightHand;
                 fauxJoints = rightHandFauxJoints;
-                handVisualizer = rightHandVisualizer;
+            }
+            else
+            {
+                return null;
             }
 
-            if (fauxJoints != null && !fauxJoints.TryGetValue(jointToEnable, out jointTransform))
+            Transform jointTransform = null;
+            if (fauxJoints != null && !fauxJoints.TryGetValue(joint, out jointTransform))
             {
                 jointTransform = new GameObject().transform;
                 // Since this service survives scene loading and unloading, the fauxJoints it manages need to as well.
                 Object.DontDestroyOnLoad(jointTransform.gameObject);
-                jointTransform.name = string.Format("Joint Tracker: {1} {0}", jointToEnable, handedness);
+                jointTransform.name = string.Format("Joint Tracker: {1} {0}", joint, handedness);
 
-                Transform realJointTransform;
-                if (handVisualizer != null && handVisualizer.TryGetJoint(jointToEnable, out realJointTransform))
+                if (hand != null && hand.TryGetJoint(joint, out MixedRealityPose pose))
                 {
-                    jointTransform.SetPositionAndRotation(realJointTransform.position, realJointTransform.rotation);
+                    jointTransform.SetPositionAndRotation(pose.Position, pose.Rotation);
                 }
 
-                fauxJoints.Add(jointToEnable, jointTransform);
+                fauxJoints.Add(joint, jointTransform);
             }
 
             return jointTransform;
         }
 
-        public Transform CreateJointWithOffset(TrackedHandJoint jointToEnable, Handedness handedness, Vector3 positionOffset, Quaternion rotationOffset)
-        {
-            Transform parentJoint = RequestJoint(jointToEnable, handedness);
-
-            Transform jointWithOffset = new GameObject().transform;
-            jointWithOffset.parent = parentJoint;
-            jointWithOffset.localPosition = positionOffset;
-            jointWithOffset.localRotation = rotationOffset;
-            jointWithOffset.name = string.Format("Offset Joint: {3} {2} by {0}, {1}", positionOffset, rotationOffset.eulerAngles, jointToEnable, handedness);
-
-            return jointWithOffset;
-        }
-
         public bool IsHandTracked(Handedness handedness)
         {
-            return handedness == Handedness.Left ? leftHandVisualizer != null : handedness == Handedness.Right ? rightHandVisualizer != null : false;
+            return handedness == Handedness.Left ? leftHand != null : handedness == Handedness.Right ? rightHand != null : false;
         }
 
         #endregion IMixedRealityHandJointService Implementation

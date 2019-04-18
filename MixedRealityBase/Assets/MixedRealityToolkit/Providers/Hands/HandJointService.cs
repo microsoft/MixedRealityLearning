@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Microsoft.MixedReality.Toolkit.Core.Definitions;
-using Microsoft.MixedReality.Toolkit.Core.Definitions.Utilities;
-using Microsoft.MixedReality.Toolkit.Core.Interfaces.Devices;
-using Microsoft.MixedReality.Toolkit.Core.Providers;
-using Microsoft.MixedReality.Toolkit.Core.Services;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
+namespace Microsoft.MixedReality.Toolkit.Input
 {
-    public class HandJointService : BaseDeviceManager, IMixedRealityHandJointService
+    [MixedRealityDataProvider(
+        typeof(IMixedRealityInputSystem),
+        (SupportedPlatforms)(-1), // All platforms supported by Unity
+        "Hand Joint Service")]
+    public class HandJointService : BaseInputDeviceManager, IMixedRealityHandJointService
     {
         private IMixedRealityHand leftHand;
         private IMixedRealityHand rightHand;
@@ -19,9 +19,16 @@ namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
         private Dictionary<TrackedHandJoint, Transform> leftHandFauxJoints = new Dictionary<TrackedHandJoint, Transform>();
         private Dictionary<TrackedHandJoint, Transform> rightHandFauxJoints = new Dictionary<TrackedHandJoint, Transform>();
 
-        #region BaseDeviceManager Implementation
+        #region BaseInputDeviceManager Implementation
 
-        public HandJointService(string name, uint priority, BaseMixedRealityProfile profile) : base(name, priority, profile) { }
+        public HandJointService(
+            IMixedRealityServiceRegistrar registrar,
+            IMixedRealityInputSystem inputSystem,
+            MixedRealityInputSystemProfile inputSystemProfile,
+            Transform playspace,
+            string name,
+            uint priority,
+            BaseMixedRealityProfile profile) : base(registrar, inputSystem, inputSystemProfile, playspace, name, priority, profile) { }
 
         /// <inheritdoc />
         public override void LateUpdate()
@@ -104,7 +111,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
             }
         }
 
-        #endregion BaseDeviceManager Implementation
+        #endregion BaseInputDeviceManager Implementation
 
         #region IMixedRealityHandJointService Implementation
 

@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Microsoft.MixedReality.Toolkit.Utilities;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
+namespace Microsoft.MixedReality.Toolkit.Input
 {
     public class HandRay
     {
@@ -65,7 +66,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
 
         #region Public Methods
 
-        public void Update(Vector3 handPosition, Vector3 palmNormal, Transform headTransform, Definitions.Utilities.Handedness sourceHandedness)
+        public void Update(Vector3 handPosition, Vector3 palmNormal, Transform headTransform, Handedness sourceHandedness)
         {
             Vector3 rayPivotPoint = ComputeRayPivotPosition(handPosition, headTransform, sourceHandedness);
             Vector3 measuredRayPosition = handPosition;
@@ -79,7 +80,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
         #endregion
 
 
-        private Vector3 ComputeRayPivotPosition(Vector3 handPosition, Transform headTransform, Definitions.Utilities.Handedness sourceHandedness)
+        private Vector3 ComputeRayPivotPosition(Vector3 handPosition, Transform headTransform, Handedness sourceHandedness)
         {
             Vector3 handPositionHeadSpace = headTransform.InverseTransformPoint(handPosition);
             float relativePivotY = DynamicPivotBaseY + Mathf.Min(DynamicPivotMultiplierY * handPositionHeadSpace.y, 0);
@@ -89,7 +90,7 @@ namespace Microsoft.MixedReality.Toolkit.Core.Devices.Hands
             float xMultiplier = DynamicPivotMultiplierX;
             float xMin = DynamicPivotMinX;
             float xMax = DynamicPivotMaxX;
-            if (sourceHandedness == Definitions.Utilities.Handedness.Left)
+            if (sourceHandedness == Handedness.Left)
             {
                 xBase = -xBase;
                 float tmp = xMin;

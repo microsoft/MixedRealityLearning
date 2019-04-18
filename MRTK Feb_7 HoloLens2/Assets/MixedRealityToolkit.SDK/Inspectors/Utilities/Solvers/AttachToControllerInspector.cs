@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.﻿
 
-using Microsoft.MixedReality.Toolkit.SDK.Utilities.Solvers;
+using Microsoft.MixedReality.Toolkit.UI.Utilities.Solvers;
+using Microsoft.MixedReality.Toolkit.Utilities.Editor.Solvers;
 using UnityEditor;
 using UnityEngine;
 
-namespace Microsoft.MixedReality.Toolkit.SDK.Inspectors.Utilities.Solvers
+namespace Microsoft.MixedReality.Toolkit.UI.Inspectors.Utilities.Solvers
 {
     [CustomEditor(typeof(AttachToController))]
     public class AttachToControllerInspector : ControllerFinderInspector
