@@ -1,0 +1,9 @@
+platform :ios, '11.0'
+use_frameworks!
+
+target 'Unity-iPhone' do
+
+  # Pods for Unity-iPhone
+  source 'https://microsoft.visualstudio.com/DefaultCollection/Analog/_git/science.spatial.cocoapod.specs'
+  pod 'AzureSpatialAnchors', '1.1.0'
+end
