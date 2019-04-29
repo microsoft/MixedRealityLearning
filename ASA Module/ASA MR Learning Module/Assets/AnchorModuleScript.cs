@@ -167,40 +167,42 @@ public class AnchorModuleScript : MonoBehaviour
 
     private void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
     {
+        Debug.Log("Cloud Anchor Located:" + args.Status);
+
         if (args.Status == LocateAnchorStatus.Located)
         {
             currentCloudAnchor = args.Anchor;
+            Debug.Log("Anchor ID Found: " + currentCloudAnchor.Identifier);
 
             QueueOnUpdate(() =>
             {
                 Pose anchorPose = Pose.identity;
 
-                anchorPose = currentCloudAnchor.GetAnchorPose();
-                SetObjectToAnchorPose(anchorPose.position, anchorPose.rotation);
+#if UNITY_ANDROID || UNITY_IOS
+            anchorPose = currentCloudAnchor.GetAnchorPose();
+#endif
+                Debug.Log("Now setting gameObject to anchor position and rotation.");
 
-//#if UNITY_ANDROID || UNITY_IOS
-//            anchorPose = currentCloudAnchor.GetAnchorPose();
-//#endif
-//                Debug.Log("Now setting gameObject to anchor position and rotation.");
+                // HoloLens: The position will be set based on the unityARUserAnchor that was located.
+#if WINDOWS_UWP || UNITY_WSA
+                //create a local anchor at the location of the object in question
+                gameObject.AddARAnchor();
 
-//                // HoloLens: The position will be set based on the unityARUserAnchor that was located.
-//#if WINDOWS_UWP || UNITY_WSA
-//                //create a local anchor at the location of the object in question
-//                gameObject.AddARAnchor();
-
-//                // On HoloLens, if we do not have a cloudAnchor already, we will have already positioned the
-//                // object based on the passed in worldPos/worldRot and attached a new world anchor,
-//                // so we are ready to commit the anchor to the cloud if requested.
-//                // If we do have a cloudAnchor, we will use it's pointer to setup the world anchor,
-//                // which will position the object automatically.
-//                if (currentCloudAnchor != null)
-//                {
-//                    GetComponent<UnityEngine.XR.WSA.WorldAnchor>().SetNativeSpatialAnchorPtr(currentCloudAnchor.LocalAnchor);
-//                }
-//#else
-//            SetObjectToAnchorPose(anchorPose.position, anchorPose.rotation);
+                // On HoloLens, if we do not have a cloudAnchor already, we will have already positioned the
+                // object based on the passed in worldPos/worldRot and attached a new world anchor,
+                // so we are ready to commit the anchor to the cloud if requested.
+                // If we do have a cloudAnchor, we will use it's pointer to setup the world anchor,
+                // which will position the object automatically.
+                if (currentCloudAnchor != null)
+                {
+                    Debug.Log("Setting Local Anchor to Cloud Anchor Position.");
+                    gameObject.GetComponent<UnityEngine.XR.WSA.WorldAnchor>().SetNativeSpatialAnchorPtr(currentCloudAnchor.LocalAnchor);
+                }
+#else
+                Debug.Log("Cloud anchor position: " + anchorPose.position + ". Cloud Anchor Rotation: " + anchorPose.rotation);
+            SetObjectToAnchorPose(anchorPose.position, anchorPose.rotation);
             
-//#endif
+#endif
             });
 
         }
@@ -208,8 +210,12 @@ public class AnchorModuleScript : MonoBehaviour
 
     private void SetObjectToAnchorPose(Vector3 position, Quaternion rotation)
     {
+        Debug.Log("Setting Object To Anchor Pose");
         transform.position = position;
         transform.rotation = rotation;
+
+        //create a local anchor at the location of the object in question
+        gameObject.AddARAnchor();
     }
 
     void OnDestroy()
