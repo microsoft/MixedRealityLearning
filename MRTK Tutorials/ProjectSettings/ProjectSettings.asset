@@ -166,7 +166,7 @@ PlayerSettings:
   applicationIdentifier: {}
   buildNumber: {}
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 16
+  AndroidMinSdkVersion: 24
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
   aotOptions: 
@@ -181,7 +181,7 @@ PlayerSettings:
   StripUnusedMeshComponents: 1
   VertexChannelCompressionMask: 4054
   iPhoneSdkVersion: 988
-  iOSTargetOSVersionString: 9.0
+  iOSTargetOSVersionString: 11.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
   tvOSTargetOSVersionString: 9.0
@@ -322,7 +322,7 @@ PlayerSettings:
   vuforiaEnabled: 0
   m_TemplateCustomTags: {}
   mobileMTRendering:
-    Android: 1
+    Android: 0
     iPhone: 1
     tvOS: 1
   m_BuildTargetGroupLightmapEncodingQuality: []
@@ -333,7 +333,7 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: 
+  cameraUsageDescription: Required for augmented reality support.
   locationUsageDescription: 
   microphoneUsageDescription: 
   switchNetLibKey: 
@@ -555,7 +555,8 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLWasmStreaming: 0
   scriptingDefineSymbols: {}
-  platformArchitecture: {}
+  platformArchitecture:
+    iPhone: 1
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}
   managedStrippingLevel: {}
@@ -603,11 +604,11 @@ PlayerSettings:
       EnterpriseAuthentication: False
       HumanInterfaceDevice: False
       InputInjectionBrokered: False
-      InternetClient: False
+      InternetClient: True
       InternetClientServer: False
       Location: False
       LowLevelDevices: False
-      Microphone: False
+      Microphone: True
       MusicLibrary: False
       Objects3D: False
       OfflineMapsManagement: False
