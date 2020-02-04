@@ -4,38 +4,39 @@ using UnityEngine;
 
 public class EyeTrackingTutorialDemo : MonoBehaviour
 {
-    #region Serialized variables
-
     [Tooltip("Euler angles by which the object should be rotated by.")]
     [SerializeField]
-    private Vector3 RotateByEulerAngles = new Vector3(0f,1f,0f);
+    private Vector3 rotateByEulerAngles = new Vector3(0f, 1f, 0f);
 
     [Tooltip("Rotation speed factor.")]
     [SerializeField]
-    private float speed = 0.5f;
+    private float rotationSpeed = 0.5f;
 
-    #endregion
+    [Tooltip("Blip scale factor.")]
+    [SerializeField]
+    private float blipScale = 2.0f;
 
+    Vector3 originalScale;
 
-    /// <summary>
-    /// Rotate game object based on specified rotation speed and Euler angles.
-    /// </summary>
+    void Start()
+    {
+        originalScale = transform.localScale;
+    }
+
     public void RotateTarget()
     {
-        transform.eulerAngles = transform.eulerAngles + RotateByEulerAngles * speed;
+        transform.eulerAngles = transform.eulerAngles + rotateByEulerAngles * rotationSpeed;
     }
 
     public void BlipTarget()
     {
         StartCoroutine(BlipTargetCoroutine());
-        Debug.Log("Blip Called");
     }
 
     IEnumerator BlipTargetCoroutine()
     {
-        transform.localScale -= new Vector3(0.2f, 0.2f, 0.2f);
+        transform.localScale = originalScale * blipScale;
         yield return new WaitForSeconds(0.1f);
-        transform.localScale += new Vector3(0.2f, 0.2f, 0.2f);
-
+        transform.localScale = originalScale;
     }
 }
