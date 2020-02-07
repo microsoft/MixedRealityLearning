@@ -8,13 +8,13 @@ public class PartAssemblyDemo : MonoBehaviour
     public Transform objectToPlace;
     public Transform locationToPlace;
 
-    public float nearDistance = 0.1f;
-    public float farDistance = 0.2f;
+    float nearDistance = 0.1f;
+    float farDistance = 0.2f;
 
     public GameObject toolTipObject;
     public AudioSource audioSource;
 
-    public bool isManipulating;
+    bool isManipulating;
     bool isSnapped;
 
     private Vector3 originalObjectPlacementPosition;

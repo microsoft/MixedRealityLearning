@@ -6,15 +6,15 @@ public class EyeTrackingTutorialDemo : MonoBehaviour
 {
     [Tooltip("Euler angles by which the object should be rotated by.")]
     [SerializeField]
-    private Vector3 rotateByEulerAngles = new Vector3(0f, 1f, 0f);
+    Vector3 rotateByEulerAngles = new Vector3(0f, 1f, 0f);
 
     [Tooltip("Rotation speed factor.")]
     [SerializeField]
-    private float rotationSpeed = 0.5f;
+    float rotationSpeed = 0.5f;
 
     [Tooltip("Blip scale factor.")]
     [SerializeField]
-    private float blipScale = 2.0f;
+    float blipScale = 2.0f;
 
     Vector3 originalScale;
 

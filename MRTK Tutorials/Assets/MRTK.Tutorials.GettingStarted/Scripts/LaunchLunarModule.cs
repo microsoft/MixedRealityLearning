@@ -5,8 +5,8 @@ using UnityEngine;
 public class LaunchLunarModule : MonoBehaviour
 {
     public float thrust;
-    public Rigidbody rb;
-    public bool ThrustOn;
+    Rigidbody rb;
+    bool ThrustOn;
 
     private Vector3 originalPosition;
     private Quaternion originalRotation;
