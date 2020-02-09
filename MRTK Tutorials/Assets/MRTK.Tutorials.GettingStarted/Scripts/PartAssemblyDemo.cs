@@ -19,6 +19,7 @@ public class PartAssemblyDemo : MonoBehaviour
 
     private Vector3 originalObjectPlacementPosition;
     private Quaternion originalObjectPlacementRotation;
+    Transform originalParent;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +31,9 @@ public class PartAssemblyDemo : MonoBehaviour
         originalObjectPlacementPosition = objectToPlace.position;
         originalObjectPlacementRotation = objectToPlace.rotation;
 
+        // Chache parent
+        originalParent = objectToPlace.parent;
+
         //Start the coroutine to check for distance every once in a while
         StartCoroutine(checkForSnap());
     }
@@ -39,6 +43,9 @@ public class PartAssemblyDemo : MonoBehaviour
         //reset object placement
         objectToPlace.position = originalObjectPlacementPosition;
         objectToPlace.rotation = originalObjectPlacementRotation;
+
+        // Reset parent
+        objectToPlace.SetParent(originalParent);
 
         //turn on tool tips again
         toolTipObject.SetActive(true);
