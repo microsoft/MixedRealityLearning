@@ -259,7 +259,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log("Azure anchor deleted successfully");
     }
 
-    public void SaveAzureAnchorIDToDisk()
+    public void SaveAzureAnchorIdToDisk()
     {
         Debug.Log("\nAnchorModuleScript.SaveAzureAnchorIDToDisk()");
 
@@ -277,7 +277,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log($"Current Azure anchor ID '{currentAzureAnchorID}' successfully saved to path '{filePath}'");
     }
 
-    public void LoadAzureAnchorIDFromDisk()
+    public void GetAzureAnchorIdFromDisk()
     {
         Debug.Log("\nAnchorModuleScript.LoadAzureAnchorIDFromDisk()");
 
@@ -295,7 +295,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log($"Current Azure anchor ID successfully updated with saved Azure anchor ID '{currentAzureAnchorID}' from path '{path}'");
     }
 
-    public void ShareAzureAnchorID()
+    public void ShareAzureAnchorIdToNetwork()
     {
         Debug.Log("\nAnchorModuleScript.ShareAzureAnchorID()");
 
@@ -339,7 +339,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log($"Current Azure anchor ID '{currentAzureAnchorID}' shared successfully");
     }
 
-    public void GetSharedAzureAnchorID()
+    public void GetAzureAnchorIdFromNetwork()
     {
         Debug.Log("\nAnchorModuleScript.GetSharedAzureAnchorID()");
 
