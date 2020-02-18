@@ -27,12 +27,12 @@ public class PartAssemblyDemo : MonoBehaviour
         //Get the audio source component to play audio when snapping objects into place
         audioSource = GetComponent<AudioSource>();
 
-        //Save original placement of object
-        originalObjectPlacementPosition = objectToPlace.position;
-        originalObjectPlacementRotation = objectToPlace.rotation;
-
         // Chache parent
         originalParent = objectToPlace.parent;
+
+        //Save original placement of object
+        originalObjectPlacementPosition = objectToPlace.localPosition;
+        originalObjectPlacementRotation = objectToPlace.localRotation;
 
         //Start the coroutine to check for distance every once in a while
         StartCoroutine(checkForSnap());
@@ -40,12 +40,12 @@ public class PartAssemblyDemo : MonoBehaviour
 
     public void ResetPlacement()
     {
-        //reset object placement
-        objectToPlace.position = originalObjectPlacementPosition;
-        objectToPlace.rotation = originalObjectPlacementRotation;
-
         // Reset parent
         objectToPlace.SetParent(originalParent);
+
+        //reset object placement
+        objectToPlace.localPosition = originalObjectPlacementPosition;
+        objectToPlace.localRotation = originalObjectPlacementRotation;
 
         //turn on tool tips again
         toolTipObject.SetActive(true);

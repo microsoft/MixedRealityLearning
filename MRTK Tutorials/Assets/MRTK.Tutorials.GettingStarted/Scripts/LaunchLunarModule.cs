@@ -15,8 +15,8 @@ public class LaunchLunarModule : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        originalPosition = transform.position;
-        originalRotation = transform.rotation;
+        originalPosition = transform.localPosition;
+        originalRotation = transform.localRotation;
     }
 
     public void ResetModule()
@@ -24,8 +24,8 @@ public class LaunchLunarModule : MonoBehaviour
         StopThruster();
         rb.velocity = Vector3.zero;
         rb.isKinematic = true;
-        transform.position = originalPosition;
-        transform.rotation = originalRotation;
+        transform.localPosition = originalPosition;
+        transform.localRotation = originalRotation;
     }
 
     public void StartThruster()
