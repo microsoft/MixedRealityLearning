@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Translation;
 
@@ -163,7 +163,7 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
 
                 if (translatedString != "")
                 {
-                    lunarcomController.outputText.text += "\n\nSending...\n" + translatedString;
+                    lunarcomController.outputText.text += "\n\nTranslation:\n" + translatedString;
                 }
             }
         }

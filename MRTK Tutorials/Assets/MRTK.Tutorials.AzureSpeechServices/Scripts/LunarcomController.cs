@@ -14,15 +14,11 @@ public class LunarcomController : MonoBehaviour
     public string SpeechServiceAPIKey = "";
     public string SpeechServiceRegion = "";
 
-    [Space(6)]
     [Header("Object References")]
+    public GameObject terminal;
+    public ConnectionLightController connectionLight;
     public Text outputText;
-    public GameObject Terminal;
-    public ConnectionLightController connectionLightController;
-
-    [Space(6)]
-    [Header("Lunarcom Buttons")]
-    public List<LunarcomButtonController> lunarcomButtons;
+    public List<LunarcomButtonController> buttons;
 
     public delegate void OnSelectRecognitionMode(RecognitionMode selectedMode);
     public event OnSelectRecognitionMode onSelectRecognitionMode;
@@ -94,12 +90,12 @@ public class LunarcomController : MonoBehaviour
 
         if (GetComponent<LunarcomTranslationRecognizer>())
         {
-            ActivateButtonNamed("Satellite");
+            ActivateButtonNamed("SatelliteButton");
         }
 
         if (GetComponent<LunarcomIntentRecognizer>())
         {
-            ActivateButtonNamed("Rocket");
+            ActivateButtonNamed("RocketButton");
         }
 
         ShowConnected(true);
@@ -124,19 +120,19 @@ public class LunarcomController : MonoBehaviour
         if (GetComponent<LunarcomTranslationRecognizer>())
         {
             GetComponent<LunarcomTranslationRecognizer>().enabled = false;
-            ActivateButtonNamed("Satellite", false);
+            ActivateButtonNamed("SatelliteButton", false);
         }
         if (GetComponent<LunarcomIntentRecognizer>())
         {
             GetComponent<LunarcomIntentRecognizer>().enabled = false;
-            ActivateButtonNamed("Rocket", false);
+            ActivateButtonNamed("RocketButton", false);
         }
 
         ShowConnected(false);
     }
 
     private void ActivateButtonNamed(string name, bool makeActive = true) {
-        foreach (LunarcomButtonController button in lunarcomButtons)
+        foreach (LunarcomButtonController button in buttons)
         {
             if (button.gameObject.name == name)
             {
@@ -153,7 +149,7 @@ public class LunarcomController : MonoBehaviour
     public void SetActiveButton(LunarcomButtonController buttonToSetActive)
     {
         activeButton = buttonToSetActive;
-        foreach (LunarcomButtonController button in lunarcomButtons)
+        foreach (LunarcomButtonController button in buttons)
         {
             if (button != activeButton && button.GetIsSelected())
             {
@@ -177,19 +173,19 @@ public class LunarcomController : MonoBehaviour
 
     public void ShowConnected(bool showConnected)
     {
-        connectionLightController.ShowConnected(showConnected);
+        connectionLight.ShowConnected(showConnected);
     }
 
     public void ShowTerminal()
     {
-        Terminal.SetActive(true);
+        terminal.SetActive(true);
     }
 
     public void HideTerminal()
     {
-        if (Terminal.activeSelf)
+        if (terminal.activeSelf)
         {
-            foreach (LunarcomButtonController button in lunarcomButtons)
+            foreach (LunarcomButtonController button in buttons)
             {
                 if (button.GetIsSelected())
                 {
@@ -198,7 +194,7 @@ public class LunarcomController : MonoBehaviour
             }
 
             outputText.text = "Select a mode to begin.";
-            Terminal.SetActive(false);
+            terminal.SetActive(false);
             SelectMode(RecognitionMode.Disabled);
         }
     }

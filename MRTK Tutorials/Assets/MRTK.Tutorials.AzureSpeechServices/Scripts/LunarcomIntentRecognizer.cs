@@ -9,14 +9,13 @@ using Microsoft.MixedReality.Toolkit.UI;
 
 public class LunarcomIntentRecognizer : MonoBehaviour
 {
-    [Header("LUIS Endpoint")]
+    [Header("LUIS Credentials")]
     public string luisEndpoint = "";
 
-    [Space(6)]
-    [Header("Lunar Launcher Buttons")]
-    public GameObject LaunchButton;
+    [Header("Rocket Launcher Buttons")]
+    public GameObject HintsButton;
     public GameObject ResetButton;
-    public GameObject HintButton;
+    public GameObject LaunchButton;
 
     DictationRecognizer dictationRecognizer;
     LunarcomController lunarcomController;
@@ -210,7 +209,10 @@ public class LunarcomIntentRecognizer : MonoBehaviour
                 CompleteButtonPress("Reset", ResetButton);
                 break;
             case "hint":
-                CompleteButtonPress("Hint", HintButton);
+                CompleteButtonPress("Hints", HintsButton);
+                break;
+            case "hints":
+                CompleteButtonPress("Hints", HintsButton);
                 break;
         }
     }
@@ -242,7 +244,7 @@ public class LunarcomIntentRecognizer : MonoBehaviour
 
                 if (commandCaptured)
                 {
-                    foreach (LunarcomButtonController button in lunarcomController.lunarcomButtons)
+                    foreach (LunarcomButtonController button in lunarcomController.buttons)
                     {
                         if (button.GetIsSelected())
                         {

@@ -3,7 +3,6 @@ using Microsoft.CognitiveServices.Speech;
 
 public class LunarcomWakeWordRecognizer : MonoBehaviour
 {
-    [Header("Lunar Launcher Buttons")]
     public string WakeWord = "";
     public string DismissWord = "";
 
@@ -113,7 +112,7 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
     {
         if (lunarcomController.CurrentRecognitionMode() == RecognitionMode.Disabled)
         {
-            if (lunarcomController.Terminal.activeSelf)
+            if (lunarcomController.terminal.activeSelf)
             {
                 if (recognizedString.ToLower().Contains(DismissWord.ToLower()))
                 {

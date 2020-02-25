@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Microsoft.CognitiveServices.Speech;
 
 public class LunarcomOfflineRecognizer : MonoBehaviour
 {
-    [Header("Lunarcom Settings")]
     public SimuilateOfflineMode simulateOfflineMode = SimuilateOfflineMode.Disabled;
 
     private string recognizedString = "Select a mode to begin.";
