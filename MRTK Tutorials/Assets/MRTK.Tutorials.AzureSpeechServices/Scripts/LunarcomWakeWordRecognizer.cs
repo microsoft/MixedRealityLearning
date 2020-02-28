@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Microsoft.CognitiveServices.Speech;
 
 public class LunarcomWakeWordRecognizer : MonoBehaviour
@@ -38,7 +38,7 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
             {
                 if (WakeWord != "" && WakeWord != "*")
                 {
-                    lunarcomController.HideTerminal();
+                    lunarcomController.ShowTerminal();
                     BeginRecognizing();
                 }
             }
@@ -47,7 +47,7 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
         {
             if (WakeWord != "" && WakeWord != "*")
             {
-                lunarcomController.HideTerminal();
+                lunarcomController.ShowTerminal();
                 BeginRecognizing();
             }
         }
