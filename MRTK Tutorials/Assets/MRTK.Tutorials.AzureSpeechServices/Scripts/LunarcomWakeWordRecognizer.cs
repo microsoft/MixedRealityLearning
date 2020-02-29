@@ -127,4 +127,12 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
             }
         }
     }
+
+    void OnDestroy()
+    {
+        if (recognizer != null)
+        {
+            recognizer.Dispose();
+        }
+    }
 }

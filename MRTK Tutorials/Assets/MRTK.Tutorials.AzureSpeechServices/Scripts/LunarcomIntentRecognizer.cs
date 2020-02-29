@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections;
@@ -255,4 +255,12 @@ public class LunarcomIntentRecognizer : MonoBehaviour
                 }
             }
         }
+
+    void OnDestroy()
+    {
+        if (dictationRecognizer != null)
+        {
+            dictationRecognizer.Dispose();
+        }
     }
+}

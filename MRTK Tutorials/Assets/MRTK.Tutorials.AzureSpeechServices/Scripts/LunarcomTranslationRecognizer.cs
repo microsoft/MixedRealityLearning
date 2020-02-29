@@ -168,6 +168,14 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
             }
         }
     }
+
+    void OnDestroy()
+    {
+        if (translator != null)
+        {
+            translator.Dispose();
+        }
+    }
 }
 
 

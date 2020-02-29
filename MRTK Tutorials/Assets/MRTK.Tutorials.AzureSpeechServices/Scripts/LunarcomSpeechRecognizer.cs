@@ -152,6 +152,12 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
             }
         }
     }
+
+    void OnDestroy()
+    {
+        if (recognizer != null)
+        {
+            recognizer.Dispose();
+        }
+    }
 }
-
-
