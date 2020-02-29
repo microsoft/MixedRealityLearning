@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -201,19 +201,6 @@ public class LunarcomController : MonoBehaviour
 
     public void UpdateLunarcomText(string textToUpdate)
     {
-        if (lunarcomWakeWordRecognizer != null)
-        {
-            if (!textToUpdate.ToLower().Contains(lunarcomWakeWordRecognizer.DismissWord.ToLower()))
-            {
-                outputText.text = textToUpdate;
-            } else
-            {
-                HideTerminal();
-            }
-        }
-        else
-        {
-            outputText.text = textToUpdate;
-        }
+        outputText.text = textToUpdate;
     }
 }
