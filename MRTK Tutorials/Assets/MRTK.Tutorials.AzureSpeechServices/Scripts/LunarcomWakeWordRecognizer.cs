@@ -78,6 +78,7 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
 
             if (recognizer != null)
             {
+                await recognizer.StopContinuousRecognitionAsync();
                 await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
             }
         }
