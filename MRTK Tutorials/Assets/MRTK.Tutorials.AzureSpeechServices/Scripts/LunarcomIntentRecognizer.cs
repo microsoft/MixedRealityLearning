@@ -192,69 +192,72 @@ public class LunarcomIntentRecognizer : MonoBehaviour
                 }
                 ProcessResults(targetButton, actionToTake);
                 break;
+            default:
+                ProcessResults();
+                break;
         }
-        CompleteButtonPress();
     }
 
-    public void ProcessResults(string targetButton, string actionToTake)
+    public void ProcessResults(string targetButton = null, string actionToTake = null)
     {
         Debug.Log("Pressing the " + targetButton + " button because I was told to " + actionToTake);
 
         switch (targetButton)
         {
             case "launch":
-                CompleteButtonPress("Launch", LaunchButton);
+                CompleteButtonPress(actionToTake, targetButton, LaunchButton);
                 break;
             case "reset":
-                CompleteButtonPress("Reset", ResetButton);
+                CompleteButtonPress(actionToTake, targetButton, ResetButton);
                 break;
             case "hint":
-                CompleteButtonPress("Hints", HintsButton);
+                CompleteButtonPress(actionToTake, targetButton, HintsButton);
                 break;
             case "hints":
-                CompleteButtonPress("Hints", HintsButton);
+                CompleteButtonPress(actionToTake, targetButton, HintsButton);
+                break;
+            default:
+                CompleteButtonPress();
                 break;
         }
     }
 
-    //private void CompleteButtonPress(string v, GameObject launchButton)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    private void CompleteButtonPress(string buttonName = null, GameObject buttonToPush = null)
+    private void CompleteButtonPress(string actionToTake = null, string buttonName = null, GameObject buttonToPush = null)
     {
-        if (buttonName != null)
-        {
-            recognizedString += "\n\nCommand Recognized:\nPushing the " + buttonName + " button.";
-        }
+        recognizedString += (actionToTake != null) ? "\n\nAction: " + actionToTake : "\n\nAction: -";
+        recognizedString += (buttonName != null) ? "\nTarget: " + buttonName : "\nTarget: -";
 
-        if (buttonToPush != null)
+        if (actionToTake != null && buttonName != null && buttonToPush != null)
         {
+            recognizedString += "\n\nCommand recognized, pushing the '" + buttonName + "' button because I was told to '" + actionToTake + "'";
             buttonToPush.GetComponent<Interactable>().OnClick.Invoke();
         }
-            commandCaptured = true;
-        }
-
-        private void Update()
+        else
         {
-            if (lunarcomController.CurrentRecognitionMode() == RecognitionMode.Intent_Recognizer)
-            {
-                lunarcomController.UpdateLunarcomText(recognizedString);
+            recognizedString += "\n\nCommand not recognized";
+        }
+        commandCaptured = true;
+    }
 
-                if (commandCaptured)
+    private void Update()
+    {
+        if (lunarcomController.CurrentRecognitionMode() == RecognitionMode.Intent_Recognizer)
+        {
+            lunarcomController.UpdateLunarcomText(recognizedString);
+
+            if (commandCaptured)
+            {
+                foreach (LunarcomButtonController button in lunarcomController.buttons)
                 {
-                    foreach (LunarcomButtonController button in lunarcomController.buttons)
+                    if (button.GetIsSelected())
                     {
-                        if (button.GetIsSelected())
-                        {
-                            button.DeselectButton();
-                        }
+                        button.DeselectButton();
                     }
-                    commandCaptured = false;
                 }
+                commandCaptured = false;
             }
         }
+    }
 
     void OnDestroy()
     {
