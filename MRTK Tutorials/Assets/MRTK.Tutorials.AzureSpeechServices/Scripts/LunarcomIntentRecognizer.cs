@@ -200,8 +200,6 @@ public class LunarcomIntentRecognizer : MonoBehaviour
 
     public void ProcessResults(string targetButton = null, string actionToTake = null)
     {
-        Debug.Log("Pressing the " + targetButton + " button because I was told to " + actionToTake);
-
         switch (targetButton)
         {
             case "launch":

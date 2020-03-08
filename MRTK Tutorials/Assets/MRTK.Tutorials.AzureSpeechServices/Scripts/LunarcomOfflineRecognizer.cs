@@ -91,11 +91,10 @@ public class LunarcomOfflineRecognizer : MonoBehaviour
     #region Speech Recognition Event Handlers
     private void SessionStartedHandler(object sender, SessionEventArgs e)
     {
-        Debug.Log("SessionStartedHandler called");
     }
+
     private void SessionStoppedHandler(object sender, SessionEventArgs e)
     {
-        Debug.Log("SessionStoppedHandler called");
         recognizer = null;
     }
 
@@ -108,39 +107,31 @@ public class LunarcomOfflineRecognizer : MonoBehaviour
                 recognizedString = $"{e.Result.Text}";
             }
         }
-        Debug.Log("Recognizing Handler called");
     }
 
     private void RecognizedHandler(object sender, SpeechRecognitionEventArgs e)
     {
-        Debug.Log("Recognized Handler called");
     }
 
     private void SpeechStartDetected(object sender, RecognitionEventArgs e)
     {
-        Debug.Log("SpeechStart Handler called");
     }
 
     private void SpeechEndDetectedHandler(object sender, RecognitionEventArgs e)
     {
-        Debug.Log("SpeechStart Handler called");
     }
 
     private void CancelHandler(object sender, RecognitionEventArgs e)
     {
-        Debug.Log("SpeechEndDetectedHandler called");
     }
     #endregion
 
     private void Update()
     {
-        Debug.Log(lunarcomController.CurrentRecognitionMode());
         if (lunarcomController.CurrentRecognitionMode() == RecognitionMode.Offline)
         {
-            Debug.Log("Now offline mode");
             if (recognizedString != "" && recognizedString != "Offline Transcription:\n")
             {
-                Debug.Log("recognized string isn't blank and it's not Offline Transcription");
                 if (recognizedString != "Say something..." && recognizedString != "Select a mode to begin.")
                 {
                     string combinedString = "Offline Transcription:\n" + recognizedString;

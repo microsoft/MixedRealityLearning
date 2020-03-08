@@ -138,18 +138,14 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
 
     private void HandleTranslatorCanceled(object s, TranslationRecognitionEventArgs e)
     {
-
-        UnityEngine.Debug.Log("HandleTranslatorCanceled called");
     }
 
     private void HandleTranslatorSessionStarted(object s, SessionEventArgs e)
     {
-        UnityEngine.Debug.Log("HandleTranslatorSessionStarted called");
     }
 
     public void HandleTranslatorSessionStopped(object s, SessionEventArgs e)
     {
-        UnityEngine.Debug.Log("HandleTranslatorSessionStopped called");
     }
     #endregion
 
@@ -177,5 +173,3 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
         }
     }
 }
-
-

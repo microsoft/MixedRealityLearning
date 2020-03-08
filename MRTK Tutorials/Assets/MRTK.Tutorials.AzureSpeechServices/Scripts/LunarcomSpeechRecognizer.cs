@@ -33,7 +33,6 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
 
     public void HandleOnSelectRecognitionMode(RecognitionMode recognitionMode)
     {
-        Debug.Log("HandleOnSelectRecognition called");
         if (recognitionMode == RecognitionMode.Speech_Recognizer)
         {
             BeginRecognizing();
@@ -90,11 +89,10 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
     #region Speech Recognition Event Handlers
     private void SessionStartedHandler(object sender, SessionEventArgs e)
     {
-        Debug.Log("SessionStartedHandler called");
     }
+
     private void SessionStoppedHandler(object sender, SessionEventArgs e)
     {
-        Debug.Log("SessionStoppedHandler called");
         recognizer = null;
     }
 
@@ -107,12 +105,10 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
                 recognizedString = $"{e.Result.Text}";
             }
         }
-        Debug.Log("Recognizing Handler called");
     }
 
     private void RecognizedHandler(object sender, SpeechRecognitionEventArgs e)
     {
-        Debug.Log("Recognized Handler called");
         if (e.Result.Reason == ResultReason.RecognizedSpeech)
         {
             lock (threadLocker)
@@ -122,23 +118,19 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
         }
         else if (e.Result.Reason == ResultReason.NoMatch)
         {
-            Debug.Log("No Match Found");
         }
     }
 
     private void SpeechStartDetected(object sender, RecognitionEventArgs e)
     {
-        Debug.Log("SpeechStart Handler called");
     }
 
     private void SpeechEndDetectedHandler(object sender, RecognitionEventArgs e)
     {
-        Debug.Log("SpeechStart Handler called");
     }
 
     private void CancelHandler(object sender, RecognitionEventArgs e)
     {
-        Debug.Log("SpeechEndDetectedHandler called");
     }
     #endregion
 
