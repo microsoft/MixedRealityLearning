@@ -19,7 +19,7 @@ public class LunarcomIntentRecognizer : MonoBehaviour
 
     DictationRecognizer dictationRecognizer;
     LunarcomController lunarcomController;
-    bool micPermissionGranted = false;
+    ///bool micPermissionGranted = false;
     string recognizedString;
     bool capturingAudio = false;
     bool commandCaptured = false;
@@ -34,7 +34,7 @@ public class LunarcomIntentRecognizer : MonoBehaviour
         }
         else
         {
-            micPermissionGranted = true;
+            ///micPermissionGranted = true;
         }
 
         lunarcomController.onSelectRecognitionMode += HandleOnSelectRecognitionMode;
@@ -109,26 +109,26 @@ public class LunarcomIntentRecognizer : MonoBehaviour
     [Serializable]
     class AnalysedQuery
     {
-        public TopScoringIntentData topScoringIntent;
-        public EntityData[] entities;
-        public string query;
+        public TopScoringIntentData topScoringIntent = default;
+        public EntityData[] entities = default;
+        ///public string query;
     }
 
     [Serializable]
     class TopScoringIntentData
     {
-        public string intent;
-        public float score;
+        public string intent = default;
+        ///public float score;
     }
 
     [Serializable]
     class EntityData
     {
-        public string entity;
-        public string type;
-        public int startIndex;
-        public int endIndex;
-        public float score;
+        public string entity = default;
+        public string type = default;
+        ///public int startIndex;
+        ///public int endIndex;
+        ///public float score;
     }
 
     public IEnumerator SubmitRequestToLuis(string dictationResult, Action done)

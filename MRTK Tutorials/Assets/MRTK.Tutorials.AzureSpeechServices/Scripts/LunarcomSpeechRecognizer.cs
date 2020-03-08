@@ -9,7 +9,7 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
     private SpeechRecognizer recognizer;
 
     private bool micPermissionGranted = false;
-    private bool scanning = false;
+    ///private bool scanning = false;
 
     private string fromLanguage = "en-US";
 

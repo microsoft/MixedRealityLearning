@@ -11,7 +11,7 @@ public class LunarcomOfflineRecognizer : MonoBehaviour
     private SpeechRecognizer recognizer;
 
     private bool micPermissionGranted = false;
-    private bool scanning = false;
+    ///private bool scanning = false;
 
     private string fromLanguage = "en-US";
 

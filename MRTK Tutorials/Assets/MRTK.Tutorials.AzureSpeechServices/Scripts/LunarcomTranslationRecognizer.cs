@@ -13,7 +13,7 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
     private TranslationRecognizer translator;
 
     private bool micPermissionGranted = false;
-    private bool scanning = false;
+    ///private bool scanning = false;
 
     private string fromLanguage = "en-US";
     private string toLanguage = "";

@@ -12,7 +12,7 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
     private SpeechRecognizer recognizer;
 
     private bool micPermissionGranted = false;
-    private bool scanning = false;
+    ///private bool scanning = false;
 
     private string fromLanguage = "en-US";
     private LunarcomController lunarcomController;
