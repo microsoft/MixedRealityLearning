@@ -208,9 +208,15 @@ public class AnchorModuleScript : MonoBehaviour
         }
     }
 
-    public void FindAzureAnchor()
+    public void FindAzureAnchor(string id)
     {
         Debug.Log("\nAnchorModuleScript.FindAzureAnchor()");
+
+        // Temp add for sharing module
+        if (id != "")
+        {
+            currentAzureAnchorID = id;
+        }
 
         // Notify AnchorFeedbackScript
         OnFindASAAnchor?.Invoke();
@@ -259,7 +265,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log("Azure anchor deleted successfully");
     }
 
-    public void SaveAzureAnchorIdToDisk()
+    public void SaveAzureAnchorIDToDisk()
     {
         Debug.Log("\nAnchorModuleScript.SaveAzureAnchorIDToDisk()");
 
@@ -277,7 +283,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log($"Current Azure anchor ID '{currentAzureAnchorID}' successfully saved to path '{filePath}'");
     }
 
-    public void GetAzureAnchorIdFromDisk()
+    public void LoadAzureAnchorIDFromDisk()
     {
         Debug.Log("\nAnchorModuleScript.LoadAzureAnchorIDFromDisk()");
 
@@ -295,7 +301,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log($"Current Azure anchor ID successfully updated with saved Azure anchor ID '{currentAzureAnchorID}' from path '{path}'");
     }
 
-    public void ShareAzureAnchorIdToNetwork()
+    public void ShareAzureAnchorID()
     {
         Debug.Log("\nAnchorModuleScript.ShareAzureAnchorID()");
 
@@ -339,7 +345,7 @@ public class AnchorModuleScript : MonoBehaviour
         Debug.Log($"Current Azure anchor ID '{currentAzureAnchorID}' shared successfully");
     }
 
-    public void GetAzureAnchorIdFromNetwork()
+    public void GetSharedAzureAnchorID()
     {
         Debug.Log("\nAnchorModuleScript.GetSharedAzureAnchorID()");
 
@@ -479,5 +485,25 @@ public class AnchorModuleScript : MonoBehaviour
 
     public delegate void DeleteASAAnchorDelegate();
     public event DeleteASAAnchorDelegate OnDeleteASAAnchor;
+    #endregion
+
+    #region Sharing
+    public void ShareAnchorNetwork()
+    {
+        GenericNetworkManager.instance.AzureAnchorID = currentAzureAnchorID;
+
+        GameObject PVuser = GenericNetworkManager.instance.localUser.gameObject;
+        PhotonUser pu = PVuser.gameObject.GetComponent<PhotonUser>();
+        pu.PVShareAnchorNetwork();
+        Debug.Log("AnchorModuleScript ShareAnchorNetwork - AzureAnchorID" + GenericNetworkManager.instance.AzureAnchorID);
+        Debug.Log("Anchor network shared!!");
+    }
+    public void GetSharedAnchorNetwork()
+    {
+        DebugWindowMessaging.Clear();
+        Debug.Log("GetSharedAnchorNetwork - AzureAnchorID" + GenericNetworkManager.instance.AzureAnchorID);
+        FindAzureAnchor(GenericNetworkManager.instance.AzureAnchorID);
+        Debug.Log("Recieved anchor network!");
+    }
     #endregion
 }
