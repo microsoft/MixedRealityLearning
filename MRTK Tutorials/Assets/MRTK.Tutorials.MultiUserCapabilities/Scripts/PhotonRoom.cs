@@ -25,10 +25,14 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     // public GameObject Tableprefab;
     // public GameObject ModulePrefab;
 
+    [SerializeField]
+    GameObject photonUserPrefab = default;
+    [SerializeField]
+    GameObject rocketLauncherPrefab = default;
+
     private GameObject table;
     private GameObject module;
 
-    private string prefabName = "Rocket Launcher_Complete Variant";
     private Vector3 moduleLocation = Vector3.zero;
 
     void Awake()
@@ -89,7 +93,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     void CreatPlayer()
     {
-        GameObject player = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PhotonUser"), Vector3.zero, Quaternion.identity);
+        GameObject player = PhotonNetwork.Instantiate(photonUserPrefab.name, Vector3.zero, Quaternion.identity);
         player.transform.parent = Camera.main.transform;
     }
 
@@ -108,14 +112,14 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     void CreateInteractableObjects()
     {
-        GameObject go = PhotonNetwork.Instantiate(Path.Combine("Prefabs", prefabName), Vector3.zero, Quaternion.identity);
+        GameObject go = PhotonNetwork.Instantiate(rocketLauncherPrefab.name, Vector3.zero, Quaternion.identity);
         go.transform.parent = TableAnchor.instance.transform;
         go.transform.localPosition = moduleLocation;
     }
 
     private void CreateMainLunarModule()
     {
-        module = PhotonNetwork.Instantiate(Path.Combine("Prefabs", prefabName), Vector3.zero, Quaternion.identity);
+        module = PhotonNetwork.Instantiate(rocketLauncherPrefab.name, Vector3.zero, Quaternion.identity);
         PV.RPC("Rpc_SetModuleParent", RpcTarget.AllBuffered);
     }
 
