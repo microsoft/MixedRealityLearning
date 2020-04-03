@@ -5,12 +5,6 @@ using Photon.Pun;
 
 public class GenericNetSync : MonoBehaviourPun, IPunObservable
 {
-
-
-
-
-
-
     public bool isUser;
 
     public Vector3 startingLocalPosition;
@@ -29,14 +23,17 @@ public class GenericNetSync : MonoBehaviourPun, IPunObservable
         PV = GetComponent<PhotonView>();
         mainCamera = Camera.main;
 
-        if (!PV.IsMine && isUser)
+        if (isUser)
         {
-            //transform.parent = FindObjectOfType<TableAnchor>().transform;
-        }
-        else if (PV.IsMine && isUser)
-        {
-            //transform.parent = FindObjectOfType<TableAnchor>().transform;
-            GenericNetworkManager.instance.localUser = PV;
+            if (TableAnchor.instance != null)
+            {
+                transform.parent = FindObjectOfType<TableAnchor>().transform;
+            }
+
+            if (PV.IsMine)
+            {
+                GenericNetworkManager.instance.localUser = PV;
+            }
         }
 
         startingLocalPosition = transform.localPosition;
