@@ -94,7 +94,6 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     void CreatPlayer()
     {
         GameObject player = PhotonNetwork.Instantiate(photonUserPrefab.name, Vector3.zero, Quaternion.identity);
-        player.transform.parent = Camera.main.transform;
     }
 
 
