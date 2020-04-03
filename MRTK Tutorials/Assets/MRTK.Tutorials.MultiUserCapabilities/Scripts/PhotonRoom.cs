@@ -64,6 +64,19 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     void Start()
     {
         PV = GetComponent<PhotonView>();
+
+        // Allow prefabs not in a Resources folder
+        if (PhotonNetwork.PrefabPool is DefaultPool pool)
+        {
+            if (photonUserPrefab != null)
+            {
+                pool.ResourceCache.Add(photonUserPrefab.name, photonUserPrefab);
+            }
+            if (rocketLauncherPrefab != null)
+            {
+                pool.ResourceCache.Add(rocketLauncherPrefab.name, rocketLauncherPrefab);
+            }
+        }
     }
 
     public override void OnJoinedRoom()
