@@ -19,8 +19,9 @@ public class AnchorModuleScript : MonoBehaviour
     [Tooltip("The unique identifier used to identify the shared file (containing the Azure anchor ID) on the web server.")]
     private string publicSharingPin = "1982734901747";
 
+    [HideInInspector]
     // Anchor ID for anchor stored in Azure (provided by Azure) 
-    private string currentAzureAnchorID = "";
+    public string currentAzureAnchorID = "";
 
     private SpatialAnchorManager cloudManager;
     private CloudSpatialAnchor currentCloudAnchor;
@@ -208,9 +209,14 @@ public class AnchorModuleScript : MonoBehaviour
         }
     }
 
-    public void FindAzureAnchor()
+    public void FindAzureAnchor(string id = "")
     {
         Debug.Log("\nAnchorModuleScript.FindAzureAnchor()");
+
+        if (id != "")
+        {
+            currentAzureAnchorID = id;
+        }
 
         // Notify AnchorFeedbackScript
         OnFindASAAnchor?.Invoke();
