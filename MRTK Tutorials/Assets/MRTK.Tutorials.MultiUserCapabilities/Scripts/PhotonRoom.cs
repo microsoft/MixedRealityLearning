@@ -10,14 +10,14 @@ using Photon.Realtime;
 public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
     public static PhotonRoom room;
-    public PhotonView PV;
-    public bool isRoomLoaded;
-    public bool isRoomFull;
+    PhotonView PV;
+    bool isRoomLoaded;
+    bool isRoomFull;
 
 
-    private Player[] photonPlayers;
-    public int playersInRoom;
-    public int myNumberInRoom;
+    Player[] photonPlayers;
+    int playersInRoom;
+    int myNumberInRoom;
 
 
     public static event Action OnJoinedRoomEvent;

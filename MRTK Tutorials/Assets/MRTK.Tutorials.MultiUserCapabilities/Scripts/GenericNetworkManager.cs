@@ -13,7 +13,9 @@ public class GenericNetworkManager : MonoBehaviour
 
     private bool isConnected;
 
+    [HideInInspector]
     public PhotonView localUser;
+    [HideInInspector]
     public string AzureAnchorID = "";
 
     void Awake()
