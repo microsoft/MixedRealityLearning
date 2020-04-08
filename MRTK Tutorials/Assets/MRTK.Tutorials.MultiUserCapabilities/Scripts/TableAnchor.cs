@@ -21,7 +21,6 @@ public class TableAnchor : MonoBehaviour
                 TableAnchor.instance = this;
             }
         }
-        DontDestroyOnLoad(this.gameObject);
     }
 
     // Update is called once per frame

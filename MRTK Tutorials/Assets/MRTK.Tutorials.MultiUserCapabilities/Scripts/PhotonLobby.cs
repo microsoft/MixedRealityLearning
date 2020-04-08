@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +19,20 @@ public class PhotonLobby : MonoBehaviourPunCallbacks
     
     void Awake()
     {
+        if (PhotonLobby.Lobby == null)
+        {
+            PhotonLobby.Lobby = this;
+        }
+        else
+        {
+            if (PhotonLobby.Lobby != this)
+            {
+                Destroy(PhotonLobby.Lobby.gameObject);
+                PhotonLobby.Lobby = this;
+            }
+        }
+        DontDestroyOnLoad(this.gameObject);
+
         GenericNetworkManager.OnReadyToStartNetwork += StartNetwork;
     }
 

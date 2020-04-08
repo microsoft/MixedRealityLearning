@@ -46,7 +46,6 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
                 PhotonRoom.room = this;
             }
         }
-        DontDestroyOnLoad(this.gameObject);
     }
 
     public override void OnEnable()
