@@ -32,7 +32,6 @@ public class GenericNetworkManager : MonoBehaviour
                 GenericNetworkManager.instance = this;
             }
         }
-        Debug.Log("GNM Created");
         DontDestroyOnLoad(this.gameObject);
 
     }

@@ -49,14 +49,12 @@ public class GenericNetSync : MonoBehaviourPun, IPunObservable
     {
         if (stream.IsWriting)
         {
-            //Debug.Log("GenericNetSync.IPunObservable.OnPhotonSerializeView() -> stream.IsWriting");
             stream.SendNext(transform.localPosition);
             stream.SendNext(transform.localRotation);
             //stream.SendNext(transform.localScale);
         }
         else
         {
-            //Debug.Log("GenericNetSync.IPunObservable.OnPhotonSerializeView() -> !stream.IsWriting");
             networkLocalPosition = (Vector3)stream.ReceiveNext();
             networkLocalRotation = (Quaternion)stream.ReceiveNext();
             //networkLocalScale = (Vector3)stream.ReceiveNext();

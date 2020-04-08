@@ -21,7 +21,6 @@ public class TableAnchor : MonoBehaviour
                 TableAnchor.instance = this;
             }
         }
-        Debug.Log("Table Created");
         DontDestroyOnLoad(this.gameObject);
     }
 

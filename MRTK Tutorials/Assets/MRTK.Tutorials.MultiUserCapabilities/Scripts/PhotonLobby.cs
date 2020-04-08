@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -32,28 +32,25 @@ public class PhotonLobby : MonoBehaviourPunCallbacks
     {
         int randomuserID = UnityEngine.Random.Range(0, 999999);
         PhotonNetwork.AutomaticallySyncScene = true;
-        Debug.Log("OnConnectedToMaster - Successful");
         PhotonNetwork.AuthValues = new AuthenticationValues();
         PhotonNetwork.AuthValues.UserId = randomuserID.ToString();
         userIDCount++;
         PhotonNetwork.NickName = PhotonNetwork.AuthValues.UserId;
-        Debug.Log("Connected To Master");
         PhotonNetwork.JoinRandomRoom();
     }
 
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
-        Debug.Log("RoomName :" + PhotonNetwork.CurrentRoom.Name);
-        Debug.Log("Players in room :" + PhotonNetwork.CountOfPlayersInRooms);
+
+        Debug.Log("\nPhotonLobby.OnJoinedRoom()");
+        Debug.Log("Current room name: " + PhotonNetwork.CurrentRoom.Name);
+        Debug.Log("Other players in room: " + PhotonNetwork.CountOfPlayersInRooms);
+        Debug.Log("Total players in room: " + (PhotonNetwork.CountOfPlayersInRooms + 1));
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-
-        Debug.Log("Random Room Join Failed no available room");
-        Debug.Log("Trying to Create a New Room");
-        
        CreateRoom();
     }
 
@@ -66,7 +63,6 @@ public class PhotonLobby : MonoBehaviourPunCallbacks
     
     public override void OnCreatedRoom()
     {
-        Debug.Log("Room Created");
        base.OnCreatedRoom();
         roomNumber++;
     }
