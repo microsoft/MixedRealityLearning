@@ -57,10 +57,22 @@ public class DebugWindowMessaging : MonoBehaviour
 
     void HandleLog(string message, string stackTrace, LogType type)
     {
+        UnityEngine.Debug.Log("stackTrace: " + stackTrace);
+
+        // Exclude unnecessary logs from other SDKs
+        if (stackTrace.Contains("Photon.Pun.PhotonNetwork") || stackTrace.Contains("Microsoft.MixedReality.Toolkit"))
+        {
+            if (type != LogType.Error)
+            {
+                return;
+            }
+        }
+
         if (type == LogType.Error)
         {
             debugWindow.debugText.GetComponent<Renderer>().material.color = Color.red;
         }
+
         debugWindow.Write(message);
         debugWindow.debugText.GetComponent<Renderer>().material.color = Color.white;
     }
