@@ -11,10 +11,10 @@ public class SharingModuleScript : MonoBehaviour
         anchorModuleScript = GetComponent<AnchorModuleScript>();
     }
 
-    public void ShareAnchorNetwork()
+    public void ShareAzureAnchor()
     {
         DebugWindowMessaging.Clear();
-        Debug.Log("\nSharingModuleScript.ShareAnchorNetwork()");
+        Debug.Log("\nSharingModuleScript.ShareAnchor()");
 
         GenericNetworkManager.instance.AzureAnchorID = anchorModuleScript.currentAzureAnchorID;
         Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
@@ -24,10 +24,10 @@ public class SharingModuleScript : MonoBehaviour
         pu.PVShareAnchorNetwork();
     }
 
-    public void GetSharedAnchorNetwork()
+    public void GetAzureAnchor()
     {
         DebugWindowMessaging.Clear();
-        Debug.Log("\nSharingModuleScript.GetSharedAnchorNetwork()");
+        Debug.Log("\nSharingModuleScript.GetSharedAnchor()");
         Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
 
         anchorModuleScript.FindAzureAnchor(GenericNetworkManager.instance.AzureAnchorID);
