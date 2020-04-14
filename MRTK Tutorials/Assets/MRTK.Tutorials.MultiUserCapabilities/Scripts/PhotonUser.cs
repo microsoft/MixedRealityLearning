@@ -30,21 +30,23 @@ public class PhotonUser : MonoBehaviour
     void RPC_SetSharedAnchorID(string anchorID)
     {
         GenericNetworkManager.instance.AzureAnchorID = anchorID;
-        Debug.Log("RPC_SetSharedAnchorID RPC - AzureAnchorID" + GenericNetworkManager.instance.AzureAnchorID);
-    }
+        Debug.Log("\nPhotonRoom.RPC_SetSharedAnchorID()");
+        Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
+   }
 
     public void PVShareAnchorNetwork()
     {
         DebugWindowMessaging.Clear();
-        Debug.Log("ShareAnchorNetwork RPC - AzureAnchorID" + GenericNetworkManager.instance.AzureAnchorID);
+        Debug.Log("\nPhotonRoom.PVShareAnchorNetwork()");
+        Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
         if (PV != null)
         {
             PV.RPC("RPC_SetSharedAnchorID", RpcTarget.AllBuffered, GenericNetworkManager.instance.AzureAnchorID);
-            Debug.Log("AzureAnchorID user " + " " + PV.Controller.UserId);
+            Debug.Log("Azure Anchor ID shared by user: " + PV.Controller.UserId);
         }
         else
         {
-            Debug.Log("PV is null");
+            Debug.LogError("PV is null");
         }
     }
 

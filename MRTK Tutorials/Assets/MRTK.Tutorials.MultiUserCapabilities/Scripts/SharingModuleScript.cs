@@ -13,7 +13,6 @@ public class SharingModuleScript : MonoBehaviour
 
     public void ShareAzureAnchor()
     {
-        DebugWindowMessaging.Clear();
         Debug.Log("\nSharingModuleScript.ShareAnchor()");
 
         GenericNetworkManager.instance.AzureAnchorID = anchorModuleScript.currentAzureAnchorID;
@@ -26,7 +25,6 @@ public class SharingModuleScript : MonoBehaviour
 
     public void GetAzureAnchor()
     {
-        DebugWindowMessaging.Clear();
         Debug.Log("\nSharingModuleScript.GetSharedAnchor()");
         Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
 
