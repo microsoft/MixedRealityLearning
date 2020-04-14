@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -138,6 +138,7 @@ public class RPCLaunchLunarModule : MonoBehaviourPunCallbacks, IInRoomCallbacks
                 //Play audio snapping sound
                 //TODO: Need to take into account whether manipulation handler is currently being held
                 //if (!audioSource.isPlaying)
+                audioSource.Play();
 
                 objectToPlace.position = locationToPlace.position;
                 objectToPlace.rotation = locationToPlace.rotation;
