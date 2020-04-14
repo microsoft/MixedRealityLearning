@@ -5,10 +5,9 @@ using UnityEngine;
 public class TableAnchor : MonoBehaviour
 {
     public static TableAnchor instance;
-    // Start is called before the first frame update
+
     void Start()
     {
-      
         if (TableAnchor.instance == null)
         {
             TableAnchor.instance = this;
@@ -21,11 +20,5 @@ public class TableAnchor : MonoBehaviour
                 TableAnchor.instance = this;
             }
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

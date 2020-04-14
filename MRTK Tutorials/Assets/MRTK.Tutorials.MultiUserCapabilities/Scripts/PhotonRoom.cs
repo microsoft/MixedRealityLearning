@@ -10,17 +10,11 @@ using Photon.Realtime;
 public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
     public static PhotonRoom room;
+
     PhotonView PV;
-    bool isRoomLoaded;
-    bool isRoomFull;
-
-
     Player[] photonPlayers;
     int playersInRoom;
     int myNumberInRoom;
-
-
-    public static event Action OnJoinedRoomEvent;
 
     [SerializeField]
     GameObject photonUserPrefab = default;
@@ -29,9 +23,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     [SerializeField]
     Transform rocketLauncherLocation = default;
 
-    private GameObject table;
     private GameObject module;
-
     private Vector3 moduleLocation = Vector3.zero;
 
     void Awake()

@@ -51,13 +51,11 @@ public class GenericNetSync : MonoBehaviourPun, IPunObservable
         {
             stream.SendNext(transform.localPosition);
             stream.SendNext(transform.localRotation);
-            //stream.SendNext(transform.localScale);
         }
         else
         {
             networkLocalPosition = (Vector3)stream.ReceiveNext();
             networkLocalRotation = (Quaternion)stream.ReceiveNext();
-            //networkLocalScale = (Vector3)stream.ReceiveNext();
         }
     }
 
@@ -67,7 +65,6 @@ public class GenericNetSync : MonoBehaviourPun, IPunObservable
         {
             transform.localPosition = networkLocalPosition;
             transform.localRotation = networkLocalRotation;
-            //transform.localScale = networkLocalScale;
         }
 
         if (PV.IsMine && isUser)

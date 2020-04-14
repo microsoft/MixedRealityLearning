@@ -9,16 +9,9 @@ public class OwnershipHandler : MonoBehaviourPun, IPunOwnershipCallbacks, IMixed
 {
     private PhotonView PV;
 
-    // Start is called before the first frame update
     void Start()
     {
         PV = GetComponent<PhotonView>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)

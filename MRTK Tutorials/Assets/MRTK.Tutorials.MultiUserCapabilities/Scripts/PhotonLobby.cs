@@ -10,13 +10,9 @@ using Random = System.Random;
 public class PhotonLobby : MonoBehaviourPunCallbacks
 {
     public static PhotonLobby Lobby;
-
     private int roomNumber = 1;
-
     private int userIDCount = 0;
-   
-	// Use this for initialization
-    
+
     void Awake()
     {
         if (PhotonLobby.Lobby == null)
@@ -65,19 +61,19 @@ public class PhotonLobby : MonoBehaviourPunCallbacks
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-       CreateRoom();
+        CreateRoom();
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
-
-        Debug.Log("Creating Room Failed");
-        CreateRoom();    
+        Debug.Log("\nPhotonLobby.OnCreateRoomFailed()");
+        Debug.LogError("Creating Room Failed");
+        CreateRoom();
     }
-    
+
     public override void OnCreatedRoom()
     {
-       base.OnCreatedRoom();
+        base.OnCreatedRoom();
         roomNumber++;
     }
 
@@ -86,10 +82,9 @@ public class PhotonLobby : MonoBehaviourPunCallbacks
         PhotonNetwork.LeaveRoom();
     }
 
-
     void CreateRoom()
     {
         RoomOptions roomOptions = new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = 2 };
-        PhotonNetwork.CreateRoom("Room" + UnityEngine.Random.Range(1,3000), roomOptions);
+        PhotonNetwork.CreateRoom("Room" + UnityEngine.Random.Range(1, 3000), roomOptions);
     }
 }

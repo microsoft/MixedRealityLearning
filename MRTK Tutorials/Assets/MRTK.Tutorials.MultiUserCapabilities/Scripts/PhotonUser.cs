@@ -6,17 +6,16 @@ using UnityEngine;
 public class PhotonUser : MonoBehaviour
 {
     private PhotonView PV;
-
     private string username;
-    // Start is called before the first frame update
+
     void Start()
     {
         PV = GetComponent<PhotonView>();
 
         if (PV.IsMine)
         {
-           username = "User" + PhotonNetwork.NickName;
-           PV.RPC("RPC_SetNickName",RpcTarget.AllBuffered, username);
+            username = "User" + PhotonNetwork.NickName;
+            PV.RPC("RPC_SetNickName", RpcTarget.AllBuffered, username);
         }
     }
 
@@ -32,7 +31,7 @@ public class PhotonUser : MonoBehaviour
         GenericNetworkManager.instance.AzureAnchorID = anchorID;
         Debug.Log("\nPhotonRoom.RPC_SetSharedAnchorID()");
         Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
-   }
+    }
 
     public void PVShareAnchorNetwork()
     {
@@ -48,12 +47,5 @@ public class PhotonUser : MonoBehaviour
         {
             Debug.LogError("PV is null");
         }
-    }
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

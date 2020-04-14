@@ -7,9 +7,7 @@ using UnityEngine;
 public class GenericNetworkManager : MonoBehaviour
 {
     public static GenericNetworkManager instance;
-
     public static event Action OnReadyToStartNetwork;
-   // public static event Action OnNetworkStarted_CreatePlayer; 
 
     private bool isConnected;
 
@@ -33,31 +31,20 @@ public class GenericNetworkManager : MonoBehaviour
             }
         }
         DontDestroyOnLoad(this.gameObject);
-
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         ConnectToNetwork();
     }
 
-    //For non Photon Networking solutions
+    // For non Photon Networking solutions
     void StartNetwork(string ipaddress, string port)
     {
-
     }
 
     void ConnectToNetwork()
     {
         OnReadyToStartNetwork?.Invoke();
-        
     }
-
-    void StopNetwork()
-    {
-        //Unnecessary for this
-    }
-
-   
 }

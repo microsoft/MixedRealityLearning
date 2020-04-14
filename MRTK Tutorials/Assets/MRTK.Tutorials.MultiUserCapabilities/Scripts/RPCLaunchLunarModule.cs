@@ -113,11 +113,6 @@ public class RPCLaunchLunarModule : MonoBehaviourPunCallbacks, IInRoomCallbacks
     [PunRPC]
     void RPC_ResetPlacement()
     {
-        if (objectToPlace.transform.parent == originalParentObject)
-        {
-            //objectToPlace.localScale = originalScale;
-        }
-
         photonView1.RPC("IsNotSnapped", RpcTarget.All);
         photonView1.RPC("ResetParent", RpcTarget.All);
 
@@ -135,9 +130,6 @@ public class RPCLaunchLunarModule : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
             if (!isSnapped && Vector3.Distance(objectToPlace.position, locationToPlace.position) > 0.01 && Vector3.Distance(objectToPlace.position, locationToPlace.position) < nearDistance)
             {
-                //Play audio snapping sound
-                //TODO: Need to take into account whether manipulation handler is currently being held
-                //if (!audioSource.isPlaying)
                 audioSource.Play();
 
                 objectToPlace.position = locationToPlace.position;
