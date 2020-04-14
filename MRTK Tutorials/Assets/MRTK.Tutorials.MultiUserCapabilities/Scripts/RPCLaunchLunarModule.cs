@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -149,7 +149,7 @@ public class RPCLaunchLunarModule : MonoBehaviourPunCallbacks, IInRoomCallbacks
                 photonView1.RPC("HideToolTip", RpcTarget.All);
             }
 
-            if (isSnapped && Vector3.Distance(objectToPlace.position, locationToPlace.position) > farDistance)
+            if (isSnapped && Vector3.Distance(objectToPlace.position, locationToPlace.position) > 0.01)
             {
                 objectToPlace.position = locationToPlace.position;
                 objectToPlace.rotation = locationToPlace.rotation;
