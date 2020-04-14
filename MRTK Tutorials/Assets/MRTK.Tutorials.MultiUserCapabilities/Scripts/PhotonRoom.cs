@@ -26,6 +26,8 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     GameObject photonUserPrefab = default;
     [SerializeField]
     GameObject rocketLauncherPrefab = default;
+    [SerializeField]
+    Transform rocketLauncherLocation = default;
 
     private GameObject table;
     private GameObject module;
@@ -123,9 +125,7 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     void CreateInteractableObjects()
     {
-        GameObject go = PhotonNetwork.Instantiate(rocketLauncherPrefab.name, Vector3.zero, Quaternion.identity);
-        go.transform.parent = TableAnchor.instance.transform;
-        go.transform.localPosition = moduleLocation;
+        GameObject go = PhotonNetwork.Instantiate(rocketLauncherPrefab.name, rocketLauncherLocation.position, rocketLauncherLocation.rotation);
     }
 
     private void CreateMainLunarModule()

@@ -9,9 +9,6 @@ public class TableAnchorAsParent : MonoBehaviour
         if (TableAnchor.instance != null)
         {
             transform.parent = TableAnchor.instance.transform;
-            transform.localPosition = Vector3.zero;
-            transform.localRotation = Quaternion.identity;
-            transform.localScale = Vector3.one;
         }
     }
 }
