@@ -28,13 +28,11 @@ public class ViewButtonControl : MonoBehaviour
             ModelIndex = 0;
             Models[ModelIndex].SetActive(true);
         }
-        
-        
+
     }
 
     public void PreviousModel()
     {
-
         foreach (GameObject model in Models)
         {
             model.SetActive(false);
