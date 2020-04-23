@@ -5,24 +5,24 @@ using UnityEngine;
 public class ExplodeView : MonoBehaviour
 {
     [Header("Game Objects to move")]
-    [SerializeField] List<GameObject> gameObjects;
+    [SerializeField] List<GameObject> roverObjects;
     [Header("Exploded view objects")]
-    [SerializeField] List<GameObject> explodedGameObjects;
+    [SerializeField] List<GameObject> explodedRoverObjects;
     [Header("Explosion settings")]
     [SerializeField] float explosionSpeed = 0.1f;
 
     bool isInDefaultPosition = false;
     List<Vector3> startingPos = new List<Vector3>();
     List<Vector3> explodedPos = new List<Vector3>();
-    
+
     void Start()
     {
         // capture the starting position and exploded position of the objects
-        foreach (var item in gameObjects)
+        foreach (var item in roverObjects)
         {
             startingPos.Add(item.transform.localPosition);
         }
-        foreach (var item in explodedGameObjects)
+        foreach (var item in explodedRoverObjects)
         {
             explodedPos.Add(item.transform.localPosition);
         }
@@ -34,18 +34,17 @@ public class ExplodeView : MonoBehaviour
         if (isInDefaultPosition)
         {
             // move objects to exploded position
-            for (int i = 0; i < gameObjects.Count; i++)
+            for (int i = 0; i < roverObjects.Count; i++)
             {
-                gameObjects[i].transform.localPosition = Vector3.Lerp(gameObjects[i].transform.localPosition, explodedPos[i], explosionSpeed);
-                
+                roverObjects[i].transform.localPosition = Vector3.Lerp(roverObjects[i].transform.localPosition, explodedPos[i], explosionSpeed);
             }
         }
         else
         {
             // move objects to default position
-            for (int i = 0; i < gameObjects.Count; i++)
+            for (int i = 0; i < roverObjects.Count; i++)
             {
-                gameObjects[i].transform.localPosition = Vector3.Lerp(gameObjects[i].transform.localPosition, startingPos[i], explosionSpeed);
+                roverObjects[i].transform.localPosition = Vector3.Lerp(roverObjects[i].transform.localPosition, startingPos[i], explosionSpeed);
             }
         }
     }
