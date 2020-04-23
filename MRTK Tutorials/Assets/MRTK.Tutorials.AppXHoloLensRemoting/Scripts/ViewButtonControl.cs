@@ -14,7 +14,10 @@ public class ViewButtonControl : MonoBehaviour
 
     public void NextModel()
     {
-        Models[ModelIndex].SetActive(false);
+        foreach (GameObject model in Models) 
+        {
+            model.SetActive(false);
+        }
         ModelIndex = ModelIndex + 1;
         if(ModelIndex < Models.Length)
         {
@@ -31,8 +34,11 @@ public class ViewButtonControl : MonoBehaviour
 
     public void PreviousModel()
     {
-        
-        Models[ModelIndex].SetActive(false);
+
+        foreach (GameObject model in Models)
+        {
+            model.SetActive(false);
+        }
         ModelIndex = ModelIndex - 1;
         if(ModelIndex >= 0)
         {
