@@ -135,17 +135,39 @@ MonoBehaviour:
   smoothingAmountOneHandManip: 0.001
   onManipulationStarted:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8962451147448188073}
+        m_MethodName: SetIsManipulating
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onManipulationEnded:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8962451147448188073}
+        m_MethodName: SetIsManipulating
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onHoverEntered:
     m_PersistentCalls:
       m_Calls: []
   onHoverExited:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7370610155190409019
+--- !u!114 &8962451147448188073
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,7 +176,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 374479626220102760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 560a4692a46bbfd459a5011904ec3208, type: 3}
+  m_Script: {fileID: 11500000, guid: 115a07d2770a0944ca23605eb4cf8588, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objectToPlace: {fileID: 8386639147447719544}
@@ -270,22 +292,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTetherWhenManipulating: 0
---- !u!114 &6975590470781320758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1395509905979695923}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 560a4692a46bbfd459a5011904ec3208, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectToPlace: {fileID: 2388098746299517926}
-  locationToPlace: {fileID: 4242447768806452122}
-  toolTipObject: {fileID: 0}
-  audioSource: {fileID: 662888960261256175}
 --- !u!114 &7399411542296493244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,8 +319,8 @@ MonoBehaviour:
   onManipulationStarted:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6975590470781320758}
-        m_MethodName: setIsManipulating
+      - m_Target: {fileID: 323727898007834305}
+        m_MethodName: SetIsManipulating
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -327,8 +333,8 @@ MonoBehaviour:
   onManipulationEnded:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6975590470781320758}
-        m_MethodName: setIsManipulating
+      - m_Target: {fileID: 323727898007834305}
+        m_MethodName: SetIsManipulating
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -344,6 +350,22 @@ MonoBehaviour:
   onHoverExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &323727898007834305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395509905979695923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 115a07d2770a0944ca23605eb4cf8588, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectToPlace: {fileID: 2388098746299517926}
+  locationToPlace: {fileID: 4242447768806452122}
+  toolTipObject: {fileID: 0}
+  audioSource: {fileID: 662888960261256175}
 --- !u!1 &2128697252414606424
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,8 +576,8 @@ MonoBehaviour:
   onManipulationStarted:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: setIsManipulating
+      - m_Target: {fileID: 4235708262206060818}
+        m_MethodName: SetIsManipulating
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -568,8 +590,8 @@ MonoBehaviour:
   onManipulationEnded:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: setIsManipulating
+      - m_Target: {fileID: 4235708262206060818}
+        m_MethodName: SetIsManipulating
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -585,6 +607,22 @@ MonoBehaviour:
   onHoverExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4235708262206060818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3639604089226777548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 115a07d2770a0944ca23605eb4cf8588, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectToPlace: {fileID: 3234760617678303418}
+  locationToPlace: {fileID: 3199254088571223553}
+  toolTipObject: {fileID: 0}
+  audioSource: {fileID: 6733606048980992380}
 --- !u!114 &4889078140097295613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -598,22 +636,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTetherWhenManipulating: 0
---- !u!114 &4235708262206060818
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3639604089226777548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 115a07d2770a0944ca23605eb4cf8588, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectToPlace: {fileID: 0}
-  locationToPlace: {fileID: 0}
-  toolTipObject: {fileID: 0}
-  audioSource: {fileID: 0}
 --- !u!82 &1383207071055511740
 AudioSource:
   m_ObjectHideFlags: 0
@@ -710,22 +732,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &4591138832530174910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7927781819230903737}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 560a4692a46bbfd459a5011904ec3208, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectToPlace: {fileID: 2103057633132532712}
-  locationToPlace: {fileID: 1774809939099517951}
-  toolTipObject: {fileID: 0}
-  audioSource: {fileID: 1383207071055511740}
 --- !u!114 &7526151291487176183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -765,16 +771,54 @@ MonoBehaviour:
   smoothingAmountOneHandManip: 0.001
   onManipulationStarted:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 9184471742000299314}
+        m_MethodName: SetIsManipulating
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onManipulationEnded:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 9184471742000299314}
+        m_MethodName: SetIsManipulating
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onHoverEntered:
     m_PersistentCalls:
       m_Calls: []
   onHoverExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &9184471742000299314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7927781819230903737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 115a07d2770a0944ca23605eb4cf8588, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectToPlace: {fileID: 2103057633132532712}
+  locationToPlace: {fileID: 1774809939099517951}
+  toolTipObject: {fileID: 0}
+  audioSource: {fileID: 1383207071055511740}
 --- !u!1001 &2220347625539646544
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1278,6 +1322,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rover
       objectReference: {fileID: 0}
+    - target: {fileID: 6864315780212187845, guid: df18e577dc343db4c9a55bcadf9c4085,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7339599959970069757, guid: df18e577dc343db4c9a55bcadf9c4085,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7855796429503339259, guid: df18e577dc343db4c9a55bcadf9c4085,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1336,6 +1390,12 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 436122905873252781, guid: df18e577dc343db4c9a55bcadf9c4085, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: df18e577dc343db4c9a55bcadf9c4085, type: 3}
+--- !u!54 &5618306925121787571 stripped
+Rigidbody:
+  m_CorrespondingSourceObject: {fileID: 1883382629990184761, guid: df18e577dc343db4c9a55bcadf9c4085,
+    type: 3}
+  m_PrefabInstance: {fileID: 6330692065520050570}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6882954399308253440 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 602928657451706506, guid: df18e577dc343db4c9a55bcadf9c4085,
@@ -1351,6 +1411,12 @@ Transform:
 --- !u!1 &3602982655295511927 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7339599959970069757, guid: df18e577dc343db4c9a55bcadf9c4085,
+    type: 3}
+  m_PrefabInstance: {fileID: 6330692065520050570}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3199254088571223553 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8916329294921473931, guid: df18e577dc343db4c9a55bcadf9c4085,
     type: 3}
   m_PrefabInstance: {fileID: 6330692065520050570}
   m_PrefabAsset: {fileID: 0}
@@ -1417,12 +1483,6 @@ GameObject:
 --- !u!4 &4241906924211207025 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7855796429503339259, guid: df18e577dc343db4c9a55bcadf9c4085,
-    type: 3}
-  m_PrefabInstance: {fileID: 6330692065520050570}
-  m_PrefabAsset: {fileID: 0}
---- !u!54 &5618306925121787571 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 1883382629990184761, guid: df18e577dc343db4c9a55bcadf9c4085,
     type: 3}
   m_PrefabInstance: {fileID: 6330692065520050570}
   m_PrefabAsset: {fileID: 0}
@@ -1684,27 +1744,27 @@ PrefabInstance:
         type: 3}
       propertyPath: animator
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5960553738541674427}
     - target: {fileID: 4041886729281235803, guid: 40f304eb28e8743419fd84e195ddf19e,
         type: 3}
       propertyPath: roverParts.Array.data[0]
       value: 
-      objectReference: {fileID: 7927781819230903737}
+      objectReference: {fileID: 9184471742000299314}
     - target: {fileID: 4041886729281235803, guid: 40f304eb28e8743419fd84e195ddf19e,
         type: 3}
       propertyPath: roverParts.Array.data[1]
       value: 
-      objectReference: {fileID: 374479626220102760}
+      objectReference: {fileID: 8962451147448188073}
     - target: {fileID: 4041886729281235803, guid: 40f304eb28e8743419fd84e195ddf19e,
         type: 3}
       propertyPath: roverParts.Array.data[2]
       value: 
-      objectReference: {fileID: 3639604089226777548}
+      objectReference: {fileID: 4235708262206060818}
     - target: {fileID: 4041886729281235803, guid: 40f304eb28e8743419fd84e195ddf19e,
         type: 3}
       propertyPath: roverParts.Array.data[3]
       value: 
-      objectReference: {fileID: 1395509905979695923}
+      objectReference: {fileID: 323727898007834305}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40f304eb28e8743419fd84e195ddf19e, type: 3}
 --- !u!4 &6330692065732116956 stripped

@@ -15,15 +15,14 @@ public class RoverController : MonoBehaviour
     [Tooltip("The speed that the rover moves")] [SerializeField] float driveFactor = 10f;
     [Tooltip("The speed that the rover turns")] [SerializeField] float turnFactor = 100f;
     [Header("Parts To Assemble")]
-    [Tooltip("The Rover can't move until all of these parts have been assembled")][SerializeField] List<GameObject> roverParts;
+    [Tooltip("The Rover can't move until all of these parts have been assembled")][SerializeField] List<PartAssembly> roverParts;
     
     Vector3 startJoystickPos;
     Vector3 oldJoystickPos;
 
     float movementLimit = .1f;
     bool isAtStartingPosition = false;
-
-    PartAssemblyDemo partAssemblyDemo;
+    
     List<Transform> transforms;
 
     bool canMove;
@@ -102,7 +101,7 @@ public class RoverController : MonoBehaviour
             yield return new WaitForSeconds(.1f);
             foreach (var part in roverParts)
             {
-                if (part.transform.position != part.GetComponent<PartAssemblyDemo>().locationToPlace.position)
+                if (part.transform.position != part.locationToPlace.position)
                 {
                     continue;
                 }

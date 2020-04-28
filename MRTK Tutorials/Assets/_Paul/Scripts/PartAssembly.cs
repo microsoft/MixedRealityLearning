@@ -80,7 +80,7 @@ public class PartAssembly : MonoBehaviour
                     audioSource.Play();
 
                     //turn off tool tips
-                    toolTipObject.SetActive(false);        
+                    //toolTipObject.SetActive(false);        
 
                     isSnapped = true;
                 }
