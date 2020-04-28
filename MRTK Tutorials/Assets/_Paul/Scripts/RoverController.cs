@@ -6,29 +6,43 @@ public class RoverController : MonoBehaviour
 {
     [Header("Joystick refrence")]
     [SerializeField] GameObject joystick;
-    [Header("Rover refrences")]
+    [Header("Rover refrence")]
     [SerializeField] Rigidbody rigidBody;
+    [Header("RoverModule refrence")]
     [SerializeField] Animator animator;
     [Header("Movement settings")]
     [Tooltip("The speed that the wheels spin")] [SerializeField] float driveSpeed = 10f;
     [Tooltip("The speed that the rover moves")] [SerializeField] float driveFactor = 10f;
     [Tooltip("The speed that the rover turns")] [SerializeField] float turnFactor = 100f;
+    [Header("Parts To Assemble")]
+    [Tooltip("The Rover can't move until all of these parts have been assembled")][SerializeField] List<PartAssembly> roverParts;
     
     Vector3 startJoystickPos;
     Vector3 oldJoystickPos;
 
     float movementLimit = .1f;
     bool isAtStartingPosition = false;
+    
+    List<Transform> transforms;
+
+    bool canMove;
 
     void Start()
     {
-        // get the starting position for the joystick
+        // get the starting position for the joystick        
         startJoystickPos = joystick.transform.localPosition;
+
+        // insure the driving animation is not playing
         animator.SetBool("isDriving", false);
+        
+        StartCoroutine(CheckIfCanMove());
     }
 
     void Update()
     {
+        // Check if parts are assembled before let the user move the rover
+        if (!canMove) return;
+               
         // move joystick back to original position after manipulation has ended
         if (!isAtStartingPosition)
         {
@@ -59,7 +73,7 @@ public class RoverController : MonoBehaviour
         Quaternion turn = Quaternion.Euler(0, rotation, 0);
         animator.SetFloat("TurnFactor", rotation);
 
-        // if the rover is driving in backwards reverse the turn direction
+        // if the rover is driving backwards reverse the turn direction
         if (translation < 0)
         {
             turn = Quaternion.Euler(0, -rotation, 0);
@@ -77,6 +91,22 @@ public class RoverController : MonoBehaviour
         else
         {
             animator.SetBool("isDriving", false);
+        }
+    }
+
+    IEnumerator CheckIfCanMove()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(.1f);
+            foreach (var part in roverParts)
+            {
+                if (part.transform.position != part.locationToPlace.position)
+                {
+                    continue;
+                }
+            }
+            canMove = true;
         }
     }
 
