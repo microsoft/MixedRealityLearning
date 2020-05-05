@@ -34,7 +34,10 @@ public class RoverController : MonoBehaviour
 
         // insure the driving animation is not playing
         animator.SetBool("isDriving", false);
-        
+
+        // turn isKinematic on so the parts don't push the rover
+        rigidBody.isKinematic = true;
+
         StartCoroutine(CheckIfCanMove());
     }
 
@@ -42,12 +45,15 @@ public class RoverController : MonoBehaviour
     {
         // Check if parts are assembled before let the user move the rover
         if (!canMove) return;
-               
+
+        // turn isKinematic off as soon as we can move
+        rigidBody.isKinematic = false;
+
         // move joystick back to original position after manipulation has ended
         if (!isAtStartingPosition)
         {
             joystick.transform.localPosition = Vector3.Lerp(joystick.transform.localPosition, startJoystickPos, .1f);
-            if (joystick.transform.position == startJoystickPos)
+            if (joystick.transform.localPosition == startJoystickPos)
             {
                 isAtStartingPosition = true;
             }
@@ -82,18 +88,21 @@ public class RoverController : MonoBehaviour
         rigidBody.MoveRotation(rigidBody.rotation * turn);
         rigidBody.transform.Translate(Vector3.forward * translation);
         animator.SetFloat("DrivingSpeed", translation * driveSpeed);
-
+        
         // start the driving animation if we are moving
-        if (translation != 0)
+        if (translation != 0f)
         {
+            Debug.Log(true);
             animator.SetBool("isDriving", true);
         }
         else
         {
+            Debug.Log(false);
             animator.SetBool("isDriving", false);
         }
     }
 
+    // constantly check if the parts in place so we can move
     IEnumerator CheckIfCanMove()
     {
         while (true)
@@ -101,9 +110,13 @@ public class RoverController : MonoBehaviour
             yield return new WaitForSeconds(.1f);
             foreach (var part in roverParts)
             {
-                if (part.transform.position != part.locationToPlace.position)
+                if (part.transform.position == part.locationToPlace.position)
                 {
-                    continue;
+                    part.gameObject.layer = 2;
+                }
+                while (part.transform.position != part.locationToPlace.position)
+                {
+                    yield return new WaitForSeconds(.1f);
                 }
             }
             canMove = true;
