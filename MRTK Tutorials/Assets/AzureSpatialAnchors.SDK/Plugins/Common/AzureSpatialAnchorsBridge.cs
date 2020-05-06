@@ -125,10 +125,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 96,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 97,
     }
 
     internal static class NativeLibraryHelpers
@@ -138,7 +134,7 @@ namespace Microsoft.Azure.SpatialAnchors
             // an empty list is returned as a single null character
             if (result_length == 1)
             {
-                return Array.Empty<string>();
+                return new string[0];
             }
 
             byte[] bytes = new byte[result_length - 1];
@@ -230,8 +226,6 @@ namespace Microsoft.Azure.SpatialAnchors
                     throw new CloudSpatialException(CloudSpatialErrorCode.LocateCriteriaNotSupported, message, requestCorrelationVector, responseCorrelationVector);
                 case status.Unknown:
                     throw new CloudSpatialException(CloudSpatialErrorCode.Unknown, message, requestCorrelationVector, responseCorrelationVector);
-                case status.HttpTimeout:
-                    throw new CloudSpatialException(CloudSpatialErrorCode.HttpTimeout, message, requestCorrelationVector, responseCorrelationVector);
             }
         }
     }
@@ -477,7 +471,7 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, EntryPoint="ssc_sensor_capabilities_get_known_beacon_proximity_uuids_flat", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_sensor_capabilities_get_known_beacon_proximity_uuids(IntPtr handle, out IntPtr result, out int result_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr, SizeParamIndex=2)] String[] value, int value_count);
+        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_create(out IntPtr instance);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -501,25 +495,25 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_geo_location_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_start(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -619,9 +613,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_session_create_hash(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -674,22 +668,14 @@ namespace Microsoft.Azure.SpatialAnchors
         internal static extern status ssc_anchor_locate_criteria_release(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_addref(IntPtr handle);
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_flat", CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_bypass_cache(IntPtr handle, out Boolean result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_bypass_cache(IntPtr handle, Boolean value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
-        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_flat", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr, SizeParamIndex=2)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_near_anchor(IntPtr handle, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -703,9 +689,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_set_source_anchor(IntPtr handle, IntPtr value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -721,15 +707,23 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_set_max_result_count(IntPtr handle, Int32 value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_near_device(IntPtr handle, IntPtr value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_anchor_properties_async(IntPtr handle, [MarshalAs(UnmanagedType.LPStr)] string identifier, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -996,7 +990,7 @@ namespace Microsoft.Azure.SpatialAnchors
         }
     }
 
-    class IDictionary_String_String : BasePrivateDictionary<string, string>
+    class IDictionary_String_String : BasePrivateDictionary<String, String>
     {
         internal IntPtr handle;
         internal IDictionary_String_String(IntPtr ahandle, bool transfer)
@@ -1015,28 +1009,27 @@ namespace Microsoft.Azure.SpatialAnchors
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_count(this.handle, out result));
             return result;
         }
-        protected override string InternalGetKey(int index)
+        protected override String InternalGetKey(int index)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_key(this.handle, index, out result));
             return result;
         }
-        protected override string InternalGetItem(string key)
+        protected override String InternalGetItem(String key)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_item(this.handle, key, out result));
             return result;
         }
-        protected override void InternalSetItem(string key, string value)
+        protected override void InternalSetItem(String key, String value)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_set_item(this.handle, key, value));
         }
-        protected override void InternalRemoveKey(string key)
+        protected override void InternalRemoveKey(String key)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_remove_key(this.handle, key));
         }
     }
-
     class IList_String : BasePrivateList<String>
     {
         internal IntPtr handle;
@@ -1293,10 +1286,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 19,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 20,
     }
 
     public enum AnchorDataCategory : int
@@ -1400,17 +1389,21 @@ namespace Microsoft.Azure.SpatialAnchors
     /// </summary>
     public class CloudSpatialException : Exception
     {
+        private CloudSpatialErrorCode code;
+        private string requestCorrelationVector;
+        private string responseCorrelationVector;
+
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         public CloudSpatialException()
         {
-            this.ErrorCode = default(CloudSpatialErrorCode);
+            this.code = default(CloudSpatialErrorCode);
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         /// <param name='code'>Error code for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -1418,7 +1411,7 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='message'>Plain text error message for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message) : base(message)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -1428,9 +1421,9 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='responseCorrelationVector'>Response correlation vector for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector) : base(message)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -1441,16 +1434,34 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='innerException'>Exception that caused this exception to be thrown.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector, Exception inner) : base(message, inner)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
-        public CloudSpatialErrorCode ErrorCode { get; }
+        /// <summary>
+        /// The error code associated with this exception.
+        /// </summary>
+        public CloudSpatialErrorCode ErrorCode
+        {
+            get { return this.code; }
+        }
 
-        public string RequestCorrelationVector { get; }
+        /// <summary>
+        /// The request correlation vector associated with this exception.
+        /// </summary>
+        public string RequestCorrelationVector
+        {
+            get { return this.requestCorrelationVector; }
+        }
 
-        public string ResponseCorrelationVector { get; }
+        /// <summary>
+        /// The response correlation vector associated with this exception.
+        /// </summary>
+        public string ResponseCorrelationVector
+        {
+            get { return this.responseCorrelationVector; }
+        }
 
     }
 
@@ -1484,6 +1495,27 @@ namespace Microsoft.Azure.SpatialAnchors
         }
 
         /// <summary>
+        /// Cloud anchor identifiers to locate. If empty, any anchors can be located. Maximum limit of 35 anchors per watcher.
+        /// </summary>
+        /// <remarks>
+        /// Any anchors within this list will match this criteria.
+        /// </remarks>
+        public string[] Identifiers
+        {
+            get
+            {
+                IntPtr result;
+                int result_length;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
+                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
+            }
+        }
+
+        /// <summary>
         /// Whether locate should bypass the local cache of anchors.
         /// </summary>
         public bool BypassCache
@@ -1497,6 +1529,47 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_bypass_cache(this.handle, value));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to a specific anchor.
+        /// </summary>
+        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value.handle));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to the device.
+        /// </summary>
+        /// <remarks>
+        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
+        /// </remarks>
+        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value.handle));
             }
         }
 
@@ -1531,68 +1604,6 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_strategy(this.handle, value));
-            }
-        }
-
-        /// <summary>
-        /// CloudSpatialAnchor identifiers to locate. Maximum limit of 35 anchors per watcher.
-        /// </summary>
-        /// <remarks>
-        /// Any anchors within this list will match this criteria.
-        /// </remarks>
-        public string[] Identifiers
-        {
-            get
-            {
-                IntPtr result;
-                int result_length;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
-                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to a specific anchor.
-        /// </summary>
-        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to the device.
-        /// </summary>
-        /// <remarks>
-        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
-        /// </remarks>
-        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value != null ? value.handle : IntPtr.Zero));
             }
         }
 
@@ -2051,7 +2062,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value.handle));
             }
         }
 
@@ -2078,10 +2089,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             TokenRequiredDelegate handler = (instance == null) ? null : instance._TokenRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static TokenRequiredDelegateNative TokenRequiredStaticHandlerDelegate = TokenRequiredStaticHandler;
@@ -2106,10 +2114,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             AnchorLocatedDelegate handler = (instance == null) ? null : instance._AnchorLocated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static AnchorLocatedDelegateNative AnchorLocatedStaticHandlerDelegate = AnchorLocatedStaticHandler;
@@ -2134,10 +2139,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             LocateAnchorsCompletedDelegate handler = (instance == null) ? null : instance._LocateAnchorsCompleted;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static LocateAnchorsCompletedDelegateNative LocateAnchorsCompletedStaticHandlerDelegate = LocateAnchorsCompletedStaticHandler;
@@ -2162,10 +2164,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionUpdatedDelegate handler = (instance == null) ? null : instance._SessionUpdated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionUpdatedDelegateNative SessionUpdatedStaticHandlerDelegate = SessionUpdatedStaticHandler;
@@ -2190,10 +2189,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionErrorDelegate handler = (instance == null) ? null : instance._Error;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionErrorDelegateNative ErrorStaticHandlerDelegate = ErrorStaticHandler;
@@ -2218,10 +2214,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             OnLogDebugDelegate handler = (instance == null) ? null : instance._OnLogDebug;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static OnLogDebugDelegateNative OnLogDebugStaticHandlerDelegate = OnLogDebugStaticHandler;
@@ -2246,10 +2239,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             UpdatedSensorFingerprintRequiredDelegate handler = (instance == null) ? null : instance._UpdatedSensorFingerprintRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static UpdatedSensorFingerprintRequiredDelegateNative UpdatedSensorFingerprintRequiredStaticHandlerDelegate = UpdatedSensorFingerprintRequiredStaticHandler;
@@ -2316,7 +2306,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -2330,7 +2320,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             IntPtr result_handle;
             Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
-            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria.handle, out result_handle));
             result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
             return result_object;
         }
@@ -2348,7 +2338,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_anchor_properties_async(this.handle, identifier, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer:true);
+                result_object = new CloudSpatialAnchor(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -2365,7 +2355,7 @@ namespace Microsoft.Azure.SpatialAnchors
             {
                 IntPtr result_handle;
                 IList_String result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria.handle, out result_handle));
                 result_object = new IList_String(result_handle, transfer:true);
                 return result_object;
             });
@@ -2396,7 +2386,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -2410,7 +2400,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -2424,7 +2414,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -2452,7 +2442,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.SessionStatus result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_session_status_async(this.handle, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.SessionStatus(result_handle, transfer:true);
+                result_object = new SessionStatus(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -2727,7 +2717,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value.handle));
             }
         }
 
@@ -3103,7 +3093,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value.handle));
             }
         }
 
@@ -3603,10 +3593,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 96,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 97,
     }
 
     internal static class NativeLibraryHelpers
@@ -3616,7 +3602,7 @@ namespace Microsoft.Azure.SpatialAnchors
             // an empty list is returned as a single null character
             if (result_length == 1)
             {
-                return Array.Empty<string>();
+                return new string[0];
             }
 
             byte[] bytes = new byte[result_length - 1];
@@ -3708,8 +3694,6 @@ namespace Microsoft.Azure.SpatialAnchors
                     throw new CloudSpatialException(CloudSpatialErrorCode.LocateCriteriaNotSupported, message, requestCorrelationVector, responseCorrelationVector);
                 case status.Unknown:
                     throw new CloudSpatialException(CloudSpatialErrorCode.Unknown, message, requestCorrelationVector, responseCorrelationVector);
-                case status.HttpTimeout:
-                    throw new CloudSpatialException(CloudSpatialErrorCode.HttpTimeout, message, requestCorrelationVector, responseCorrelationVector);
             }
         }
     }
@@ -3955,7 +3939,7 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, EntryPoint="ssc_sensor_capabilities_get_known_beacon_proximity_uuids_wide_flat", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_sensor_capabilities_get_known_beacon_proximity_uuids(IntPtr handle, out IntPtr result, out int result_count);
         [DllImport(DllName, EntryPoint="ssc_sensor_capabilities_set_known_beacon_proximity_uuids_wide", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr, SizeParamIndex=2)] String[] value, int value_count);
+        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_create(out IntPtr instance);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -3979,25 +3963,25 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_geo_location_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_start(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -4097,9 +4081,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_session_create_hash(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -4152,22 +4136,14 @@ namespace Microsoft.Azure.SpatialAnchors
         internal static extern status ssc_anchor_locate_criteria_release(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_addref(IntPtr handle);
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_wide_flat", CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_set_identifiers_wide", CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_bypass_cache(IntPtr handle, out Boolean result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_bypass_cache(IntPtr handle, Boolean value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
-        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_wide_flat", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
-        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_set_identifiers_wide", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr, SizeParamIndex=2)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_near_anchor(IntPtr handle, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -4181,9 +4157,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_set_source_anchor(IntPtr handle, IntPtr value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -4199,15 +4175,23 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_set_max_result_count(IntPtr handle, Int32 value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_near_device(IntPtr handle, IntPtr value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
         [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_anchor_properties_async_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_anchor_properties_async(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string identifier, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -4472,7 +4456,7 @@ namespace Microsoft.Azure.SpatialAnchors
         }
     }
 
-    class IDictionary_String_String : BasePrivateDictionary<string, string>
+    class IDictionary_String_String : BasePrivateDictionary<String, String>
     {
         internal IntPtr handle;
         internal IDictionary_String_String(IntPtr ahandle, bool transfer)
@@ -4491,28 +4475,27 @@ namespace Microsoft.Azure.SpatialAnchors
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_count(this.handle, out result));
             return result;
         }
-        protected override string InternalGetKey(int index)
+        protected override String InternalGetKey(int index)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_key(this.handle, index, out result));
             return result;
         }
-        protected override string InternalGetItem(string key)
+        protected override String InternalGetItem(String key)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_item(this.handle, key, out result));
             return result;
         }
-        protected override void InternalSetItem(string key, string value)
+        protected override void InternalSetItem(String key, String value)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_set_item(this.handle, key, value));
         }
-        protected override void InternalRemoveKey(string key)
+        protected override void InternalRemoveKey(String key)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_remove_key(this.handle, key));
         }
     }
-
     class IList_String : BasePrivateList<String>
     {
         internal IntPtr handle;
@@ -4769,10 +4752,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 19,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 20,
     }
 
     public enum AnchorDataCategory : int
@@ -4876,17 +4855,21 @@ namespace Microsoft.Azure.SpatialAnchors
     /// </summary>
     public class CloudSpatialException : Exception
     {
+        private CloudSpatialErrorCode code;
+        private string requestCorrelationVector;
+        private string responseCorrelationVector;
+
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         public CloudSpatialException()
         {
-            this.ErrorCode = default(CloudSpatialErrorCode);
+            this.code = default(CloudSpatialErrorCode);
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         /// <param name='code'>Error code for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -4894,7 +4877,7 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='message'>Plain text error message for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message) : base(message)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -4904,9 +4887,9 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='responseCorrelationVector'>Response correlation vector for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector) : base(message)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -4917,16 +4900,34 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='innerException'>Exception that caused this exception to be thrown.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector, Exception inner) : base(message, inner)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
-        public CloudSpatialErrorCode ErrorCode { get; }
+        /// <summary>
+        /// The error code associated with this exception.
+        /// </summary>
+        public CloudSpatialErrorCode ErrorCode
+        {
+            get { return this.code; }
+        }
 
-        public string RequestCorrelationVector { get; }
+        /// <summary>
+        /// The request correlation vector associated with this exception.
+        /// </summary>
+        public string RequestCorrelationVector
+        {
+            get { return this.requestCorrelationVector; }
+        }
 
-        public string ResponseCorrelationVector { get; }
+        /// <summary>
+        /// The response correlation vector associated with this exception.
+        /// </summary>
+        public string ResponseCorrelationVector
+        {
+            get { return this.responseCorrelationVector; }
+        }
 
     }
 
@@ -4960,6 +4961,27 @@ namespace Microsoft.Azure.SpatialAnchors
         }
 
         /// <summary>
+        /// Cloud anchor identifiers to locate. If empty, any anchors can be located. Maximum limit of 35 anchors per watcher.
+        /// </summary>
+        /// <remarks>
+        /// Any anchors within this list will match this criteria.
+        /// </remarks>
+        public string[] Identifiers
+        {
+            get
+            {
+                IntPtr result;
+                int result_length;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
+                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
+            }
+        }
+
+        /// <summary>
         /// Whether locate should bypass the local cache of anchors.
         /// </summary>
         public bool BypassCache
@@ -4973,6 +4995,47 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_bypass_cache(this.handle, value));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to a specific anchor.
+        /// </summary>
+        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value.handle));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to the device.
+        /// </summary>
+        /// <remarks>
+        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
+        /// </remarks>
+        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value.handle));
             }
         }
 
@@ -5007,68 +5070,6 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_strategy(this.handle, value));
-            }
-        }
-
-        /// <summary>
-        /// CloudSpatialAnchor identifiers to locate. Maximum limit of 35 anchors per watcher.
-        /// </summary>
-        /// <remarks>
-        /// Any anchors within this list will match this criteria.
-        /// </remarks>
-        public string[] Identifiers
-        {
-            get
-            {
-                IntPtr result;
-                int result_length;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
-                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to a specific anchor.
-        /// </summary>
-        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to the device.
-        /// </summary>
-        /// <remarks>
-        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
-        /// </remarks>
-        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value != null ? value.handle : IntPtr.Zero));
             }
         }
 
@@ -5508,7 +5509,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value.handle));
             }
         }
 
@@ -5535,10 +5536,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             TokenRequiredDelegate handler = (instance == null) ? null : instance._TokenRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static TokenRequiredDelegateNative TokenRequiredStaticHandlerDelegate = TokenRequiredStaticHandler;
@@ -5563,10 +5561,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             AnchorLocatedDelegate handler = (instance == null) ? null : instance._AnchorLocated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static AnchorLocatedDelegateNative AnchorLocatedStaticHandlerDelegate = AnchorLocatedStaticHandler;
@@ -5591,10 +5586,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             LocateAnchorsCompletedDelegate handler = (instance == null) ? null : instance._LocateAnchorsCompleted;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static LocateAnchorsCompletedDelegateNative LocateAnchorsCompletedStaticHandlerDelegate = LocateAnchorsCompletedStaticHandler;
@@ -5619,10 +5611,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionUpdatedDelegate handler = (instance == null) ? null : instance._SessionUpdated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionUpdatedDelegateNative SessionUpdatedStaticHandlerDelegate = SessionUpdatedStaticHandler;
@@ -5647,10 +5636,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionErrorDelegate handler = (instance == null) ? null : instance._Error;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionErrorDelegateNative ErrorStaticHandlerDelegate = ErrorStaticHandler;
@@ -5675,10 +5661,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             OnLogDebugDelegate handler = (instance == null) ? null : instance._OnLogDebug;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static OnLogDebugDelegateNative OnLogDebugStaticHandlerDelegate = OnLogDebugStaticHandler;
@@ -5703,10 +5686,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             UpdatedSensorFingerprintRequiredDelegate handler = (instance == null) ? null : instance._UpdatedSensorFingerprintRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static UpdatedSensorFingerprintRequiredDelegateNative UpdatedSensorFingerprintRequiredStaticHandlerDelegate = UpdatedSensorFingerprintRequiredStaticHandler;
@@ -5773,7 +5753,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -5787,7 +5767,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             IntPtr result_handle;
             Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
-            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria.handle, out result_handle));
             result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
             return result_object;
         }
@@ -5805,7 +5785,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_anchor_properties_async(this.handle, identifier, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer:true);
+                result_object = new CloudSpatialAnchor(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -5822,7 +5802,7 @@ namespace Microsoft.Azure.SpatialAnchors
             {
                 IntPtr result_handle;
                 IList_String result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria.handle, out result_handle));
                 result_object = new IList_String(result_handle, transfer:true);
                 return result_object;
             });
@@ -5853,7 +5833,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -5867,7 +5847,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -5881,7 +5861,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -5895,7 +5875,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.SessionStatus result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_session_status_async(this.handle, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.SessionStatus(result_handle, transfer:true);
+                result_object = new SessionStatus(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -6170,7 +6150,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value.handle));
             }
         }
 
@@ -6546,7 +6526,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value.handle));
             }
         }
 
@@ -7046,10 +7026,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 96,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 97,
     }
 
     internal static class NativeLibraryHelpers
@@ -7059,7 +7035,7 @@ namespace Microsoft.Azure.SpatialAnchors
             // an empty list is returned as a single null character
             if (result_length == 1)
             {
-                return Array.Empty<string>();
+                return new string[0];
             }
 
             byte[] bytes = new byte[result_length - 1];
@@ -7151,8 +7127,6 @@ namespace Microsoft.Azure.SpatialAnchors
                     throw new CloudSpatialException(CloudSpatialErrorCode.LocateCriteriaNotSupported, message, requestCorrelationVector, responseCorrelationVector);
                 case status.Unknown:
                     throw new CloudSpatialException(CloudSpatialErrorCode.Unknown, message, requestCorrelationVector, responseCorrelationVector);
-                case status.HttpTimeout:
-                    throw new CloudSpatialException(CloudSpatialErrorCode.HttpTimeout, message, requestCorrelationVector, responseCorrelationVector);
             }
         }
     }
@@ -7398,7 +7372,7 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, EntryPoint="ssc_sensor_capabilities_get_known_beacon_proximity_uuids_flat", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_sensor_capabilities_get_known_beacon_proximity_uuids(IntPtr handle, out IntPtr result, out int result_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr, SizeParamIndex=2)] String[] value, int value_count);
+        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_create(out IntPtr instance);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -7422,25 +7396,25 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_geo_location_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_start(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -7540,9 +7514,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_session_create_hash(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -7595,22 +7569,14 @@ namespace Microsoft.Azure.SpatialAnchors
         internal static extern status ssc_anchor_locate_criteria_release(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_addref(IntPtr handle);
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_flat", CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_bypass_cache(IntPtr handle, out Boolean result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_bypass_cache(IntPtr handle, Boolean value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
-        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_flat", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr, SizeParamIndex=2)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_near_anchor(IntPtr handle, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -7624,9 +7590,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_set_source_anchor(IntPtr handle, IntPtr value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -7642,15 +7608,23 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_set_max_result_count(IntPtr handle, Int32 value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_near_device(IntPtr handle, IntPtr value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_anchor_properties_async(IntPtr handle, [MarshalAs(UnmanagedType.LPStr)] string identifier, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -7917,7 +7891,7 @@ namespace Microsoft.Azure.SpatialAnchors
         }
     }
 
-    class IDictionary_String_String : BasePrivateDictionary<string, string>
+    class IDictionary_String_String : BasePrivateDictionary<String, String>
     {
         internal IntPtr handle;
         internal IDictionary_String_String(IntPtr ahandle, bool transfer)
@@ -7936,28 +7910,27 @@ namespace Microsoft.Azure.SpatialAnchors
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_count(this.handle, out result));
             return result;
         }
-        protected override string InternalGetKey(int index)
+        protected override String InternalGetKey(int index)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_key(this.handle, index, out result));
             return result;
         }
-        protected override string InternalGetItem(string key)
+        protected override String InternalGetItem(String key)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_item(this.handle, key, out result));
             return result;
         }
-        protected override void InternalSetItem(string key, string value)
+        protected override void InternalSetItem(String key, String value)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_set_item(this.handle, key, value));
         }
-        protected override void InternalRemoveKey(string key)
+        protected override void InternalRemoveKey(String key)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_remove_key(this.handle, key));
         }
     }
-
     class IList_String : BasePrivateList<String>
     {
         internal IntPtr handle;
@@ -8214,10 +8187,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 19,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 20,
     }
 
     public enum AnchorDataCategory : int
@@ -8321,17 +8290,21 @@ namespace Microsoft.Azure.SpatialAnchors
     /// </summary>
     public class CloudSpatialException : Exception
     {
+        private CloudSpatialErrorCode code;
+        private string requestCorrelationVector;
+        private string responseCorrelationVector;
+
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         public CloudSpatialException()
         {
-            this.ErrorCode = default(CloudSpatialErrorCode);
+            this.code = default(CloudSpatialErrorCode);
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         /// <param name='code'>Error code for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -8339,7 +8312,7 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='message'>Plain text error message for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message) : base(message)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -8349,9 +8322,9 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='responseCorrelationVector'>Response correlation vector for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector) : base(message)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -8362,16 +8335,34 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='innerException'>Exception that caused this exception to be thrown.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector, Exception inner) : base(message, inner)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
-        public CloudSpatialErrorCode ErrorCode { get; }
+        /// <summary>
+        /// The error code associated with this exception.
+        /// </summary>
+        public CloudSpatialErrorCode ErrorCode
+        {
+            get { return this.code; }
+        }
 
-        public string RequestCorrelationVector { get; }
+        /// <summary>
+        /// The request correlation vector associated with this exception.
+        /// </summary>
+        public string RequestCorrelationVector
+        {
+            get { return this.requestCorrelationVector; }
+        }
 
-        public string ResponseCorrelationVector { get; }
+        /// <summary>
+        /// The response correlation vector associated with this exception.
+        /// </summary>
+        public string ResponseCorrelationVector
+        {
+            get { return this.responseCorrelationVector; }
+        }
 
     }
 
@@ -8405,6 +8396,27 @@ namespace Microsoft.Azure.SpatialAnchors
         }
 
         /// <summary>
+        /// Cloud anchor identifiers to locate. If empty, any anchors can be located. Maximum limit of 35 anchors per watcher.
+        /// </summary>
+        /// <remarks>
+        /// Any anchors within this list will match this criteria.
+        /// </remarks>
+        public string[] Identifiers
+        {
+            get
+            {
+                IntPtr result;
+                int result_length;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
+                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
+            }
+        }
+
+        /// <summary>
         /// Whether locate should bypass the local cache of anchors.
         /// </summary>
         public bool BypassCache
@@ -8418,6 +8430,47 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_bypass_cache(this.handle, value));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to a specific anchor.
+        /// </summary>
+        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value.handle));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to the device.
+        /// </summary>
+        /// <remarks>
+        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
+        /// </remarks>
+        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value.handle));
             }
         }
 
@@ -8452,68 +8505,6 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_strategy(this.handle, value));
-            }
-        }
-
-        /// <summary>
-        /// CloudSpatialAnchor identifiers to locate. Maximum limit of 35 anchors per watcher.
-        /// </summary>
-        /// <remarks>
-        /// Any anchors within this list will match this criteria.
-        /// </remarks>
-        public string[] Identifiers
-        {
-            get
-            {
-                IntPtr result;
-                int result_length;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
-                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to a specific anchor.
-        /// </summary>
-        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to the device.
-        /// </summary>
-        /// <remarks>
-        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
-        /// </remarks>
-        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value != null ? value.handle : IntPtr.Zero));
             }
         }
 
@@ -8972,7 +8963,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value.handle));
             }
         }
 
@@ -8999,10 +8990,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             TokenRequiredDelegate handler = (instance == null) ? null : instance._TokenRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static TokenRequiredDelegateNative TokenRequiredStaticHandlerDelegate = TokenRequiredStaticHandler;
@@ -9027,10 +9015,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             AnchorLocatedDelegate handler = (instance == null) ? null : instance._AnchorLocated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static AnchorLocatedDelegateNative AnchorLocatedStaticHandlerDelegate = AnchorLocatedStaticHandler;
@@ -9055,10 +9040,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             LocateAnchorsCompletedDelegate handler = (instance == null) ? null : instance._LocateAnchorsCompleted;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static LocateAnchorsCompletedDelegateNative LocateAnchorsCompletedStaticHandlerDelegate = LocateAnchorsCompletedStaticHandler;
@@ -9083,10 +9065,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionUpdatedDelegate handler = (instance == null) ? null : instance._SessionUpdated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionUpdatedDelegateNative SessionUpdatedStaticHandlerDelegate = SessionUpdatedStaticHandler;
@@ -9111,10 +9090,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionErrorDelegate handler = (instance == null) ? null : instance._Error;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionErrorDelegateNative ErrorStaticHandlerDelegate = ErrorStaticHandler;
@@ -9139,10 +9115,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             OnLogDebugDelegate handler = (instance == null) ? null : instance._OnLogDebug;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static OnLogDebugDelegateNative OnLogDebugStaticHandlerDelegate = OnLogDebugStaticHandler;
@@ -9167,10 +9140,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             UpdatedSensorFingerprintRequiredDelegate handler = (instance == null) ? null : instance._UpdatedSensorFingerprintRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static UpdatedSensorFingerprintRequiredDelegateNative UpdatedSensorFingerprintRequiredStaticHandlerDelegate = UpdatedSensorFingerprintRequiredStaticHandler;
@@ -9237,7 +9207,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -9251,7 +9221,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             IntPtr result_handle;
             Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
-            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria.handle, out result_handle));
             result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
             return result_object;
         }
@@ -9269,7 +9239,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_anchor_properties_async(this.handle, identifier, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer:true);
+                result_object = new CloudSpatialAnchor(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -9286,7 +9256,7 @@ namespace Microsoft.Azure.SpatialAnchors
             {
                 IntPtr result_handle;
                 IList_String result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria.handle, out result_handle));
                 result_object = new IList_String(result_handle, transfer:true);
                 return result_object;
             });
@@ -9317,7 +9287,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -9331,7 +9301,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -9345,7 +9315,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -9373,7 +9343,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.SessionStatus result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_session_status_async(this.handle, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.SessionStatus(result_handle, transfer:true);
+                result_object = new SessionStatus(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -9648,7 +9618,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value.handle));
             }
         }
 
@@ -10024,7 +9994,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value.handle));
             }
         }
 
@@ -10398,7 +10368,7 @@ namespace Microsoft.Azure.SpatialAnchors
 }
 
 #elif UNITY_EDITOR
-// Making calls from the Unity editor is not currently supported.
+// Making calls to Azure Spatial Anchors from the Unity editor is not currently supported.
 // These stubs are here to prevent the editor from reporting compilation errors.
 //
 // AzureSpatialAnchors
@@ -10526,10 +10496,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 96,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 97,
     }
 
     internal static class NativeLibraryHelpers
@@ -10539,7 +10505,7 @@ namespace Microsoft.Azure.SpatialAnchors
             // an empty list is returned as a single null character
             if (result_length == 1)
             {
-                return Array.Empty<string>();
+                return new string[0];
             }
 
             byte[] bytes = new byte[result_length - 1];
@@ -10631,8 +10597,6 @@ namespace Microsoft.Azure.SpatialAnchors
                     throw new CloudSpatialException(CloudSpatialErrorCode.LocateCriteriaNotSupported, message, requestCorrelationVector, responseCorrelationVector);
                 case status.Unknown:
                     throw new CloudSpatialException(CloudSpatialErrorCode.Unknown, message, requestCorrelationVector, responseCorrelationVector);
-                case status.HttpTimeout:
-                    throw new CloudSpatialException(CloudSpatialErrorCode.HttpTimeout, message, requestCorrelationVector, responseCorrelationVector);
             }
         }
     }
@@ -10768,7 +10732,7 @@ namespace Microsoft.Azure.SpatialAnchors
 
     internal static class NativeLibrary
     {
-        internal const string DllName = "AzureSpatialAnchors";
+        internal const string DllName = "__Internal";
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_locate_anchors_completed_event_args_release(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -10878,7 +10842,7 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, EntryPoint="ssc_sensor_capabilities_get_known_beacon_proximity_uuids_wide_flat", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_sensor_capabilities_get_known_beacon_proximity_uuids(IntPtr handle, out IntPtr result, out int result_count);
         [DllImport(DllName, EntryPoint="ssc_sensor_capabilities_set_known_beacon_proximity_uuids_wide", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr, SizeParamIndex=2)] String[] value, int value_count);
+        internal static extern status ssc_sensor_capabilities_set_known_beacon_proximity_uuids(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_create(out IntPtr instance);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -10902,25 +10866,25 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_geo_location_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_latitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_latitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out double result);
+        internal static extern status ssc_geo_location_get_longitude(IntPtr handle, out Double result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, double value);
+        internal static extern status ssc_geo_location_set_longitude(IntPtr handle, Double value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_horizontal_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_horizontal_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_altitude(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_altitude(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out float result);
+        internal static extern status ssc_geo_location_get_vertical_error(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, float value);
+        internal static extern status ssc_geo_location_set_vertical_error(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_platform_location_provider_start(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -11020,9 +10984,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out float result);
+        internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_session_create_hash(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -11075,22 +11039,14 @@ namespace Microsoft.Azure.SpatialAnchors
         internal static extern status ssc_anchor_locate_criteria_release(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_addref(IntPtr handle);
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_wide_flat", CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_set_identifiers_wide", CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_bypass_cache(IntPtr handle, out Boolean result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_bypass_cache(IntPtr handle, Boolean value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
-        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
-        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_wide_flat", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
-        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_set_identifiers_wide", CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr, SizeParamIndex=2)] String[] value, int value_count);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_near_anchor(IntPtr handle, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -11104,9 +11060,9 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_set_source_anchor(IntPtr handle, IntPtr value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -11122,15 +11078,23 @@ namespace Microsoft.Azure.SpatialAnchors
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_addref(IntPtr handle);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out float result);
+        internal static extern status ssc_near_device_criteria_get_distance_in_meters(IntPtr handle, out Single result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
-        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, float value);
+        internal static extern status ssc_near_device_criteria_set_distance_in_meters(IntPtr handle, Single value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_get_max_result_count(IntPtr handle, out Int32 result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_device_criteria_set_max_result_count(IntPtr handle, Int32 value);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_near_device(IntPtr handle, IntPtr value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
         [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_anchor_properties_async_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_anchor_properties_async(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string identifier, out IntPtr result);
         [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
@@ -11397,7 +11361,7 @@ namespace Microsoft.Azure.SpatialAnchors
         }
     }
 
-    class IDictionary_String_String : BasePrivateDictionary<string, string>
+    class IDictionary_String_String : BasePrivateDictionary<String, String>
     {
         internal IntPtr handle;
         internal IDictionary_String_String(IntPtr ahandle, bool transfer)
@@ -11416,28 +11380,27 @@ namespace Microsoft.Azure.SpatialAnchors
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_count(this.handle, out result));
             return result;
         }
-        protected override string InternalGetKey(int index)
+        protected override String InternalGetKey(int index)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_key(this.handle, index, out result));
             return result;
         }
-        protected override string InternalGetItem(string key)
+        protected override String InternalGetItem(String key)
         {
             string result;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_get_item(this.handle, key, out result));
             return result;
         }
-        protected override void InternalSetItem(string key, string value)
+        protected override void InternalSetItem(String key, String value)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_set_item(this.handle, key, value));
         }
-        protected override void InternalRemoveKey(string key)
+        protected override void InternalRemoveKey(String key)
         {
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_idictionary_string_string_remove_key(this.handle, key));
         }
     }
-
     class IList_String : BasePrivateList<String>
     {
         internal IntPtr handle;
@@ -11694,10 +11657,6 @@ namespace Microsoft.Azure.SpatialAnchors
         /// Encountered an unknown error on the session.
         /// </summary>
         Unknown = 19,
-        /// <summary>
-        /// The Http request timed out.
-        /// </summary>
-        HttpTimeout = 20,
     }
 
     public enum AnchorDataCategory : int
@@ -11801,17 +11760,21 @@ namespace Microsoft.Azure.SpatialAnchors
     /// </summary>
     public class CloudSpatialException : Exception
     {
+        private CloudSpatialErrorCode code;
+        private string requestCorrelationVector;
+        private string responseCorrelationVector;
+
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         public CloudSpatialException()
         {
-            this.ErrorCode = default(CloudSpatialErrorCode);
+            this.code = default(CloudSpatialErrorCode);
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
         /// <param name='code'>Error code for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -11819,7 +11782,7 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='message'>Plain text error message for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message) : base(message)
         {
-            this.ErrorCode = code;
+            this.code = code;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -11829,9 +11792,9 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='responseCorrelationVector'>Response correlation vector for this exception.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector) : base(message)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
         /// <summary>Creates a new instance of the <see cref='CloudSpatialException'/> class.</summary>
@@ -11842,16 +11805,34 @@ namespace Microsoft.Azure.SpatialAnchors
         /// <param name='innerException'>Exception that caused this exception to be thrown.</param>
         public CloudSpatialException(CloudSpatialErrorCode code, string message, string requestCorrelationVector, string responseCorrelationVector, Exception inner) : base(message, inner)
         {
-            this.ErrorCode = code;
-            this.RequestCorrelationVector = requestCorrelationVector;
-            this.ResponseCorrelationVector = responseCorrelationVector;
+            this.code = code;
+            this.requestCorrelationVector = requestCorrelationVector;
+            this.responseCorrelationVector = responseCorrelationVector;
         }
 
-        public CloudSpatialErrorCode ErrorCode { get; }
+        /// <summary>
+        /// The error code associated with this exception.
+        /// </summary>
+        public CloudSpatialErrorCode ErrorCode
+        {
+            get { return this.code; }
+        }
 
-        public string RequestCorrelationVector { get; }
+        /// <summary>
+        /// The request correlation vector associated with this exception.
+        /// </summary>
+        public string RequestCorrelationVector
+        {
+            get { return this.requestCorrelationVector; }
+        }
 
-        public string ResponseCorrelationVector { get; }
+        /// <summary>
+        /// The response correlation vector associated with this exception.
+        /// </summary>
+        public string ResponseCorrelationVector
+        {
+            get { return this.responseCorrelationVector; }
+        }
 
     }
 
@@ -11885,6 +11866,27 @@ namespace Microsoft.Azure.SpatialAnchors
         }
 
         /// <summary>
+        /// Cloud anchor identifiers to locate. If empty, any anchors can be located. Maximum limit of 35 anchors per watcher.
+        /// </summary>
+        /// <remarks>
+        /// Any anchors within this list will match this criteria.
+        /// </remarks>
+        public string[] Identifiers
+        {
+            get
+            {
+                IntPtr result;
+                int result_length;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
+                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
+            }
+        }
+
+        /// <summary>
         /// Whether locate should bypass the local cache of anchors.
         /// </summary>
         public bool BypassCache
@@ -11898,6 +11900,47 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_bypass_cache(this.handle, value));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to a specific anchor.
+        /// </summary>
+        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value.handle));
+            }
+        }
+
+        /// <summary>
+        /// Filters anchors to locate to be close to the device.
+        /// </summary>
+        /// <remarks>
+        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
+        /// </remarks>
+        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
+        {
+            get
+            {
+                IntPtr result_handle;
+                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
+                return result_object;
+            }
+            set
+            {
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value.handle));
             }
         }
 
@@ -11932,68 +11975,6 @@ namespace Microsoft.Azure.SpatialAnchors
             set
             {
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_strategy(this.handle, value));
-            }
-        }
-
-        /// <summary>
-        /// CloudSpatialAnchor identifiers to locate. Maximum limit of 35 anchors per watcher.
-        /// </summary>
-        /// <remarks>
-        /// Any anchors within this list will match this criteria.
-        /// </remarks>
-        public string[] Identifiers
-        {
-            get
-            {
-                IntPtr result;
-                int result_length;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_identifiers(this.handle, out result, out result_length));
-                return NativeLibraryHelpers.IntPtrToStringArray(result, result_length);
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_identifiers(this.handle, value, value.Length));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to a specific anchor.
-        /// </summary>
-        public Microsoft.Azure.SpatialAnchors.NearAnchorCriteria NearAnchor
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
-            }
-        }
-
-        /// <summary>
-        /// Filters anchors to locate to be close to the device.
-        /// </summary>
-        /// <remarks>
-        /// Any enabled sensors will be used to help discover anchors around your device. To have the best chance of finding anchors, you should configure the SensorCapabilities to give the session access to all appropriate sensors.
-        /// </remarks>
-        public Microsoft.Azure.SpatialAnchors.NearDeviceCriteria NearDevice
-        {
-            get
-            {
-                IntPtr result_handle;
-                Microsoft.Azure.SpatialAnchors.NearDeviceCriteria result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_device(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearDeviceCriteria(result_handle, transfer:true) : null;
-                return result_object;
-            }
-            set
-            {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_set_near_device(this.handle, value != null ? value.handle : IntPtr.Zero));
             }
         }
 
@@ -12452,7 +12433,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_set_location_provider(this.handle, value.handle));
             }
         }
 
@@ -12479,10 +12460,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             TokenRequiredDelegate handler = (instance == null) ? null : instance._TokenRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static TokenRequiredDelegateNative TokenRequiredStaticHandlerDelegate = TokenRequiredStaticHandler;
@@ -12507,10 +12485,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             AnchorLocatedDelegate handler = (instance == null) ? null : instance._AnchorLocated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static AnchorLocatedDelegateNative AnchorLocatedStaticHandlerDelegate = AnchorLocatedStaticHandler;
@@ -12535,10 +12510,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             LocateAnchorsCompletedDelegate handler = (instance == null) ? null : instance._LocateAnchorsCompleted;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static LocateAnchorsCompletedDelegateNative LocateAnchorsCompletedStaticHandlerDelegate = LocateAnchorsCompletedStaticHandler;
@@ -12563,10 +12535,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionUpdatedDelegate handler = (instance == null) ? null : instance._SessionUpdated;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionUpdatedDelegateNative SessionUpdatedStaticHandlerDelegate = SessionUpdatedStaticHandler;
@@ -12591,10 +12560,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionErrorDelegate handler = (instance == null) ? null : instance._Error;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionErrorDelegateNative ErrorStaticHandlerDelegate = ErrorStaticHandler;
@@ -12619,10 +12585,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             OnLogDebugDelegate handler = (instance == null) ? null : instance._OnLogDebug;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static OnLogDebugDelegateNative OnLogDebugStaticHandlerDelegate = OnLogDebugStaticHandler;
@@ -12647,10 +12610,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             UpdatedSensorFingerprintRequiredDelegate handler = (instance == null) ? null : instance._UpdatedSensorFingerprintRequired;
-            if (handler != null)
-            {
-                handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
-            }
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SensorFingerprintEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static UpdatedSensorFingerprintRequiredDelegateNative UpdatedSensorFingerprintRequiredStaticHandlerDelegate = UpdatedSensorFingerprintRequiredStaticHandler;
@@ -12717,7 +12677,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -12731,7 +12691,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             IntPtr result_handle;
             Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
-            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+            NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria.handle, out result_handle));
             result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
             return result_object;
         }
@@ -12749,7 +12709,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_anchor_properties_async(this.handle, identifier, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer:true);
+                result_object = new CloudSpatialAnchor(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -12766,7 +12726,7 @@ namespace Microsoft.Azure.SpatialAnchors
             {
                 IntPtr result_handle;
                 IList_String result_object;
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria != null ? criteria.handle : IntPtr.Zero, out result_handle));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_nearby_anchor_ids_async(this.handle, criteria.handle, out result_handle));
                 result_object = new IList_String(result_handle, transfer:true);
                 return result_object;
             });
@@ -12797,7 +12757,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -12811,7 +12771,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_update_anchor_properties_async(this.handle, anchor.handle));
             });
         }
 
@@ -12825,7 +12785,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             await Task.Run(() =>
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor != null ? anchor.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_delete_anchor_async(this.handle, anchor.handle));
             });
         }
 
@@ -12853,7 +12813,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.SessionStatus result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_session_status_async(this.handle, out result_handle));
-                result_object = new Microsoft.Azure.SpatialAnchors.SessionStatus(result_handle, transfer:true);
+                result_object = new SessionStatus(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -13128,7 +13088,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_set_source_anchor(this.handle, value.handle));
             }
         }
 
@@ -13504,7 +13464,7 @@ namespace Microsoft.Azure.SpatialAnchors
             }
             set
             {
-                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value != null ? value.handle : IntPtr.Zero));
+                NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_sensor_fingerprint_event_args_set_geo_position(this.handle, value.handle));
             }
         }
 
