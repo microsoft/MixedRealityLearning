@@ -4,48 +4,48 @@ using UnityEngine;
 
 public class ViewButtonControl : MonoBehaviour
 {
-    public GameObject[] models;
-    int modelIndex = 0;
+    public GameObject[] Models;
+    private int ModelIndex = 0;
     
     void Start()
     {
-      models[0].SetActive(true);
+      Models[0].SetActive(true);
     }
 
     public void NextModel()
     {
-        foreach (GameObject model in models) 
+        foreach (GameObject model in Models) 
         {
             model.SetActive(false);
         }
-        modelIndex = modelIndex + 1;
-        if(modelIndex < models.Length)
+        ModelIndex = ModelIndex + 1;
+        if(ModelIndex < Models.Length)
         {
-            models[modelIndex].SetActive(true);
+            Models[ModelIndex].SetActive(true);
         }
         else
         {
-            modelIndex = 0;
-            models[modelIndex].SetActive(true);
+            ModelIndex = 0;
+            Models[ModelIndex].SetActive(true);
         }
 
     }
 
     public void PreviousModel()
     {
-        foreach (GameObject model in models)
+        foreach (GameObject model in Models)
         {
             model.SetActive(false);
         }
-        modelIndex = modelIndex - 1;
-        if(modelIndex >= 0)
+        ModelIndex = ModelIndex - 1;
+        if(ModelIndex >= 0)
         {
-            models[modelIndex].SetActive(true);
+            Models[ModelIndex].SetActive(true);
         }
         else
         {
-            modelIndex = models.Length-1;
-            models[modelIndex].SetActive(true);
+            ModelIndex = Models.Length-1;
+            Models[ModelIndex].SetActive(true);
 
         }
         
