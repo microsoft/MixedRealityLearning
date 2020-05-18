@@ -369,11 +369,6 @@ public class AnchorModuleScript : MonoBehaviour
                 // Notify AnchorFeedbackScript
                 OnASAAnchorLocated?.Invoke();
 
-#if UNITY_ANDROID || UNITY_IOS
-                Pose anchorPose = Pose.identity;
-                anchorPose = currentCloudAnchor.GetPose();
-#endif
-
 #if WINDOWS_UWP || UNITY_WSA
                 // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
@@ -394,7 +389,11 @@ public class AnchorModuleScript : MonoBehaviour
 
                     gameObject.GetComponent<UnityEngine.XR.WSA.WorldAnchor>().SetNativeSpatialAnchorPtr(currentCloudAnchor.LocalAnchor);
                 }
-#else
+
+#elif UNITY_ANDROID || UNITY_IOS
+                Pose anchorPose = Pose.identity;
+                anchorPose = currentCloudAnchor.GetPose();
+
                 Debug.Log($"Setting object to anchor pose with position '{anchorPose.position}' and rotation '{anchorPose.rotation}'");
                 transform.position = anchorPose.position;
                 transform.rotation = anchorPose.rotation;
