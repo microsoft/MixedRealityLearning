@@ -707,6 +707,12 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
+--- !u!1 &1309722691 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4346792278806811707, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+    type: 3}
+  m_PrefabInstance: {fileID: 2653589438883226336}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1540051913
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -776,6 +782,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 375369510d9c8fd428ed10a1f6bef485, type: 3}
+--- !u!1 &1969684487 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7224899074429954487, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+    type: 3}
+  m_PrefabInstance: {fileID: 2653589438883226336}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2653589438883226336
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -783,15 +795,30 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1471795211103622172, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1471795211103622172, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
     - target: {fileID: 1473455307198742347, guid: c67c69f90ca75fb4b9bcf9309537cef0,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2516282558384914875, guid: c67c69f90ca75fb4b9bcf9309537cef0,
         type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2616294973909754695, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2653589438732267877, guid: c67c69f90ca75fb4b9bcf9309537cef0,
         type: 3}
@@ -863,6 +890,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2734730233528770235, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2998266959719286665, guid: c67c69f90ca75fb4b9bcf9309537cef0,
         type: 3}
       propertyPath: m_Mesh
@@ -871,14 +903,47 @@ PrefabInstance:
     - target: {fileID: 3190015845940335376, guid: c67c69f90ca75fb4b9bcf9309537cef0,
         type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3222237069984367639, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1969684487}
+    - target: {fileID: 3222237069984367639, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 3222237069984367639, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1309722691}
+    - target: {fileID: 3222237069984367639, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 4386711309204745024, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 4535123985700499899, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+    - target: {fileID: 4666695382371327511, guid: c67c69f90ca75fb4b9bcf9309537cef0,
         type: 3}
-      propertyPath: m_text
-      value: Please follow the arrow direction to find your object Location. Select
-        "Yes" if you would like to verify your object or "No" to go back to the main
-        menu.
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5229681690033001754, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5717389672121037186, guid: c67c69f90ca75fb4b9bcf9309537cef0,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c67c69f90ca75fb4b9bcf9309537cef0, type: 3}
