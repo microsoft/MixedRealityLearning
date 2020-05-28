@@ -6917,61 +6917,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 1624556745}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23f9be7a3cb53794ead8b55e784b65aa, type: 3}
+  m_Script: {fileID: 11500000, guid: 8200a044a5affb843ba856b902d9fd3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 0}
+  targetObject: {fileID: 1624556745}
   boundsOverride: {fileID: 0}
   boundsCalculationMethod: 0
   activation: 0
-  scaleMinimum: 0.2
-  scaleMaximum: 2
   flattenAxis: 0
-  flattenAxisDisplayScale: 0
   boxPadding: {x: 0, y: 0, z: 0}
-  boxMaterial: {fileID: 0}
-  boxGrabbedMaterial: {fileID: 0}
-  showWireframe: 1
-  wireframeShape: 0
-  wireframeMaterial: {fileID: 0}
-  wireframeEdgeRadius: 0.001
-  handleMaterial: {fileID: 0}
-  handleGrabbedMaterial: {fileID: 0}
-  scaleHandlePrefab: {fileID: 0}
-  scaleHandleSlatePrefab: {fileID: 0}
-  scaleHandleSize: 0.016
-  scaleHandleColliderPadding: {x: 0.016, y: 0.016, z: 0.016}
-  rotationHandlePrefab: {fileID: 0}
-  rotationHandleSize: 0.016
-  rotateHandleColliderPadding: {x: 0.016, y: 0.016, z: 0.016}
-  rotationHandlePrefabColliderType: 1
-  showScaleHandles: 1
-  showRotationHandleForX: 1
-  showRotationHandleForY: 1
-  showRotationHandleForZ: 1
-  drawTetherWhenManipulating: 1
-  proximityEffectActive: 0
-  handleMediumProximity: 0.1
-  handleCloseProximity: 0.03
-  farScale: 0
-  mediumScale: 1
-  closeScale: 1.5
-  farGrowRate: 0.3
-  mediumGrowRate: 0.2
-  closeGrowRate: 0.3
-  handlesIgnoreCollider: {fileID: 0}
-  debugText: {fileID: 0}
+  boxDisplayConfiguration: {fileID: 11400000, guid: 5a6be2d1558b8bf42ab0e0f3c5055b5e,
+    type: 2}
+  linksConfiguration: {fileID: 11400000, guid: 8d894c3aa345e514d889052d7cd3ff9c, type: 2}
+  scaleHandlesConfiguration: {fileID: 11400000, guid: 8bcfb2bc94295e448b4a6ba2a369f863,
+    type: 2}
+  rotationHandlesConfiguration: {fileID: 11400000, guid: 72fc37cb4258ae745bb54988a9a0fd05,
+    type: 2}
+  handleProximityEffectConfiguration: {fileID: 11400000, guid: a228730c3a9c89746a10a635d15f5538,
+    type: 2}
   hideElementsInInspector: 1
-  RotateStarted:
+  rotateStarted:
     m_PersistentCalls:
       m_Calls: []
-  RotateStopped:
+  rotateStopped:
     m_PersistentCalls:
       m_Calls: []
-  ScaleStarted:
+  scaleStarted:
     m_PersistentCalls:
       m_Calls: []
-  ScaleStopped:
+  scaleStopped:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &1624556749
