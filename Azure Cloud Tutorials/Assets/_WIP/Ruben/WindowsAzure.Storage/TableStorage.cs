@@ -14,32 +14,9 @@ namespace Microsoft.WindowsAzure.Storage
         public string DemoDirectory = "demofiledirectory";
         public string QueueName = "samplequeue";
 
-        public async void TestWringTrackedObjectInfo()
+        public void TestWringTrackedObjectInfo()
         {
-            //await WriteTable();
-            await ReadTable();
-        }
-
-        private async Task WriteTable()
-        {
-            CloudTableClient tableClient = StorageAccount.CreateCloudTableClient();
-            CloudTable table = tableClient.GetTableReference(TableName);
-            await table.CreateIfNotExistsAsync();
-            var testObj = TrackedObject.CreateRandom("testobject", "main");
-            TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(testObj);
-            TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
-        }
-
-        private async Task<TrackedObject> ReadTable()
-        {
-            CloudTableClient tableClient = StorageAccount.CreateCloudTableClient();
-            CloudTable table = tableClient.GetTableReference(TableName);
-
-            TableOperation retrieveOperation = TableOperation.Retrieve<TrackedObject>("main", "testobject");
-            TableResult result = await table.ExecuteAsync(retrieveOperation);
-            TrackedObject trackedObject = result.Result as TrackedObject;
-
-            return trackedObject;
+            TableStorageTest();
         }
 
         public async void TableStorageTest()

@@ -7,6 +7,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using MRTK.Tutorials.AzureCloudPower.Domain;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MRTK.Tutorials.AzureCloudPower.Managers
 {
@@ -27,6 +28,11 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         private string blockBlobContainerName = "trackedobjectslob";
         [SerializeField]
         private bool tryCreateBlobContainerOnStart = true;
+        [Header("Events")]
+        [SerializeField]
+        private UnityEvent onDataManagerReady;
+        [SerializeField]
+        private UnityEvent onDataManagerInitFailed;
 
         private CloudStorageAccount storageAccount;
         private CloudTableClient cloudTableClient;
@@ -52,6 +58,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
                 {
                     Debug.LogError("Failed to connect with Azure Storage.\nIf you are running with the default storage emulator configuration, please make sure you have started the storage emulator.");
                     Debug.LogException(ex);
+                    onDataManagerInitFailed?.Invoke();
                 }
             }
 
@@ -70,8 +77,11 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
                 {
                     Debug.LogError("Failed to connect with Azure Storage.\nIf you are running with the default storage emulator configuration, please make sure you have started the storage emulator.");
                     Debug.LogException(ex);
+                    onDataManagerInitFailed?.Invoke();
                 }
             }
+
+            onDataManagerReady?.Invoke();
         }
 
         /// <summary>
@@ -79,12 +89,17 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         /// </summary>
         /// <param name="trackedObject">Instance to write or update.</param>
         /// <returns>Success result.</returns>
-        public async Task<bool> WriteTrackedObject(TrackedObject trackedObject)
+        public async Task<bool> UploadTrackedObject(TrackedObject trackedObject)
         {
+            if (string.IsNullOrWhiteSpace(trackedObject.PartitionKey))
+            {
+                trackedObject.PartitionKey = partitionKey;
+            }
+
             var insertOrMergeOperation = TableOperation.InsertOrMerge(trackedObject);
             var result = await trackedObjectsTable.ExecuteAsync(insertOrMergeOperation);
 
-            return result.HttpStatusCode == (int)HttpStatusCode.OK;
+            return result.Result != null;
         }
 
         /// <summary>

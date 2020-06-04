@@ -2,7 +2,6 @@
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
-using Random = UnityEngine.Random;
 
 namespace MRTK.Tutorials.AzureCloudPower.Domain
 {
@@ -30,21 +29,6 @@ namespace MRTK.Tutorials.AzureCloudPower.Domain
             base.ReadEntity(properties, operationContext);
             var urls = properties[nameof(VisionTrainingImagesUrls)].StringValue;
             VisionTrainingImagesUrls = JsonConvert.DeserializeObject<List<string>>(urls);
-        }
-
-        public static TrackedObject CreateRandom(string id, string partitionKey)
-        {
-            return new TrackedObject
-            {
-                Id = id,
-                RowKey = id,
-                PartitionKey = partitionKey,
-                Name = $"Name_{Random.Range(1000, 9999)}",
-                ThumbnailBlobUrl = $"{Random.Range(1000, 9999)}_img.png",
-                SpatialAnchorId = $"spatial-id_{Random.Range(1000, 9999)}",
-                VisionTagId = $"vision-tag-id_{Random.Range(1000, 9999)}",
-                VisionTrainingImagesUrls = new List<string>(){"123", "456"}
-            };
         }
     }
 }
