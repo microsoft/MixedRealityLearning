@@ -5,7 +5,7 @@ using UnityEngine;
 public class ToggleButton : MonoBehaviour
 {
     public GameObject ClipingObject;
-    public void ToggleCliping()
+    public void ToggleClipping()
     {
         ClipingObject.SetActive(!ClipingObject.activeInHierarchy);
     }
