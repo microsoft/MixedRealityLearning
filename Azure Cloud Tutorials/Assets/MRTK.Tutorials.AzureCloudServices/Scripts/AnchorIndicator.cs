@@ -14,6 +14,10 @@ namespace MRTK.Tutorials.AzureCloudPower
 	{
 		[SerializeField]
 		bool allowSpeechCommand = true;
+		[SerializeField]
+		GameObject anchorPosition = default; // Enabled when tap to place
+		[SerializeField]
+		GameObject saveLocationDialog = default; // Enabled when tap to place
 
 		AnchorManager anchorManager;
 		Interactable interactableVisual;
@@ -73,11 +77,18 @@ namespace MRTK.Tutorials.AzureCloudPower
 
 		void OnPlacingStoppedAndOnClickHandler()
 		{
-			// Tell manager to create anchor at my current position
-			anchorManager.Create();
+			Debug.Log("OnPlacingStoppedAndOnClickHandler()");
+
+			// Enable the dialog box prompt
+			saveLocationDialog.SetActive(true);
 
 			// Disable myself because I'm no longer needed
 			gameObject.SetActive(false);
+
+			// Move the anchor position to the location of the anchor indicator and enable it
+			anchorPosition.transform.position = gameObject.transform.position;
+			anchorPosition.transform.rotation = gameObject.transform.rotation;
+			anchorPosition.SetActive(true);
 		}
 	}
 }

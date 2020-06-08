@@ -59,6 +59,7 @@ namespace MRTK.Tutorials.AzureCloudPower
 			#region TODO: TEMP UX MANAGER
 			// Enable the object card because user clicked anchor
 			objectCard.SetActive(true);
+			objectCard.GetComponent<RadialView>().enabled = true;
 			#endregion
 		}
 		#endregion
