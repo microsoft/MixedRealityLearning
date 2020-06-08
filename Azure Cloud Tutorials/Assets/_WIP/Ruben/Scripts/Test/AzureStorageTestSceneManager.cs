@@ -66,22 +66,20 @@ namespace MRTK.Tutorials.AzureCloudPower.Test
             text.text = "All TrackedObjects have been deleted!";
         }
 
-        private TrackedObject CreateDummy()
+        private ObjectProject CreateDummy()
         {
             var id = Guid.NewGuid()
                 .ToString()
                 .Replace("-", "")
                 .Substring(0, 6);
 
-            return new TrackedObject
+            return new ObjectProject
             {
                 Id = id,
                 RowKey = id,
                 Name = $"Name_{Random.Range(1000, 9999)}",
                 ThumbnailBlobUrl = $"{Random.Range(1000, 9999)}_img.png",
-                SpatialAnchorId = $"spatial-id_{Random.Range(1000, 9999)}",
-                VisionTagId = $"vision-tag-id_{Random.Range(1000, 9999)}",
-                VisionTrainingImagesUrls = new List<string>() { "123", "456" }
+                SpatialAnchorId = $"spatial-id_{Random.Range(1000, 9999)}"
             };
         }
     }
