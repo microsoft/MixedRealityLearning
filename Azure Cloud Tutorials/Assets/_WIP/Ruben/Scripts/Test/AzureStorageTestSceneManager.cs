@@ -20,7 +20,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Test
         {
             var dummyTrackedObject = CreateDummy();
             text.text = $"Uploading TrackedObject '{dummyTrackedObject.Id}' to Table.";
-            var success = await dataManager.UploadTrackedObject(dummyTrackedObject);
+            var success = await dataManager.UploadOrUpdate(dummyTrackedObject);
             if (success)
             {
                 text.text = $"Uploaded TrackedObject\n\tId: {dummyTrackedObject.Id}\n\tName: {dummyTrackedObject.Name}";
@@ -35,7 +35,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Test
         {
             text.text = "Fetching all TrackedObjects from table.";
             
-            var objects = await dataManager.GetAllTrackedObjects();
+            var objects = await dataManager.GetAll();
             var textToWrite = new StringBuilder();
             textToWrite.Append($"Found objects ({objects.Count})\n");
             foreach (var trackedObject in objects)
@@ -49,7 +49,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Test
         public async void DeleteAllFromTable()
         {
             text.text = "Checking if TrackedObject to delete exists.";
-            var objects = await dataManager.GetAllTrackedObjects();
+            var objects = await dataManager.GetAll();
             if (objects.Count == 0)
             {
                 text.text = "The table is empty, there is nothing to delete.";
@@ -60,7 +60,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Test
 
             foreach (var trackedObject in objects)
             {
-                await dataManager.DeleteTrackedObject(trackedObject);
+                await dataManager.Delete(trackedObject);
             }
 
             text.text = "All TrackedObjects have been deleted!";
