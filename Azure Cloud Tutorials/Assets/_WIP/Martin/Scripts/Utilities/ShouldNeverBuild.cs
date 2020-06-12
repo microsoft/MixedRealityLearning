@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShouldNeverBuild : MonoBehaviour
+namespace MRTK.Tutorials.AzureCloudPower
 {
-	void Start()
+	public class ShouldNeverBuild : MonoBehaviour
 	{
+		void Start()
+		{
 #if UNITY_EDITOR
-		gameObject.SetActive(true);
+			gameObject.SetActive(true);
 #else
 		gameObject.SetActive(false);
 #endif
+		}
 	}
 }
