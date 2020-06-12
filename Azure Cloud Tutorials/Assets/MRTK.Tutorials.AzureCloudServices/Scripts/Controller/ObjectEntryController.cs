@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
 using MRTK.Tutorials.AzureCloudPower.Domain;
-using MRTK.Tutorials.AzureCloudPower.Managers;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
 using TMPro;
 using UnityEngine;
@@ -20,8 +18,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private GameObject objectCardQueryPanel;
         [SerializeField]
         private MainSceneManager sceneManager;
-        [SerializeField]
-        private DataManager dataManager;
         [Header("UI Elements")]
         [SerializeField]
         private Interactable submitButton;
@@ -41,10 +37,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             if (sceneManager == null)
             {
                 sceneManager = FindObjectOfType<MainSceneManager>();
-            }
-            if (dataManager == null)
-            {
-                dataManager = FindObjectOfType<DataManager>();
             }
         }
 
@@ -72,7 +64,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 return;
             }
 
-            if (!dataManager.IsReady)
+            if (!sceneManager.DataManager.IsReady)
             {
                 hintLabel.SetText("No connection to the database!");
                 hintLabel.gameObject.SetActive(true);
@@ -82,60 +74,65 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             submitButton.IsEnabled = false;
             if (isInSearchMode)
             {
-                var success = await FindObject(inputField.text);
-                if (success)
+                var project = await FindObject(inputField.text);
+                if (project != null)
                 {
                     searchObjectPanel.SetActive(false);
                     objectCardQueryPanel.SetActive(true);
+                    // TODO handle Init
                 }
             }
             else
             {
-                var success = await CreateObject(inputField.text);
-                if (success)
+                var project = await CreateObject(inputField.text);
+                if (project != null)
                 {
                     searchObjectPanel.SetActive(false);
                     objectCardCreationPanel.gameObject.SetActive(true);
-                    objectCardCreationPanel.Init();
+                    objectCardCreationPanel.Init(project);
                 }
             }
             submitButton.IsEnabled = true;
         }
 
-        private async Task<bool> FindObject(string searchName)
+        private async Task<TrackedObjectProject> FindObject(string searchName)
         {
             hintLabel.SetText(loadingText);
             hintLabel.gameObject.SetActive(true);
-            var objectFromDb = await dataManager.FindByName(searchName);
-            if (objectFromDb == null)
+            var projectFromDb = await sceneManager.DataManager.FindByName(searchName);
+            if (projectFromDb == null)
             {
                 hintLabel.SetText($"No object found with the name '{searchName}'.");
-                return false;
+                return null;
             }
 
-            sceneManager.CurrentProject = objectFromDb;
             hintLabel.gameObject.SetActive(false);
-            return true;
+            return projectFromDb;
         }
 
-        private async Task<bool> CreateObject(string searchName)
+        private async Task<TrackedObjectProject> CreateObject(string searchName)
         {
             hintLabel.SetText("Please wait...");
             hintLabel.gameObject.SetActive(true);
-            var project = await dataManager.FindByName(searchName);
+            var project = await sceneManager.DataManager.FindByName(searchName);
             if (project == null)
             {
                 project = new TrackedObjectProject(searchName);
-                var success = await dataManager.UploadOrUpdate(project);
+                var success = await sceneManager.DataManager.UploadOrUpdate(project);
                 if (!success)
                 {
-                    return false;
+                    return null;
                 }
+
+                var tagName = $"tag_{project.Name}";
+                var tagCreation = await sceneManager.ObjectDetectionManager.CreateTag(tagName);
+                project.CustomVision.TagName = tagCreation.Name;
+                project.CustomVision.TagId = tagCreation.Id;
+                await sceneManager.DataManager.UploadOrUpdate(project);
             }
 
-            sceneManager.CurrentProject = project;
             hintLabel.gameObject.SetActive(false);
-            return true;
+            return project;
         }
     }
 }

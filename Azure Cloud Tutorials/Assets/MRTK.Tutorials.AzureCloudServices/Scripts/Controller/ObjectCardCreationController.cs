@@ -1,9 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
+using MRTK.Tutorials.AzureCloudPower.Domain;
 using MRTK.Tutorials.AzureCloudPower.Managers;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 {
@@ -12,11 +14,9 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [Header("Managers")]
         [SerializeField]
         private MainSceneManager sceneManager;
-        [SerializeField]
-        private DataManager dataManager;
-        [SerializeField]
-        private ObjectDetectionManager objectDetectionManager;
         [Header("UI Elements")]
+        [SerializeField]
+        private ComputerVisionController computerVisionController;
         [SerializeField]
         private TMP_Text objectNameLabel;
         [SerializeField]
@@ -24,11 +24,13 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [SerializeField]
         private TMP_InputField descriptionInputField;
         [SerializeField]
-        private SpriteRenderer thumbnailSpriteRenderer;
+        private Image thumbnailImage;
         [SerializeField]
         private Sprite thumbnailPlaceHolderImage;
         [SerializeField]
         private Interactable[] buttons;
+        
+        private TrackedObjectProject project;
         
         private void Awake()
         {
@@ -36,33 +38,26 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             {
                 sceneManager = FindObjectOfType<MainSceneManager>();
             }
-            if (dataManager == null)
-            {
-                dataManager = FindObjectOfType<DataManager>();
-            }
-            if (objectDetectionManager == null)
-            {
-                objectDetectionManager = FindObjectOfType<ObjectDetectionManager>();
-            }
         }
 
-        public async void Init()
+        public async void Init(TrackedObjectProject trackedObjectProject)
         {
-            objectNameLabel.SetText(sceneManager.CurrentProject.Name);
-            descriptionInputField.text = sceneManager.CurrentProject.Description;
-            if (!string.IsNullOrEmpty(sceneManager.CurrentProject.ThumbnailBlobName))
+            project = trackedObjectProject;
+            objectNameLabel.SetText(project.Name);
+            descriptionInputField.text = project.Description;
+            if (!string.IsNullOrEmpty(project.ThumbnailBlobName))
             {
-                thumbnailSpriteRenderer.sprite = await LoadThumbnailImage();
+                thumbnailImage.sprite = await LoadThumbnailImage();
             }
             else
             {
-                thumbnailSpriteRenderer.sprite = thumbnailPlaceHolderImage;
+                thumbnailImage.sprite = thumbnailPlaceHolderImage;
             }
         }
 
         private async Task<Sprite> LoadThumbnailImage()
         {
-            var imageData = await dataManager.DownloadBlob(sceneManager.CurrentProject.ThumbnailBlobName);
+            var imageData = await sceneManager.DataManager.DownloadBlob(project.ThumbnailBlobName);
             var texture = new Texture2D(2, 2);
             texture.LoadImage(imageData);
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
@@ -71,46 +66,45 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         public async void TakeThumbnailPhoto()
         {
             SetButtonsInteractiveState(false);
+            byte[] imageData;
             if (Application.isEditor)
             {
                 var texture = ScreenCapture.CaptureScreenshotAsTexture();
-                thumbnailSpriteRenderer.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                var pngData = texture.EncodeToPNG();
-                messageLabel.text = "Uploading Thumbnail, please wait ...";
-                var blobName = await dataManager.UploadBlob(pngData, sceneManager.CurrentProject.Name + "_thumbnail.png");
-                sceneManager.CurrentProject.ThumbnailBlobName = blobName;
-                SaveChanges();
+                thumbnailImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                imageData = texture.EncodeToPNG();
             }
             else
             {
-                var imageData = await objectDetectionManager.TakePhoto();
+                imageData = await sceneManager.ObjectDetectionManager.TakePhoto();
                 var texture = new Texture2D(2, 2);
                 texture.LoadImage(imageData);
-                thumbnailSpriteRenderer.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                messageLabel.text = "Uploading Thumbnail, please wait ...";
-                var blobName = await dataManager.UploadBlob(imageData, sceneManager.CurrentProject.Name + "_thumbnail.png");
-                sceneManager.CurrentProject.ThumbnailBlobName = blobName;
-                SaveChanges();
+                thumbnailImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             }
+            
+            messageLabel.text = "Uploading Thumbnail, please wait ...";
+            var blobName = await sceneManager.DataManager.UploadBlob(imageData, project.Name + "_thumbnail.png");
+            project.ThumbnailBlobName = blobName;
+            SaveChanges();
+            
             SetButtonsInteractiveState(true);
         }
 
         public async void DeleteThumbnailPhoto()
         {
-            if (!string.IsNullOrEmpty(sceneManager.CurrentProject.ThumbnailBlobName))
+            if (!string.IsNullOrEmpty(project.ThumbnailBlobName))
             {
-                if (!await dataManager.DeleteBlob(sceneManager.CurrentProject.ThumbnailBlobName))
+                if (!await sceneManager.DataManager.DeleteBlob(project.ThumbnailBlobName))
                 {
                     return;
                 }
                 
-                thumbnailSpriteRenderer.sprite = thumbnailPlaceHolderImage;
-                sceneManager.CurrentProject.ThumbnailBlobName = "";
+                thumbnailImage.sprite = thumbnailPlaceHolderImage;
+                project.ThumbnailBlobName = "";
                 SaveChanges();
             }
             else
             {
-                thumbnailSpriteRenderer.sprite = thumbnailPlaceHolderImage;
+                thumbnailImage.sprite = thumbnailPlaceHolderImage;
             }
         }
 
@@ -119,14 +113,36 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             SetButtonsInteractiveState(false);
             UpdateProjectData();
             messageLabel.text = "Updating data, please wait ...";
-            var success = await dataManager.UploadOrUpdate(sceneManager.CurrentProject);
+            var success = await sceneManager.DataManager.UploadOrUpdate(project);
             messageLabel.text = success ? "Updated data in database." : "Failed to update database.";
             SetButtonsInteractiveState(true);
         }
 
+        public async void OnComputerVisionButtonClick()
+        {
+            if(!string.IsNullOrEmpty(project.CustomVision.IterationId))
+            {
+                var status = await sceneManager.ObjectDetectionManager.GetIterationStatus(project.CustomVision.IterationId);
+                if (status.IsCompleted())
+                {
+                    messageLabel.text = "The model is already trained.";
+                    return;
+                }
+            }
+            
+            computerVisionController.gameObject.SetActive(true);
+            computerVisionController.Init(project);
+            gameObject.SetActive(false);
+        }
+        
+        public void OnSaveLocationButtonClick()
+        {
+            
+        }
+
         private void UpdateProjectData()
         {
-            sceneManager.CurrentProject.Description = descriptionInputField.text;
+            project.Description = descriptionInputField.text;
         }
 
         private void SetButtonsInteractiveState(bool state)
