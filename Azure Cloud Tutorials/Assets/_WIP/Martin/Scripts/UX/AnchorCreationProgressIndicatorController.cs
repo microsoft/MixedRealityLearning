@@ -14,6 +14,7 @@ namespace MRTK.Tutorials.AzureCloudPower
         [SerializeField, Header("UX")]
         private GameObject anchorCreationProgressIndicatorPrefab;
 
+        private AnchorManager anchorManager;
         private GameObject indicatorObject;
         private IProgressIndicator indicator;
         private Camera mainCamera;
@@ -21,7 +22,11 @@ namespace MRTK.Tutorials.AzureCloudPower
         private void Start()
         {
             // Cache references
+            anchorManager = GameObject.FindObjectOfType<AnchorManager>();
             mainCamera = Camera.main;
+            
+            // Subscribe to Anchor Manager events
+            anchorManager.OnFindAnchorSucceeded += EndProgressIndicatorSession;
         }
 
         private async void OpenProgressIndicator()

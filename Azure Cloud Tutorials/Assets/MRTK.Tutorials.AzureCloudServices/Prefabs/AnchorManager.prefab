@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 828838689807954120}
   - component: {fileID: 840231123}
   - component: {fileID: 8969008589097978125}
+  - component: {fileID: 4957614524028121935}
   m_Layer: 0
   m_Name: AnchorManager
   m_TagString: Untagged
@@ -48,6 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anchorPositionPrefab: {fileID: 3038703190177936561, guid: e34d8c424755455488f5c6335dc03b16,
     type: 3}
+  publicSharingPin: 1982734901747
+  currentAzureAnchorID: 
   objectCardGo: {fileID: 0}
   saveLocationDialogGo: {fileID: 0}
 --- !u!114 &8969008589097978125
@@ -64,6 +67,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waitingForAnchorCreation: 1
   anchorCreationProgressIndicatorPrefab: {fileID: 0}
+--- !u!114 &4957614524028121935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 828838689807954127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ef4e40d29b7a564f86f3d2f0abca194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  authenticationMode: 0
+  spatialAnchorsAccountId: 
+  spatialAnchorsAccountKey: 
+  clientId: 
+  tenantId: 
+  logLevel: 5
 --- !u!1001 &1758946854
 PrefabInstance:
   m_ObjectHideFlags: 0
