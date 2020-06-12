@@ -36,7 +36,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Test
                 return;
             }
 
-            trackedObject = new ObjectProject()
+            trackedObject = new TrackedObjectProject()
             {
                 Name = testProjectName,
                 CustomVision = new CustomVision()

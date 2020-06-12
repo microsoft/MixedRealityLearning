@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,14 +22,14 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         private string connectionString = "UseDevelopmentStorage=true";
         [Header("Table Settings")]
         [SerializeField]
-        private string tableName = "ObjectProjects";
+        private string tableName = "objects";
         [SerializeField]
         private string partitionKey = "main";
         [SerializeField]
         private bool tryCreateTableOnStart = true;
         [Header("Blob Settings")]
         [SerializeField]
-        private string blockBlobContainerName = "ObjectProjectsBlob";
+        private string blockBlobContainerName = "tracked-objects-container";
         [SerializeField]
         private bool tryCreateBlobContainerOnStart = true;
         [Header("Events")]
@@ -88,57 +90,57 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         }
 
         /// <summary>
-        /// Write or update a ObjectProject instance to the table storage.
+        /// Insert a new or update an TrackedObjectProject instance on the table storage.
         /// </summary>
-        /// <param name="objectProject">Instance to write or update.</param>
+        /// <param name="trackedObjectProject">Instance to write or update.</param>
         /// <returns>Success result.</returns>
-        public async Task<bool> UploadOrUpdate(ObjectProject objectProject)
+        public async Task<bool> UploadOrUpdate(TrackedObjectProject trackedObjectProject)
         {
-            if (string.IsNullOrWhiteSpace(objectProject.PartitionKey))
+            if (string.IsNullOrWhiteSpace(trackedObjectProject.PartitionKey))
             {
-                objectProject.PartitionKey = partitionKey;
+                trackedObjectProject.PartitionKey = partitionKey;
             }
-
-            var insertOrMergeOperation = TableOperation.InsertOrMerge(objectProject);
+            
+            var insertOrMergeOperation = TableOperation.InsertOrMerge(trackedObjectProject);
             var result = await objectProjectsTable.ExecuteAsync(insertOrMergeOperation);
 
             return result.Result != null;
         }
 
         /// <summary>
-        /// Get all ObjectProject from the table.
+        /// Get all TrackedObjectProjects from the table.
         /// </summary>
-        /// <returns>List of ObjectProject from table.</returns>
-        public async Task<List<ObjectProject>> GetAll()
+        /// <returns>List of all TrackedObjectProjects from table.</returns>
+        public async Task<List<TrackedObjectProject>> GetAll()
         {
-            var query = new TableQuery<ObjectProject>();
+            var query = new TableQuery<TrackedObjectProject>();
             var segment = await objectProjectsTable.ExecuteQuerySegmentedAsync(query, null);
 
             return segment.Results;
         }
 
         /// <summary>
-        /// Find a ObjectProject by a given Id (partition key).
+        /// Find a TrackedObjectProject by a given Id (partition key).
         /// </summary>
         /// <param name="id">Id/Partition Key to search by.</param>
-        /// <returns>Found ObjectProject, null if nothing is found.</returns>
-        public async Task<ObjectProject> FindById(string id)
+        /// <returns>Found TrackedObjectProject, null if nothing is found.</returns>
+        public async Task<TrackedObjectProject> FindById(string id)
         {
-            var retrieveOperation = TableOperation.Retrieve<ObjectProject>(partitionKey, id);
+            var retrieveOperation = TableOperation.Retrieve<TrackedObjectProject>(partitionKey, id);
             var result = await objectProjectsTable.ExecuteAsync(retrieveOperation);
-            var trackedObject = result.Result as ObjectProject;
+            var trackedObject = result.Result as TrackedObjectProject;
 
             return trackedObject;
         }
 
         /// <summary>
-        /// Find a ObjectProject by its name.
+        /// Find a TrackedObjectProject by its name.
         /// </summary>
         /// <param name="name">Name to search by.</param>
-        /// <returns>Found ObjectProject, null if nothing is found.</returns>
-        public async Task<ObjectProject> FindByName(string name)
+        /// <returns>Found TrackedObjectProject, null if nothing is found.</returns>
+        public async Task<TrackedObjectProject> FindByName(string name)
         {
-            var query = new TableQuery<ObjectProject>().Where(
+            var query = new TableQuery<TrackedObjectProject>().Where(
                 TableQuery.CombineFilters(
                     TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey),
                     TableOperators.And,
@@ -149,11 +151,11 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         }
 
         /// <summary>
-        /// Delete a ObjectProject from the table.
+        /// Delete a TrackedObjectProject from the table.
         /// </summary>
         /// <param name="instance">Object to delete.</param>
         /// <returns>Success result of deletion.</returns>
-        public async Task<bool> Delete(ObjectProject instance)
+        public async Task<bool> Delete(TrackedObjectProject instance)
         {
             var deleteOperation = TableOperation.Delete(instance);
             var result = await objectProjectsTable.ExecuteAsync(deleteOperation);
@@ -172,7 +174,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
             var blockBlob = blobContainer.GetBlockBlobReference(blobName);
             await blockBlob.UploadFromByteArrayAsync(data, 0, data.Length);
 
-            return blockBlob.Uri.ToString();
+            return blockBlob.Name;
         }
 
         /// <summary>
@@ -183,11 +185,11 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         public async Task<byte[]> DownloadBlob(string blobName)
         {
             var blockBlob = blobContainer.GetBlockBlobReference(blobName);
-            await blockBlob.FetchAttributesAsync();
-            var data = new byte[blockBlob.Properties.Length];
-            await blockBlob.DownloadToByteArrayAsync(data, data.Length);
-
-            return data;
+            using (var stream = new MemoryStream())
+            {
+                await blockBlob.DownloadToStreamAsync(stream);
+                return stream.ToArray();
+            }
         }
 
         /// <summary>
@@ -198,9 +200,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         public async Task<bool> DeleteBlob(string blobName)
         {
             var blockBlob = blobContainer.GetBlockBlobReference(blobName);
-            await blockBlob.DeleteIfExistsAsync();
-
-            return blockBlob.IsDeleted;
+            return await blockBlob.DeleteIfExistsAsync();
         }
     }
 }

@@ -5,15 +5,23 @@ using Newtonsoft.Json;
 
 namespace MRTK.Tutorials.AzureCloudPower.Domain
 {
-    public class ObjectProject : TableEntity
+    public class TrackedObjectProject : TableEntity
     {
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string ThumbnailBlobUrl { get; set; }
+        public string ThumbnailBlobName { get; set; }
         public string SpatialAnchorId { get; set; }
         [IgnoreProperty]
         public CustomVision CustomVision { get; set; } = new CustomVision();
+
+        public TrackedObjectProject() { }
+
+        public TrackedObjectProject(string name)
+        {
+            Name = name;
+            RowKey = name;
+        }
 
         public override IDictionary<string, EntityProperty> WriteEntity(OperationContext operationContext)
         {

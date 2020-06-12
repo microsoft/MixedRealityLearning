@@ -44,6 +44,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionString: UseDevelopmentStorage=true
-  tableName: trackedobjects
+  tableName: objects
   partitionKey: main
   tryCreateTableOnStart: 1
+  blockBlobContainerName: tracked-objects-container
+  tryCreateBlobContainerOnStart: 1
+  onDataManagerReady:
+    m_PersistentCalls:
+      m_Calls: []
+  onDataManagerInitFailed:
+    m_PersistentCalls:
+      m_Calls: []
