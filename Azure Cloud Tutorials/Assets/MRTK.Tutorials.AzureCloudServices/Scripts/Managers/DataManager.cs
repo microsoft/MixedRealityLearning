@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -7,29 +6,33 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
-using MRTK.Tutorials.AzureCloudPower.Domain;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace MRTK.Tutorials.AzureCloudPower.Managers
+namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
 {
     public class DataManager : MonoBehaviour
     {
         public bool IsReady { get; private set; }
         
-        [Header("Azure Storage Base Settings")]
+        [Header("Base Settings")]
         [SerializeField]
         private string connectionString = "UseDevelopmentStorage=true";
+        [SerializeField]
+        private string projectName = "MyAzurePowerToolsProject";
         [Header("Table Settings")]
         [SerializeField]
-        private string tableName = "objects";
+        private string projectsTableName = "projects";
+        [SerializeField]
+        private string trackedObjectsTableName = "objects";
         [SerializeField]
         private string partitionKey = "main";
         [SerializeField]
         private bool tryCreateTableOnStart = true;
         [Header("Blob Settings")]
         [SerializeField]
-        private string blockBlobContainerName = "tracked-objects-container";
+        private string blockBlobContainerName = "tracked-objects-thumbnails";
         [SerializeField]
         private bool tryCreateBlobContainerOnStart = true;
         [Header("Events")]
@@ -40,7 +43,8 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
 
         private CloudStorageAccount storageAccount;
         private CloudTableClient cloudTableClient;
-        private CloudTable objectProjectsTable;
+        private CloudTable projectsTable;
+        private CloudTable trackedObjectsTable;
         private CloudBlobClient blobClient;
         private CloudBlobContainer blobContainer;
 
@@ -48,14 +52,19 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         {
             storageAccount = CloudStorageAccount.Parse(connectionString);
             cloudTableClient = storageAccount.CreateCloudTableClient();
-            objectProjectsTable = cloudTableClient.GetTableReference(tableName);
+            projectsTable = cloudTableClient.GetTableReference(projectsTableName);
+            trackedObjectsTable = cloudTableClient.GetTableReference(trackedObjectsTableName);
             if (tryCreateTableOnStart)
             {
                 try
                 {
-                    if (await objectProjectsTable.CreateIfNotExistsAsync())
+                    if (await projectsTable.CreateIfNotExistsAsync())
                     {
-                        Debug.Log($"Created table {tableName}.");
+                        Debug.Log($"Created table {projectsTableName}.");
+                    }
+                    if (await trackedObjectsTable.CreateIfNotExistsAsync())
+                    {
+                        Debug.Log($"Created table {trackedObjectsTableName}.");
                     }
                 }
                 catch (StorageException ex)
@@ -90,19 +99,64 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         }
 
         /// <summary>
+        /// Get a project or create one if it does not exist.
+        /// </summary>
+        /// <returns>Project instance from database.</returns>
+        public async Task<Project> GetOrCreateProject()
+        {
+            var query = new TableQuery<Project>().Where(
+                TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey),
+                    TableOperators.And,
+                    TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, projectName)));
+            var segment = await projectsTable.ExecuteQuerySegmentedAsync(query, null);
+
+            var project = segment.Results.FirstOrDefault();
+            if (project != null)
+            {
+                return project;
+            }
+
+            project = new Project()
+            {
+                Name = projectName,
+                RowKey = projectName,
+                PartitionKey = partitionKey,
+                CustomVisionIterationId = "",
+                CustomVisionPublishedModelName = ""
+            };
+            
+            var insertOrMergeOperation = TableOperation.InsertOrMerge(project);
+            await projectsTable.ExecuteAsync(insertOrMergeOperation);
+
+            return project;
+        }
+
+        /// <summary>
+        /// Update the project changes back to the table store;
+        /// </summary>
+        public async Task<bool> UpdateProject(Project project)
+        {
+            var insertOrMergeOperation = TableOperation.InsertOrMerge(project);
+            var result = await projectsTable.ExecuteAsync(insertOrMergeOperation);
+
+            return result.Result != null;
+        }
+
+        /// <summary>
         /// Insert a new or update an TrackedObjectProject instance on the table storage.
         /// </summary>
-        /// <param name="trackedObjectProject">Instance to write or update.</param>
+        /// <param name="trackedObject">Instance to write or update.</param>
         /// <returns>Success result.</returns>
-        public async Task<bool> UploadOrUpdate(TrackedObjectProject trackedObjectProject)
+        public async Task<bool> UploadOrUpdate(TrackedObject trackedObject)
         {
-            if (string.IsNullOrWhiteSpace(trackedObjectProject.PartitionKey))
+            if (string.IsNullOrWhiteSpace(trackedObject.PartitionKey))
             {
-                trackedObjectProject.PartitionKey = partitionKey;
+                trackedObject.PartitionKey = partitionKey;
             }
             
-            var insertOrMergeOperation = TableOperation.InsertOrMerge(trackedObjectProject);
-            var result = await objectProjectsTable.ExecuteAsync(insertOrMergeOperation);
+            var insertOrMergeOperation = TableOperation.InsertOrMerge(trackedObject);
+            var result = await trackedObjectsTable.ExecuteAsync(insertOrMergeOperation);
 
             return result.Result != null;
         }
@@ -111,10 +165,10 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         /// Get all TrackedObjectProjects from the table.
         /// </summary>
         /// <returns>List of all TrackedObjectProjects from table.</returns>
-        public async Task<List<TrackedObjectProject>> GetAll()
+        public async Task<List<TrackedObject>> GetAllTrackedObjects()
         {
-            var query = new TableQuery<TrackedObjectProject>();
-            var segment = await objectProjectsTable.ExecuteQuerySegmentedAsync(query, null);
+            var query = new TableQuery<TrackedObject>();
+            var segment = await trackedObjectsTable.ExecuteQuerySegmentedAsync(query, null);
 
             return segment.Results;
         }
@@ -124,11 +178,11 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         /// </summary>
         /// <param name="id">Id/Partition Key to search by.</param>
         /// <returns>Found TrackedObjectProject, null if nothing is found.</returns>
-        public async Task<TrackedObjectProject> FindById(string id)
+        public async Task<TrackedObject> FindTrackedObjectById(string id)
         {
-            var retrieveOperation = TableOperation.Retrieve<TrackedObjectProject>(partitionKey, id);
-            var result = await objectProjectsTable.ExecuteAsync(retrieveOperation);
-            var trackedObject = result.Result as TrackedObjectProject;
+            var retrieveOperation = TableOperation.Retrieve<TrackedObject>(partitionKey, id);
+            var result = await trackedObjectsTable.ExecuteAsync(retrieveOperation);
+            var trackedObject = result.Result as TrackedObject;
 
             return trackedObject;
         }
@@ -136,16 +190,16 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         /// <summary>
         /// Find a TrackedObjectProject by its name.
         /// </summary>
-        /// <param name="name">Name to search by.</param>
+        /// <param name="trackedObjectName">Name to search by.</param>
         /// <returns>Found TrackedObjectProject, null if nothing is found.</returns>
-        public async Task<TrackedObjectProject> FindByName(string name)
+        public async Task<TrackedObject> FindTrackedObjectByName(string trackedObjectName)
         {
-            var query = new TableQuery<TrackedObjectProject>().Where(
+            var query = new TableQuery<TrackedObject>().Where(
                 TableQuery.CombineFilters(
                     TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey),
                     TableOperators.And,
-                    TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, name)));
-            var segment = await objectProjectsTable.ExecuteQuerySegmentedAsync(query, null);
+                    TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, trackedObjectName)));
+            var segment = await trackedObjectsTable.ExecuteQuerySegmentedAsync(query, null);
 
             return segment.Results.FirstOrDefault();
         }
@@ -155,10 +209,10 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         /// </summary>
         /// <param name="instance">Object to delete.</param>
         /// <returns>Success result of deletion.</returns>
-        public async Task<bool> Delete(TrackedObjectProject instance)
+        public async Task<bool> DeleteTrackedObject(TrackedObject instance)
         {
             var deleteOperation = TableOperation.Delete(instance);
-            var result = await objectProjectsTable.ExecuteAsync(deleteOperation);
+            var result = await trackedObjectsTable.ExecuteAsync(deleteOperation);
 
             return result.HttpStatusCode == (int)HttpStatusCode.OK;
         }

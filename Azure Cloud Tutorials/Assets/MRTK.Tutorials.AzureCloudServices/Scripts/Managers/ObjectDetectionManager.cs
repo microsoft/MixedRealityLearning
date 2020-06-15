@@ -1,26 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using MRTK.Tutorials.AzureCloudPower.Dtos;
-using MRTK.Tutorials.AzureCloudPower.Utilities;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Dtos;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Windows.WebCam;
 
-namespace MRTK.Tutorials.AzureCloudPower.Managers
+namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
 {
     public class ObjectDetectionManager : MonoBehaviour
     {
-        public bool IsCameraActive { private set; get; }
-        public string ProjectId => projectId;
-
         [Header("Azure Settings")]
         [SerializeField]
-        private string azureResourceSubcriptionId;
+        private string azureResourceSubscriptionId;
         [SerializeField]
         private string azureResourceGroupName;
         [SerializeField]
@@ -34,127 +26,12 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         [SerializeField]
         private string projectId;
 
-        [Header("Misc Settings")]
-        [SerializeField]
-        private bool autostartCamera = true;
-
-        [Header("Events")]
-        [SerializeField]
-        private UnityEvent onCameraStarted;
-        [SerializeField]
-        private UnityEvent onCameraStopped;
-
-        private PhotoCapture photoCapture;
-
-        private void Start()
-        {
-            if (autostartCamera)
-            {
-                StartCamera();
-            }
-        }
-
-        public void StartCamera()
-        {
-            if (IsCameraActive)
-            {
-                return;
-            }
-
-            Debug.Log("Starting camera system.");
-            if (photoCapture == null)
-            {
-                PhotoCapture.CreateAsync(false, captureObject =>
-                {
-                    photoCapture = captureObject;
-                    StartPhotoMode();
-                });
-            }
-            else
-            {
-                StartPhotoMode();
-            }
-        }
-
-        public void StopCamera()
-        {
-            if (!IsCameraActive || photoCapture == null)
-            {
-                return;
-            }
-
-            photoCapture.StopPhotoModeAsync(result =>
-            {
-                if (result.success)
-                {
-                    IsCameraActive = false;
-                    onCameraStopped?.Invoke();
-                }
-            });
-        }
-
-        private void StartPhotoMode()
-        {
-            var resolution = PhotoCapture
-                .SupportedResolutions
-                .OrderByDescending((r) => r.width * r.height)
-                .First();
-
-            var cameraParams = new CameraParameters()
-            {
-                hologramOpacity = 0f,
-                cameraResolutionWidth = resolution.width,
-                cameraResolutionHeight = resolution.height,
-                pixelFormat = CapturePixelFormat.JPEG
-            };
-
-            photoCapture.StartPhotoModeAsync(cameraParams, startResult =>
-            {
-                Debug.Log($"Camera system start result = {startResult.resultType}.");
-                IsCameraActive = startResult.success;
-                onCameraStarted?.Invoke();
-            });
-        }
-
-        /// <summary>
-        /// Take a photo from the WebCam. Make sure the camera is active.
-        /// </summary>
-        /// <returns>Image data encoded as jpg.</returns>
-        public Task<byte[]> TakePhoto()
-        {
-            if (!IsCameraActive || photoCapture == null)
-            {
-                throw new Exception("Can't take photo when camera is not ready.");
-            }
-
-            return Task.Run(() =>
-            {
-                var completionSource = new TaskCompletionSource<byte[]>();
-
-                AppDispatcher.Instance().Enqueue(() =>
-                {
-                    Debug.Log("Starting photo capture.");
-
-                    photoCapture.TakePhotoAsync((photoCaptureResult, frame) =>
-                    {
-                        Debug.Log("Photo capture done.");
-
-                        var buffer = new List<byte>();
-                        frame.CopyRawImageDataIntoBuffer(buffer);
-                        completionSource.TrySetResult(buffer.ToArray());
-                    });
-                });
-                
-                return completionSource.Task;
-            });
-        }
-
         /// <summary>
         /// Create a tag for the project to associate images with for later detection once a project is trained.
         /// </summary>
-        /// <param name="tag">Name of the tag</param>
+        /// <param name="nameOfTag">Name of the tag</param>
         /// <returns>Tag info with id.</returns>
-        public async Task<TagCreationResult> CreateTag(string tag)
+        public async Task<TagCreationResult> CreateTag(string nameOfTag)
         {
             // https://docs.microsoft.com/en-us/rest/api/cognitiveservices/customvisiontraining/createtag/createtag
             
@@ -162,7 +39,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
             {
                 client.DefaultRequestHeaders.Add("Training-Key", apiKey);
                 var result = await client.PostAsync(
-                    $"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/tags?name={tag}", null);
+                    $"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/tags?name={nameOfTag}", null);
 
                 if (!result.IsSuccessStatusCode)
                 {
@@ -240,7 +117,7 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         /// </summary>
         /// <param name="iterationId">Target iteration to check.</param>
         /// <returns>Status of the training iteration.</returns>
-        public async Task<TrainProjectResult> GetIterationStatus(string iterationId)
+        public async Task<TrainProjectResult> GetTrainingStatus(string iterationId)
         {
             // https://docs.microsoft.com/en-us/rest/api/cognitiveservices/customvisiontraining/getiteration/getiteration
 
@@ -267,23 +144,48 @@ namespace MRTK.Tutorials.AzureCloudPower.Managers
         /// <param name="iterationId">Id of the trained iteration.</param>
         /// <param name="publishName">Name for the trained model which is used when detecting images.</param>
         /// <returns>Success status.</returns>
-        public async Task<bool> PublishIteration(string iterationId, string publishName)
+        public async Task<bool> PublishTrainingIteration(string iterationId, string publishName)
         {
             // https://docs.microsoft.com/en-us/rest/api/cognitiveservices/customvisiontraining/publishiteration/publishiteration
 
             using (var client = new HttpClient())
             {
-                var predictionId = $"/subscriptions/{azureResourceSubcriptionId}/resourceGroups/{azureResourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{cognitiveServiceResourceName}";
+                var predictionId = $"/subscriptions/{azureResourceSubscriptionId}/resourceGroups/{azureResourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{cognitiveServiceResourceName}";
                 client.DefaultRequestHeaders.Add("Training-Key", apiKey);
                 var result = await client.PostAsync(
                     $"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/iterations/{iterationId}/publish?publishName={publishName}&predictionId={predictionId}", null);
-
-                // store the publishName in VisionProject.PublishModelName
 
                 return result.IsSuccessStatusCode;
             }
         }
 
+        /// <summary>
+        /// Delete a training iteration by the given id.
+        /// </summary>
+        /// <param name="iterationId">Id of the training iteration to delete.</param>
+        /// <returns>Deletion success result.</returns>
+        public async Task<bool> DeleteTrainingIteration(string iterationId)
+        {
+            // https://docs.microsoft.com/en-us/rest/api/cognitiveservices/customvisiontraining/unpublishiteration/unpublishiteration
+            // https://docs.microsoft.com/en-us/rest/api/cognitiveservices/customvisiontraining/deleteiteration/deleteiteration
+            
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Training-Key", apiKey);
+                // before deleting the training iteration must be deleted
+                await client.DeleteAsync($"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/iterations/{iterationId}/publish");
+                var result = await client.DeleteAsync($"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/iterations/{iterationId}");
+
+                return result.IsSuccessStatusCode;
+            }
+        }
+
+        /// <summary>
+        /// Get classification info for a provided image.
+        /// </summary>
+        /// <param name="image">Image data</param>
+        /// <param name="publishedName">Published name of the trained model.</param>
+        /// <returns>Classification information-</returns>
         public async Task<ImagePredictionResult> DetectImage(byte[] image, string publishedName)
         {
             // https://docs.microsoft.com/en-us/rest/api/cognitiveservices/customvisionprediction/classifyimage/classifyimage

@@ -19,7 +19,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MRTK.Tutorials.AzureCloudPower.Utilities
+namespace MRTK.Tutorials.AzureCloudServices.Scripts.Utilities
 {
     /// Author: Pim de Witte (pimdewitte.com) and contributors, https://github.com/PimDeWitte/UnityMainThreadDispatcher
     /// <summary>

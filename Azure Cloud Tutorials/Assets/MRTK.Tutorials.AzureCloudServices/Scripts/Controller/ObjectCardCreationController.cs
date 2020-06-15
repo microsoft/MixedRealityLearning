@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
-using MRTK.Tutorials.AzureCloudPower.Domain;
-using MRTK.Tutorials.AzureCloudPower.Managers;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,7 +30,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [SerializeField]
         private Interactable[] buttons;
         
-        private TrackedObjectProject project;
+        private TrackedObject trackedObject;
         
         private void Awake()
         {
@@ -39,13 +39,14 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 sceneManager = FindObjectOfType<MainSceneManager>();
             }
         }
-
-        public async void Init(TrackedObjectProject trackedObjectProject)
+        
+        public async void Init(TrackedObject source)
         {
-            project = trackedObjectProject;
-            objectNameLabel.SetText(project.Name);
-            descriptionInputField.text = project.Description;
-            if (!string.IsNullOrEmpty(project.ThumbnailBlobName))
+            trackedObject = source;
+            objectNameLabel.SetText(this.trackedObject.Name);
+            descriptionInputField.text = this.trackedObject.Description;
+            SetButtonsInteractiveState(true);
+            if (!string.IsNullOrEmpty(this.trackedObject.ThumbnailBlobName))
             {
                 thumbnailImage.sprite = await LoadThumbnailImage();
             }
@@ -57,7 +58,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         private async Task<Sprite> LoadThumbnailImage()
         {
-            var imageData = await sceneManager.DataManager.DownloadBlob(project.ThumbnailBlobName);
+            var imageData = await sceneManager.DataManager.DownloadBlob(trackedObject.ThumbnailBlobName);
             var texture = new Texture2D(2, 2);
             texture.LoadImage(imageData);
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
@@ -66,24 +67,13 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         public async void TakeThumbnailPhoto()
         {
             SetButtonsInteractiveState(false);
-            byte[] imageData;
-            if (Application.isEditor)
-            {
-                var texture = ScreenCapture.CaptureScreenshotAsTexture();
-                thumbnailImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                imageData = texture.EncodeToPNG();
-            }
-            else
-            {
-                imageData = await sceneManager.ObjectDetectionManager.TakePhoto();
-                var texture = new Texture2D(2, 2);
-                texture.LoadImage(imageData);
-                thumbnailImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-            }
+            
+            var photo = await sceneManager.TakePhotoWithThumbnail();
+            thumbnailImage.sprite = photo.Texture.CreateSprite();
             
             messageLabel.text = "Uploading Thumbnail, please wait ...";
-            var blobName = await sceneManager.DataManager.UploadBlob(imageData, project.Name + "_thumbnail.png");
-            project.ThumbnailBlobName = blobName;
+            var blobName = await sceneManager.DataManager.UploadBlob(photo.ImageData, trackedObject.Name + "_thumbnail.png");
+            trackedObject.ThumbnailBlobName = blobName;
             SaveChanges();
             
             SetButtonsInteractiveState(true);
@@ -91,15 +81,15 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         public async void DeleteThumbnailPhoto()
         {
-            if (!string.IsNullOrEmpty(project.ThumbnailBlobName))
+            if (!string.IsNullOrEmpty(trackedObject.ThumbnailBlobName))
             {
-                if (!await sceneManager.DataManager.DeleteBlob(project.ThumbnailBlobName))
+                if (!await sceneManager.DataManager.DeleteBlob(trackedObject.ThumbnailBlobName))
                 {
                     return;
                 }
                 
                 thumbnailImage.sprite = thumbnailPlaceHolderImage;
-                project.ThumbnailBlobName = "";
+                trackedObject.ThumbnailBlobName = "";
                 SaveChanges();
             }
             else
@@ -113,36 +103,50 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             SetButtonsInteractiveState(false);
             UpdateProjectData();
             messageLabel.text = "Updating data, please wait ...";
-            var success = await sceneManager.DataManager.UploadOrUpdate(project);
+            var success = await sceneManager.DataManager.UploadOrUpdate(trackedObject);
             messageLabel.text = success ? "Updated data in database." : "Failed to update database.";
             SetButtonsInteractiveState(true);
         }
 
-        public async void OnComputerVisionButtonClick()
+        public void OnComputerVisionButtonClick()
         {
-            if(!string.IsNullOrEmpty(project.CustomVision.IterationId))
+            if (!string.IsNullOrWhiteSpace(trackedObject.CustomVisionTagId))
             {
-                var status = await sceneManager.ObjectDetectionManager.GetIterationStatus(project.CustomVision.IterationId);
-                if (status.IsCompleted())
-                {
-                    messageLabel.text = "The model is already trained.";
-                    return;
-                }
+                messageLabel.text = "This object has been already trained for custom vision object.";
+                return;
             }
             
             computerVisionController.gameObject.SetActive(true);
-            computerVisionController.Init(project);
+            computerVisionController.Init(trackedObject);
             gameObject.SetActive(false);
         }
         
         public void OnSaveLocationButtonClick()
         {
-            
+            if (!string.IsNullOrWhiteSpace(trackedObject.SpatialAnchorId))
+            {
+                messageLabel.text = "There is already an anchor location saved for this object.";
+                return;
+            }
+
+            SetButtonsInteractiveState(false);
+            messageLabel.text = "Move pointer and AirTap on the desired place to save the location.";
+            sceneManager.AnchorManager.StartPlacingAnchor(trackedObject);
+            sceneManager.AnchorManager.OnCreateAnchorSucceeded += HandleOnCreateAnchorSucceeded;
+        }
+
+        private async void HandleOnCreateAnchorSucceeded(object sender, string id)
+        {
+            sceneManager.AnchorManager.OnCreateAnchorSucceeded -= HandleOnCreateAnchorSucceeded;
+            trackedObject.SpatialAnchorId = id;
+            await sceneManager.DataManager.UploadOrUpdate(trackedObject);
+            sceneManager.OpenMainMenu();
+            gameObject.SetActive(false);
         }
 
         private void UpdateProjectData()
         {
-            project.Description = descriptionInputField.text;
+            trackedObject.Description = descriptionInputField.text;
         }
 
         private void SetButtonsInteractiveState(bool state)

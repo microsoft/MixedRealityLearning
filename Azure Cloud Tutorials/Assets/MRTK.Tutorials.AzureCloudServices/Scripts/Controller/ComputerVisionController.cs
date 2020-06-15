@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
-using MRTK.Tutorials.AzureCloudPower.Domain;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,10 +12,15 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 {
     public class ComputerVisionController : MonoBehaviour
     {
+        [Header("Settings")]
+        [SerializeField]
+        private string trainingModelPublishingName = "main_model";
         [Header("Manager")]
         [SerializeField]
         private MainSceneManager sceneManager;
         [Header("UI")]
+        [SerializeField]
+        private GameObject previousMenu;
         [SerializeField]
         private Image previewImage;
         [SerializeField]
@@ -26,7 +32,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [SerializeField]
         private Interactable[] buttons;
         
-        private TrackedObjectProject project;
+        private TrackedObject trackedObject;
         private int index;
         private List<ImageThumbnail> imagesToCapture;
         private bool isWaitingForAirtap;
@@ -39,12 +45,13 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             }
         }
 
-        public void Init(TrackedObjectProject trackedObjectProject)
+        public void Init(TrackedObject source)
         {
-            project = trackedObjectProject;
+            trackedObject = source;
             index = -1;
             imagesToCapture = new List<ImageThumbnail>();
             previewImage.sprite = thumbnailPlaceHolderImage;
+            SetButtonsInteractiveState(true);
             foreach (var image in images)
             {
                 image.sprite = thumbnailPlaceHolderImage;
@@ -62,11 +69,11 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 messageLabel.text = "You have enough images";
                 return;
             }
-
+            
+            isWaitingForAirtap = true;
             SetButtonsInteractiveState(false);
             messageLabel.text = "Do AirTap to take a photo.";
             await Task.Delay(300);
-            isWaitingForAirtap = true;
         }
 
         public void OnDeleteButtonClick()
@@ -94,47 +101,49 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 return;
             }
             
-            if(!string.IsNullOrEmpty(project.CustomVision.IterationId))
+            // Check if there is already an existing iteration and delete it
+            if(!string.IsNullOrEmpty(sceneManager.CurrentProject.CustomVisionIterationId))
             {
-                var status = await sceneManager.ObjectDetectionManager.GetIterationStatus(project.CustomVision.IterationId);
-                if (status.IsCompleted())
-                {
-                    messageLabel.text = "The model is already trained.";
-                    return;
-                }
+                await sceneManager.ObjectDetectionManager.DeleteTrainingIteration(sceneManager.CurrentProject.CustomVisionIterationId);
+                sceneManager.CurrentProject.CustomVisionIterationId = "";
+                await sceneManager.DataManager.UpdateProject(sceneManager.CurrentProject);
             }
 
             messageLabel.text = "Please wait, uploading images.";
             SetButtonsInteractiveState(false);
-            var tagId = project.CustomVision.TagId;
+            var tagId = trackedObject.CustomVisionTagId;
             foreach (var imageThumbnail in imagesToCapture)
             {
-                 await sceneManager.ObjectDetectionManager.UploadTrainingImage(imageThumbnail.PngData, tagId);
+                 await sceneManager.ObjectDetectionManager.UploadTrainingImage(imageThumbnail.ImageData, tagId);
             }
             messageLabel.text = "All images have been uploaded!";
             var objectTrainingResult = await sceneManager.ObjectDetectionManager.TrainProject();
             messageLabel.text = "Started training process, please wait for completion.";
-            project.CustomVision.IterationId = objectTrainingResult.Id;
-            project.CustomVision.PublishModelName = objectTrainingResult.Name;
+            sceneManager.CurrentProject.CustomVisionIterationId = objectTrainingResult.Id;
+            await sceneManager.DataManager.UpdateProject(sceneManager.CurrentProject);
 
-            await sceneManager.DataManager.UploadOrUpdate(project);
-
-            var tries = 10;
+            var tries = 15;
             while (tries > 0)
             {
                 await Task.Delay(1000);
-                var status = sceneManager.ObjectDetectionManager.GetIterationStatus(objectTrainingResult.Id);
-                if (status.IsCompleted)
+                var status = await sceneManager.ObjectDetectionManager.GetTrainingStatus(objectTrainingResult.Id);
+                if (status.IsCompleted())
                 {
-                    var publishResult = await sceneManager.ObjectDetectionManager.PublishIteration(objectTrainingResult.Id,
-                        objectTrainingResult.Name);
+                    var publishResult = await sceneManager.ObjectDetectionManager.PublishTrainingIteration(objectTrainingResult.Id,
+                        trainingModelPublishingName);
                     if (!publishResult)
                     {
                         Debug.LogError("Failed to publish, please check the custom vision portal for your project.");
                     }
                     else
                     {
+                        sceneManager.CurrentProject.CustomVisionPublishedModelName = trainingModelPublishingName;
+                        await sceneManager.DataManager.UpdateProject(sceneManager.CurrentProject);
+
                         messageLabel.text = "Model training is done and ready for detection.";
+                        await Task.Delay(1000);
+                        previousMenu.SetActive(true);
+                        gameObject.SetActive(false);
                     }
                     break;
                 }
@@ -147,35 +156,18 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         private async void CapturePhoto()
         {
-            messageLabel.text = "";
             index++;
-            
-            byte[] imageData;
-            Texture2D texture;
-            if (Application.isEditor)
-            {
-                texture = ScreenCapture.CaptureScreenshotAsTexture();
-                imageData = texture.EncodeToPNG();
-            }
-            else
-            {
-                imageData = await sceneManager.ObjectDetectionManager.TakePhoto();
-                texture = new Texture2D(2, 2);
-                texture.LoadImage(imageData);
-            }
-            
-            var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+            messageLabel.text = "Taking photo, stand still.";
+            var imageThumbnail = await sceneManager.TakePhotoWithThumbnail();
+            var sprite = imageThumbnail.Texture.CreateSprite();
             images[index].sprite = sprite;
             previewImage.sprite = sprite;
+            messageLabel.text = "";
             
-            var imageThumbnail = new ImageThumbnail()
-            {
-                PngData = imageData,
-                Texture = texture
-            };
             imagesToCapture.Add(imageThumbnail);
-            SetButtonsInteractiveState(true);
             isWaitingForAirtap = false;
+            SetButtonsInteractiveState(true);
         }
         
         private void SetButtonsInteractiveState(bool state)
@@ -184,12 +176,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             {
                 interactable.IsEnabled = state;
             }
-        }
-
-        private class ImageThumbnail
-        {
-            public byte[] PngData { get; set; }
-            public Texture2D Texture { get; set; }
         }
 
         public void HandleOnTap()

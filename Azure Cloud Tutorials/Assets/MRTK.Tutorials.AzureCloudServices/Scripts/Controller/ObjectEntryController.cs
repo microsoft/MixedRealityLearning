@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
-using MRTK.Tutorials.AzureCloudPower.Domain;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
 using TMPro;
 using UnityEngine;
@@ -11,13 +11,13 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
     {
         [Header("References")]
         [SerializeField]
+        private MainSceneManager sceneManager;
+        [SerializeField]
         private GameObject searchObjectPanel;
         [SerializeField]
         private ObjectCardCreationController objectCardCreationPanel;
         [SerializeField]
-        private GameObject objectCardQueryPanel;
-        [SerializeField]
-        private MainSceneManager sceneManager;
+        private ObjectCardViewController objectCardPrefab;
         [Header("UI Elements")]
         [SerializeField]
         private Interactable submitButton;
@@ -78,8 +78,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 if (project != null)
                 {
                     searchObjectPanel.SetActive(false);
-                    objectCardQueryPanel.SetActive(true);
-                    // TODO handle Init
+                    var objectCard = Instantiate(objectCardPrefab, transform.position, transform.rotation);
+                    objectCard.Init(project);
                 }
             }
             else
@@ -95,11 +95,11 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             submitButton.IsEnabled = true;
         }
 
-        private async Task<TrackedObjectProject> FindObject(string searchName)
+        private async Task<TrackedObject> FindObject(string searchName)
         {
             hintLabel.SetText(loadingText);
             hintLabel.gameObject.SetActive(true);
-            var projectFromDb = await sceneManager.DataManager.FindByName(searchName);
+            var projectFromDb = await sceneManager.DataManager.FindTrackedObjectByName(searchName);
             if (projectFromDb == null)
             {
                 hintLabel.SetText($"No object found with the name '{searchName}'.");
@@ -110,14 +110,14 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             return projectFromDb;
         }
 
-        private async Task<TrackedObjectProject> CreateObject(string searchName)
+        private async Task<TrackedObject> CreateObject(string searchName)
         {
-            hintLabel.SetText("Please wait...");
+            hintLabel.SetText(loadingText);
             hintLabel.gameObject.SetActive(true);
-            var project = await sceneManager.DataManager.FindByName(searchName);
+            var project = await sceneManager.DataManager.FindTrackedObjectByName(searchName);
             if (project == null)
             {
-                project = new TrackedObjectProject(searchName);
+                project = new TrackedObject(searchName);
                 var success = await sceneManager.DataManager.UploadOrUpdate(project);
                 if (!success)
                 {
@@ -126,8 +126,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
                 var tagName = $"tag_{project.Name}";
                 var tagCreation = await sceneManager.ObjectDetectionManager.CreateTag(tagName);
-                project.CustomVision.TagName = tagCreation.Name;
-                project.CustomVision.TagId = tagCreation.Id;
+                project.CustomVisionTagName = tagCreation.Name;
+                project.CustomVisionTagId = tagCreation.Id;
                 await sceneManager.DataManager.UploadOrUpdate(project);
             }
 

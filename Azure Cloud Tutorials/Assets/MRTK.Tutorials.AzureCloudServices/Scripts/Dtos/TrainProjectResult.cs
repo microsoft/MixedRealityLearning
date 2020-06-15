@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace MRTK.Tutorials.AzureCloudPower.Dtos
+namespace MRTK.Tutorials.AzureCloudServices.Scripts.Dtos
 {
     public class TrainProjectResult
     {
