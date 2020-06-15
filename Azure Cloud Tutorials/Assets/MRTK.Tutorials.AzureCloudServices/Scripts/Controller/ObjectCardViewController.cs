@@ -79,6 +79,12 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         
         public async void OnComputerVisionButtonClick()
         {
+            if (string.IsNullOrEmpty(trackedObject.CustomVisionTagId) 
+                || string.IsNullOrEmpty(sceneManager.CurrentProject.CustomVisionIterationId))
+            {
+                messageLabel.text = "There is no model trained set for this object.";
+                return;
+            }
             if (isSearchingWithComputerVision || objectDetectedWithComputerVision)
             {
                 return;

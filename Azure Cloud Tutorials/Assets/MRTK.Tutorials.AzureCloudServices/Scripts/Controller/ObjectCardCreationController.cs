@@ -110,7 +110,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         public void OnComputerVisionButtonClick()
         {
-            if (!string.IsNullOrWhiteSpace(trackedObject.CustomVisionTagId))
+            if (!string.IsNullOrWhiteSpace(trackedObject.CustomVisionTagId) 
+                && !string.IsNullOrWhiteSpace(sceneManager.CurrentProject.CustomVisionIterationId))
             {
                 messageLabel.text = "This object has been already trained for custom vision object.";
                 return;
