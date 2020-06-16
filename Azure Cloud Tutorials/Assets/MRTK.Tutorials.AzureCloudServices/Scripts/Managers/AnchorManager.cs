@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.SpatialAnchors;
 using Microsoft.Azure.SpatialAnchors.Unity;
-using MRTK.Tutorials.AzureCloudPower;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Controller;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.UX;
 using UnityEngine;
@@ -105,7 +105,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             }
         }
 
-        // TODO: Update summary when known where to hook this up 
         /// <summary>
         /// Starts Azure Spatial Anchors find anchor process.
         /// Called from 'Not-sure-where' when user is ready to find location.

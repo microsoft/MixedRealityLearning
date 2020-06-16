@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
-using MRTK.Tutorials.AzureCloudPower;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
 using UnityEngine;
 

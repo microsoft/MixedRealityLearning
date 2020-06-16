@@ -18,7 +18,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         [SerializeField]
         private string cognitiveServiceResourceName;
         [SerializeField]
-        private string resourceBaseEndpoint = "https://westeurope.api.cognitive.microsoft.com";
+        private string resourceBaseEndpoint;
 
         [Header("Project Settings")]
         [SerializeField]

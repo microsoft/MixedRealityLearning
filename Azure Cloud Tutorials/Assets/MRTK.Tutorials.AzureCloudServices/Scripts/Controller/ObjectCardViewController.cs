@@ -14,7 +14,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
     {
         [Header("Managers")]
         [SerializeField]
-        private MainSceneManager sceneManager;
+        private SceneController sceneController;
         [Header("UI")]
         [SerializeField]
         private TMP_Text objectNameLabel;
@@ -35,22 +35,22 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         
         private void Awake()
         {
-            if (sceneManager == null)
+            if (sceneController == null)
             {
-                sceneManager = FindObjectOfType<MainSceneManager>();
+                sceneController = FindObjectOfType<SceneController>();
             }
         }
         
         private void OnDisable()
         {
-            sceneManager.OpenMainMenu();
+            sceneController.OpenMainMenu();
         }
 
         public async void Init(TrackedObject source)
         {
-            if (sceneManager == null)
+            if (sceneController == null)
             {
-                sceneManager = FindObjectOfType<MainSceneManager>();
+                sceneController = FindObjectOfType<SceneController>();
             }
             
             trackedObject = source;
@@ -68,19 +68,12 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 thumbnailImage.sprite = thumbnailPlaceHolderImage;
             }
         }
-        
-        private async Task<Sprite> LoadThumbnailImage()
+
+        public async void StartComputerVisionDetection()
         {
-            var imageData = await sceneManager.DataManager.DownloadBlob(trackedObject.ThumbnailBlobName);
-            var texture = new Texture2D(2, 2);
-            texture.LoadImage(imageData);
-            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-        }
-        
-        public async void OnComputerVisionButtonClick()
-        {
+            sceneController.StartCamera();
             if (string.IsNullOrEmpty(trackedObject.CustomVisionTagId) 
-                || string.IsNullOrEmpty(sceneManager.CurrentProject.CustomVisionIterationId))
+                || string.IsNullOrEmpty(sceneController.CurrentProject.CustomVisionIterationId))
             {
                 messageLabel.text = "There is no model trained set for this object.";
                 return;
@@ -94,37 +87,39 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             isSearchingWithComputerVision = true;
             messageLabel.text = "Look around for object...";
             await SearchWithComputerVision();
+            sceneController.StopCamera();
         }
-        
-        public void OnFindLocationButtonClick()
+
+        public void StartFindLocation()
         {
             if (string.IsNullOrEmpty(trackedObject.SpatialAnchorId))
             {
                 messageLabel.text = "No spatial anchor has been specified for this object.";
                 return;
             }
-            if (sceneManager.AnchorManager.CheckIsAnchorActiveForTrackedObject(trackedObject.SpatialAnchorId))
+            if (sceneController.AnchorManager.CheckIsAnchorActiveForTrackedObject(trackedObject.SpatialAnchorId))
             {
                 messageLabel.text = "The spatial anchor for this object is already spawned.";
-                sceneManager.AnchorManager.GuideToAnchor(trackedObject.SpatialAnchorId);
+                sceneController.AnchorManager.GuideToAnchor(trackedObject.SpatialAnchorId);
                 return;
             }
             
-            sceneManager.AnchorManager.OnFindAnchorSucceeded += HandleOnAnchorFound;
-            sceneManager.AnchorManager.FindAnchor(trackedObject);
+            sceneController.StopCamera();
+            sceneController.AnchorManager.OnFindAnchorSucceeded += HandleOnAnchorFound;
+            sceneController.AnchorManager.FindAnchor(trackedObject);
         }
 
         private void HandleOnAnchorFound(object sender, EventArgs e)
         {
-            sceneManager.AnchorManager.OnFindAnchorSucceeded -= HandleOnAnchorFound;
+            sceneController.AnchorManager.OnFindAnchorSucceeded -= HandleOnAnchorFound;
             SetButtonsInteractiveState(true);
         }
 
-        public void OnCloseButtonClick()
+        public void CloseCard()
         {
             isSearchingWithComputerVision = false;
             messageLabel.text = "";
-            sceneManager.OpenMainMenu();
+            sceneController.OpenMainMenu();
             Destroy(gameObject);
         }
 
@@ -133,10 +128,10 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             while (isSearchingWithComputerVision)
             {
                 await Task.Delay(1000);
-                var image = await sceneManager.TakePhoto();
+                var image = await sceneController.TakePhoto();
                 try
                 {
-                    var response = await sceneManager.ObjectDetectionManager.DetectImage(image, sceneManager.CurrentProject.CustomVisionPublishedModelName);
+                    var response = await sceneController.ObjectDetectionManager.DetectImage(image, sceneController.CurrentProject.CustomVisionPublishedModelName);
                     var prediction = response.Predictions.SingleOrDefault(p => p.TagId == trackedObject.CustomVisionTagId);
                     if(prediction != null && prediction.Probability > 0.75d)
                     {
@@ -157,7 +152,15 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             
             SetButtonsInteractiveState(true);
         }
-        
+
+        private async Task<Sprite> LoadThumbnailImage()
+        {
+            var imageData = await sceneController.DataManager.DownloadBlob(trackedObject.ThumbnailBlobName);
+            var texture = new Texture2D(2, 2);
+            texture.LoadImage(imageData);
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        }
+
         private void SetButtonsInteractiveState(bool state)
         {
             foreach (var interactable in buttons)

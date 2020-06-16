@@ -10,17 +10,25 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private GameObject originMenu;
         private GameObject targetMenu;
 
+        /// <summary>
+        /// Menu to back when cancel button is clicked.
+        /// </summary>
+        /// <param name="menu">target menu</param>
         public void SetOriginMenu(GameObject menu)
         {
             originMenu = menu;
         }
         
+        /// <summary>
+        /// Menu to back when ok button is clicked.
+        /// </summary>
+        /// <param name="menu">target menu</param>
         public void SetTargetMenu(GameObject menu)
         {
             targetMenu = menu;
         }
 
-        public void OnOkButtonClick()
+        public void HandleOkButtonClick()
         {
             if (targetMenu == null)
             {
@@ -34,7 +42,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             gameObject.SetActive(false);
         }
 
-        public void OnCancelButtonClick()
+        public void HandleCancelButtonClick()
         {
             if (originMenu == null)
             {

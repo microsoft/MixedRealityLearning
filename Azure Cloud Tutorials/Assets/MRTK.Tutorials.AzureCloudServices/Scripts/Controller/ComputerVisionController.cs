@@ -10,6 +10,9 @@ using UnityEngine.UI;
 
 namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 {
+    /// <summary>
+    /// Handles UI, UX and flow for computer vision menu.
+    /// </summary>
     public class ComputerVisionController : MonoBehaviour
     {
         [Header("Settings")]
@@ -17,7 +20,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private string trainingModelPublishingName = "main_model";
         [Header("Manager")]
         [SerializeField]
-        private MainSceneManager sceneManager;
+        private SceneController sceneController;
         [Header("UI")]
         [SerializeField]
         private GameObject previousMenu;
@@ -33,22 +36,22 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private Interactable[] buttons;
         
         private TrackedObject trackedObject;
-        private int index;
         private List<ImageThumbnail> imagesToCapture;
+        private int currentImageIndex;
         private bool isWaitingForAirtap;
         
         private void Awake()
         {
-            if (sceneManager == null)
+            if (sceneController == null)
             {
-                sceneManager = FindObjectOfType<MainSceneManager>();
+                sceneController = FindObjectOfType<SceneController>();
             }
         }
 
         public void Init(TrackedObject source)
         {
             trackedObject = source;
-            index = -1;
+            currentImageIndex = -1;
             imagesToCapture = new List<ImageThumbnail>();
             previewImage.sprite = thumbnailPlaceHolderImage;
             SetButtonsInteractiveState(true);
@@ -56,15 +59,16 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             {
                 image.sprite = thumbnailPlaceHolderImage;
             }
+            sceneController.StartCamera();
         }
 
-        public async void OnCapturePhotoButtonClick()
+        public async void StartPhotoCapture()
         {
             if (isWaitingForAirtap)
             {
                 return;
             }
-            if (index == 6)
+            if (currentImageIndex == 6)
             {
                 messageLabel.text = "You have enough images";
                 return;
@@ -76,24 +80,24 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             await Task.Delay(300);
         }
 
-        public void OnDeleteButtonClick()
+        public void DeleteCurrentPhoto()
         {
-            if (index < 0)
+            if (currentImageIndex < 0)
             {
                 return;
             }
             
             previewImage.sprite = thumbnailPlaceHolderImage;
-            images[index].sprite = thumbnailPlaceHolderImage;
+            images[currentImageIndex].sprite = thumbnailPlaceHolderImage;
             if(imagesToCapture.Count > 0)
             {
-                imagesToCapture.Remove(imagesToCapture[index]);
+                imagesToCapture.Remove(imagesToCapture[currentImageIndex]);
             }
             
-            index--;
+            currentImageIndex--;
         }
 
-        public async void OnTrainButtonClick()
+        public async void StartModelTraining()
         {
             if (imagesToCapture.Count < 6)
             {
@@ -102,11 +106,11 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             }
             
             // Check if there is already an existing iteration and delete it
-            if(!string.IsNullOrEmpty(sceneManager.CurrentProject.CustomVisionIterationId))
+            if(!string.IsNullOrEmpty(sceneController.CurrentProject.CustomVisionIterationId))
             {
-                await sceneManager.ObjectDetectionManager.DeleteTrainingIteration(sceneManager.CurrentProject.CustomVisionIterationId);
-                sceneManager.CurrentProject.CustomVisionIterationId = "";
-                await sceneManager.DataManager.UpdateProject(sceneManager.CurrentProject);
+                await sceneController.ObjectDetectionManager.DeleteTrainingIteration(sceneController.CurrentProject.CustomVisionIterationId);
+                sceneController.CurrentProject.CustomVisionIterationId = "";
+                await sceneController.DataManager.UpdateProject(sceneController.CurrentProject);
             }
 
             messageLabel.text = "Please wait, uploading images.";
@@ -114,22 +118,22 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             var tagId = trackedObject.CustomVisionTagId;
             foreach (var imageThumbnail in imagesToCapture)
             {
-                 await sceneManager.ObjectDetectionManager.UploadTrainingImage(imageThumbnail.ImageData, tagId);
+                 await sceneController.ObjectDetectionManager.UploadTrainingImage(imageThumbnail.ImageData, tagId);
             }
             messageLabel.text = "All images have been uploaded!";
-            var objectTrainingResult = await sceneManager.ObjectDetectionManager.TrainProject();
+            var objectTrainingResult = await sceneController.ObjectDetectionManager.TrainProject();
             messageLabel.text = "Started training process, please wait for completion.";
-            sceneManager.CurrentProject.CustomVisionIterationId = objectTrainingResult.Id;
-            await sceneManager.DataManager.UpdateProject(sceneManager.CurrentProject);
+            sceneController.CurrentProject.CustomVisionIterationId = objectTrainingResult.Id;
+            await sceneController.DataManager.UpdateProject(sceneController.CurrentProject);
 
             var tries = 15;
             while (tries > 0)
             {
                 await Task.Delay(1000);
-                var status = await sceneManager.ObjectDetectionManager.GetTrainingStatus(objectTrainingResult.Id);
+                var status = await sceneController.ObjectDetectionManager.GetTrainingStatus(objectTrainingResult.Id);
                 if (status.IsCompleted())
                 {
-                    var publishResult = await sceneManager.ObjectDetectionManager.PublishTrainingIteration(objectTrainingResult.Id,
+                    var publishResult = await sceneController.ObjectDetectionManager.PublishTrainingIteration(objectTrainingResult.Id,
                         trainingModelPublishingName);
                     if (!publishResult)
                     {
@@ -137,8 +141,10 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                     }
                     else
                     {
-                        sceneManager.CurrentProject.CustomVisionPublishedModelName = trainingModelPublishingName;
-                        await sceneManager.DataManager.UpdateProject(sceneManager.CurrentProject);
+                        trackedObject.HasBeenTrained = true;
+                        await sceneController.DataManager.UploadOrUpdate(trackedObject);
+                        sceneController.CurrentProject.CustomVisionPublishedModelName = trainingModelPublishingName;
+                        await sceneController.DataManager.UpdateProject(sceneController.CurrentProject);
 
                         messageLabel.text = "Model training is done and ready for detection.";
                         await Task.Delay(1000);
@@ -153,15 +159,23 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             
             SetButtonsInteractiveState(true);
         }
+        
+        public void HandleOnPointerClick()
+        {
+            if (isWaitingForAirtap)
+            {
+                CapturePhoto();
+            }
+        }
 
         private async void CapturePhoto()
         {
-            index++;
+            currentImageIndex++;
 
             messageLabel.text = "Taking photo, stand still.";
-            var imageThumbnail = await sceneManager.TakePhotoWithThumbnail();
+            var imageThumbnail = await sceneController.TakePhotoWithThumbnail();
             var sprite = imageThumbnail.Texture.CreateSprite();
-            images[index].sprite = sprite;
+            images[currentImageIndex].sprite = sprite;
             previewImage.sprite = sprite;
             messageLabel.text = "";
             
@@ -175,14 +189,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             foreach (var interactable in buttons)
             {
                 interactable.IsEnabled = state;
-            }
-        }
-
-        public void HandleOnTap()
-        {
-            if (isWaitingForAirtap)
-            {
-                CapturePhoto();
             }
         }
     }

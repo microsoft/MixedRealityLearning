@@ -11,11 +11,11 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
     {
         [Header("References")]
         [SerializeField]
-        private MainSceneManager sceneManager;
+        private SceneController sceneController;
         [SerializeField]
         private GameObject searchObjectPanel;
         [SerializeField]
-        private ObjectCardCreationController objectCardCreationPanel;
+        private ObjectEditController objectEditPanel;
         [SerializeField]
         private ObjectCardViewController objectCardPrefab;
         [Header("UI Elements")]
@@ -34,9 +34,9 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         
         private void Awake()
         {
-            if (sceneManager == null)
+            if (sceneController == null)
             {
-                sceneManager = FindObjectOfType<MainSceneManager>();
+                sceneController = FindObjectOfType<SceneController>();
             }
         }
 
@@ -55,7 +55,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             isInSearchMode = searchModeActive;
         }
 
-        public async void OnButtonClick()
+        public async void SubmitQuery()
         {
             if (string.IsNullOrWhiteSpace(inputField.text))
             {
@@ -64,7 +64,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 return;
             }
 
-            if (!sceneManager.DataManager.IsReady)
+            if (!sceneController.DataManager.IsReady)
             {
                 hintLabel.SetText("No connection to the database!");
                 hintLabel.gameObject.SetActive(true);
@@ -88,8 +88,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 if (project != null)
                 {
                     searchObjectPanel.SetActive(false);
-                    objectCardCreationPanel.gameObject.SetActive(true);
-                    objectCardCreationPanel.Init(project);
+                    objectEditPanel.gameObject.SetActive(true);
+                    objectEditPanel.Init(project);
                 }
             }
             submitButton.IsEnabled = true;
@@ -99,7 +99,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         {
             hintLabel.SetText(loadingText);
             hintLabel.gameObject.SetActive(true);
-            var projectFromDb = await sceneManager.DataManager.FindTrackedObjectByName(searchName);
+            var projectFromDb = await sceneController.DataManager.FindTrackedObjectByName(searchName);
             if (projectFromDb == null)
             {
                 hintLabel.SetText($"No object found with the name '{searchName}'.");
@@ -114,21 +114,21 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         {
             hintLabel.SetText(loadingText);
             hintLabel.gameObject.SetActive(true);
-            var project = await sceneManager.DataManager.FindTrackedObjectByName(searchName);
+            var project = await sceneController.DataManager.FindTrackedObjectByName(searchName);
             if (project == null)
             {
                 project = new TrackedObject(searchName);
-                var success = await sceneManager.DataManager.UploadOrUpdate(project);
+                var success = await sceneController.DataManager.UploadOrUpdate(project);
                 if (!success)
                 {
                     return null;
                 }
 
                 var tagName = $"tag_{project.Name}";
-                var tagCreation = await sceneManager.ObjectDetectionManager.CreateTag(tagName);
+                var tagCreation = await sceneController.ObjectDetectionManager.CreateTag(tagName);
                 project.CustomVisionTagName = tagCreation.Name;
                 project.CustomVisionTagId = tagCreation.Id;
-                await sceneManager.DataManager.UploadOrUpdate(project);
+                await sceneController.DataManager.UploadOrUpdate(project);
             }
 
             hintLabel.gameObject.SetActive(false);

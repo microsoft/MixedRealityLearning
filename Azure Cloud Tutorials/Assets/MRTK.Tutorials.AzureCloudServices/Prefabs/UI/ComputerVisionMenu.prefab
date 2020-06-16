@@ -960,7 +960,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4200744624060275946}
-        m_MethodName: OnTrainButtonClick
+        m_MethodName: StartModelTraining
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3970,7 +3970,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4200744624060275946}
-        m_MethodName: HandleOnTap
+        m_MethodName: HandleOnPointerClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4465,7 +4465,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4200744624060275946}
-        m_MethodName: OnCapturePhotoButtonClick
+        m_MethodName: StartPhotoCapture
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5957,22 +5957,22 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
-  - {x: -0.052471552, y: 0.0292, z: 0.59900004}
-  - {x: -0.04684068, y: 0.0292, z: 0.59900004}
-  - {x: -0.041209802, y: 0.0292, z: 0.59900004}
-  - {x: -0.035578933, y: 0.0292, z: 0.59900004}
-  - {x: -0.029948056, y: 0.0292, z: 0.59900004}
-  - {x: -0.024317183, y: 0.0292, z: 0.59900004}
-  - {x: -0.01868631, y: 0.0292, z: 0.59900004}
-  - {x: -0.01305544, y: 0.0292, z: 0.59900004}
-  - {x: -0.0074245594, y: 0.0292, z: 0.59900004}
-  - {x: -0.00179369, y: 0.0292, z: 0.59900004}
-  - {x: 0.0038371868, y: 0.0292, z: 0.59900004}
-  - {x: 0.009468064, y: 0.0292, z: 0.59900004}
-  - {x: 0.015098926, y: 0.0292, z: 0.59900004}
-  - {x: 0.020729799, y: 0.0292, z: 0.59900004}
-  - {x: 0.026360687, y: 0.0292, z: 0.59900004}
-  - {x: 0.031991545, y: 0.0292, z: 0.59900004}
+  - {x: -0.002471551, y: 0.0292, z: -0.001}
+  - {x: 0.0031593232, y: 0.0292, z: -0.001}
+  - {x: 0.008790197, y: 0.0292, z: -0.001}
+  - {x: 0.014421069, y: 0.0292, z: -0.001}
+  - {x: 0.020051945, y: 0.0292, z: -0.001}
+  - {x: 0.025682818, y: 0.0292, z: -0.001}
+  - {x: 0.03131369, y: 0.0292, z: -0.001}
+  - {x: 0.03694456, y: 0.0292, z: -0.001}
+  - {x: 0.04257544, y: 0.0292, z: -0.001}
+  - {x: 0.04820631, y: 0.0292, z: -0.001}
+  - {x: 0.053837188, y: 0.0292, z: -0.001}
+  - {x: 0.059468064, y: 0.0292, z: -0.001}
+  - {x: 0.06509893, y: 0.0292, z: -0.001}
+  - {x: 0.0707298, y: 0.0292, z: -0.001}
+  - {x: 0.07636069, y: 0.0292, z: -0.001}
+  - {x: 0.081991546, y: 0.0292, z: -0.001}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -6354,7 +6354,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4200744624060275946}
-        m_MethodName: OnDeleteButtonClick
+        m_MethodName: DeleteCurrentPhoto
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

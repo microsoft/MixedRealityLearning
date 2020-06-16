@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.MixedReality.Toolkit.UI;
-using UnityEngine;
 using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
+using UnityEngine;
 
-namespace MRTK.Tutorials.AzureCloudPower
+namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 {
     /// <summary>
     /// Handles the anchor indicator (and UX as needed).
@@ -24,7 +24,7 @@ namespace MRTK.Tutorials.AzureCloudPower
 
         [Header("UX")]
         [SerializeField]
-        private GameObject saveLocationDialog = default;
+        private GameObject saveLocationDialog;
         [SerializeField]
         private Interactable submitButton;
         [SerializeField]
@@ -74,6 +74,7 @@ namespace MRTK.Tutorials.AzureCloudPower
         
         private void HandleOnSubmitButtonClick()
         {
+            
             saveLocationDialog.SetActive(false);
             OnIndicatorPlaced?.Invoke(this, transform);
         }
