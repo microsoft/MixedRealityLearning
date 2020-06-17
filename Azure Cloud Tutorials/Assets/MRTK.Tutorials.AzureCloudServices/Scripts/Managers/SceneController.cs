@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
+#if UNITY_WSA
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.Windows.WebCam;
+#endif
 
 namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
 {
@@ -36,7 +38,11 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         [SerializeField]
         private UnityEvent onCameraStopped;
 
+#if UNITY_WSA
         private PhotoCapture photoCapture;
+#else
+        private WebCamTexture webCamTexture; 
+#endif
         
         private void Start()
         {
@@ -63,6 +69,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             }
 
             Debug.Log("Starting camera system.");
+#if UNITY_WSA
             if (photoCapture == null)
             {
                 PhotoCapture.CreateAsync(false, captureObject =>
@@ -75,6 +82,22 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             {
                 StartPhotoMode();
             }
+#else
+            if (webCamTexture == null)
+            {
+                webCamTexture = new WebCamTexture();
+                var webcamRenderer = gameObject.AddComponent<MeshRenderer>();
+                webcamRenderer.material = new Material(Shader.Find("Standard"));
+                webcamRenderer.material.mainTexture = webCamTexture;
+                webCamTexture.Play();
+            }
+            else if (!webCamTexture.isPlaying)
+            {
+                webCamTexture.Play();
+            }
+#endif
+
+            IsCameraActive = true;
         }
 
         /// <summary>
@@ -82,11 +105,13 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         /// </summary>
         public void StopCamera()
         {
-            if (!IsCameraActive || photoCapture == null)
+            if (!IsCameraActive)
             {
                 return;
             }
 
+            Debug.Log("Stopping camera system.");
+#if UNITY_WSA
             photoCapture.StopPhotoModeAsync(result =>
             {
                 if (result.success)
@@ -95,8 +120,13 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                     onCameraStopped?.Invoke();
                 }
             });
+#else
+            webCamTexture.Stop();
+#endif
+            IsCameraActive = false;
         }
 
+#if UNITY_WSA
         private void StartPhotoMode()
         {
             var cameraResolution = PhotoCapture.SupportedResolutions
@@ -118,14 +148,15 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                 onCameraStarted?.Invoke();
             });
         }
-        
+#endif
+
         /// <summary>
         /// Take a photo from the WebCam. Make sure the camera is active.
         /// </summary>
         /// <returns>Image data encoded as jpg.</returns>
         public Task<byte[]> TakePhoto()
         {
-            if (!IsCameraActive || photoCapture == null)
+            if (!IsCameraActive)
             {
                 throw new Exception("Can't take photo when camera is not ready.");
             }
@@ -133,19 +164,27 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             return Task.Run(() =>
             {
                 var completionSource = new TaskCompletionSource<byte[]>();
-
+            
                 AppDispatcher.Instance().Enqueue(() =>
                 {
                     Debug.Log("Starting photo capture.");
-
+                    
+#if UNITY_WSA
                     photoCapture.TakePhotoAsync((photoCaptureResult, frame) =>
                     {
                         Debug.Log("Photo capture done.");
-
+            
                         var buffer = new List<byte>();
                         frame.CopyRawImageDataIntoBuffer(buffer);
                         completionSource.TrySetResult(buffer.ToArray());
                     });
+#else
+                    var tex = new Texture2D(webCamTexture.width, webCamTexture.height);
+                    tex.SetPixels(webCamTexture.GetPixels());
+                    tex.Apply();
+                    var data = tex.EncodeToPNG();
+                    completionSource.TrySetResult(data);
+#endif
                 });
                 
                 return completionSource.Task;
@@ -158,7 +197,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         /// <returns>Image data with a Texture for thumbnail.</returns>
         public Task<ImageThumbnail> TakePhotoWithThumbnail()
         {
-            if (!IsCameraActive || photoCapture == null)
+            if (!IsCameraActive)
             {
                 throw new Exception("Can't take photo when camera is not ready.");
             }
@@ -170,7 +209,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                 AppDispatcher.Instance().Enqueue(() =>
                 {
                     Debug.Log("Starting photo capture.");
-
+                    
+#if UNITY_WSA
                     photoCapture.TakePhotoAsync((photoCaptureResult, frame) =>
                     {
                         Debug.Log("Photo capture done.");
@@ -188,6 +228,19 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                         
                         completionSource.TrySetResult(imageThumbnail);
                     });
+#else
+                    var tex = new Texture2D(webCamTexture.width, webCamTexture.height);
+                    tex.SetPixels(webCamTexture.GetPixels());
+                    tex.Apply();
+                    var data = tex.EncodeToPNG();
+                    var imageThumbnail = new ImageThumbnail
+                    {
+                        ImageData = data,
+                        Texture = tex
+                    };
+                    
+                    completionSource.TrySetResult(imageThumbnail);
+#endif
                 });
                 
                 return completionSource.Task;
