@@ -35,7 +35,6 @@ public class PhotonUser : MonoBehaviour
 
     public void PVShareAnchorNetwork()
     {
-        DebugWindowMessaging.Clear();
         Debug.Log("\nPhotonRoom.PVShareAnchorNetwork()");
         Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
         if (PV != null)
