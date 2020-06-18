@@ -4,7 +4,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Domain
 {
     public class TrackedObject : TableEntity
     {
-        public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string ThumbnailBlobName { get; set; }

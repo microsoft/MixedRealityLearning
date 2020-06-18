@@ -130,6 +130,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             await Task.Delay(2500);
             indicator.Init(currentTrackedObject);
             var mockAnchorId = Guid.NewGuid().ToString();
+            currentTrackedObject.SpatialAnchorId = mockAnchorId;
             activeAnchors.Add(currentTrackedObject.SpatialAnchorId, indicator);
             OnCreateAnchorSucceeded?.Invoke(this, mockAnchorId);
             currentTrackedObject = null;
@@ -200,6 +201,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                     // Update the current Azure anchor ID
                     Debug.Log($"Current Azure anchor ID updated to '{currentCloudAnchor.Identifier}'");
 
+                    currentTrackedObject.SpatialAnchorId = currentTrackedObject.SpatialAnchorId;
                     activeAnchors.Add(currentTrackedObject.SpatialAnchorId, anchorPosition);
 
                     // Notify subscribers
