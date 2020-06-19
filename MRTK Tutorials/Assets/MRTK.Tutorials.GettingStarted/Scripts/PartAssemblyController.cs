@@ -6,11 +6,14 @@ namespace MRTK.Tutorials.GettingStarted
 {
     public class PartAssemblyController : MonoBehaviour
     {
-        private const float MinDistance = 0.01f;
+        [SerializeField] private Transform locationToPlace = default;
+
+        private const float MinDistance = 0.001f;
         private const float MaxDistance = 0.1f;
+
         private AudioSource audioSource;
+        private bool hasAudioSource;
         private bool isSnapped;
-        [SerializeField] private Transform locationToPlace;
         private ObjectManipulator objectManipulator;
         private Transform originalParent;
         private Vector3 originalPosition;
@@ -25,6 +28,9 @@ namespace MRTK.Tutorials.GettingStarted
             originalParent = trans.parent;
             originalPosition = trans.localPosition;
             originalRotation = trans.localRotation;
+
+            // Check if object has audio source
+            hasAudioSource = audioSource != null;
 
             // Start coroutine to continuously check if the object has been placed
             if (locationToPlace != null) StartCoroutine(CheckPlacement());
@@ -67,7 +73,7 @@ namespace MRTK.Tutorials.GettingStarted
                     trans.rotation = locationToPlace.rotation;
 
                     // Play audio snapping sound
-                    if (audioSource != null) audioSource.Play();
+                    if (hasAudioSource) audioSource.Play();
                 }
 
                 if (isSnapped && Vector3.Distance(transform.position, locationToPlace.position) > MinDistance)

@@ -5,13 +5,14 @@ namespace MRTK.Tutorials.GettingStarted
 {
     public class ExplodeViewController : MonoBehaviour
     {
-        private readonly List<Vector3> explodedPos = new List<Vector3>();
-        private readonly List<Vector3> startingPos = new List<Vector3>();
-        [SerializeField] private List<GameObject> defaultPositions;
-        [SerializeField] private List<GameObject> explodedPositions;
-        private bool isInDefaultPosition;
+        [SerializeField] private List<GameObject> defaultPositions = default;
+        [SerializeField] private List<GameObject> explodedPositions = default;
         [SerializeField] private float speed = 0.1f;
 
+        private readonly List<Vector3> explodedPos = new List<Vector3>();
+        private readonly List<Vector3> startingPos = new List<Vector3>();
+        private bool isInDefaultPosition;
+        
         private void Start()
         {
             // Capture the starting position and exploded position of the objects
