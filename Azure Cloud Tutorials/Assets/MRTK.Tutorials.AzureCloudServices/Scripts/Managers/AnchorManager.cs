@@ -201,7 +201,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                     // Update the current Azure anchor ID
                     Debug.Log($"Current Azure anchor ID updated to '{currentCloudAnchor.Identifier}'");
 
-                    currentTrackedObject.SpatialAnchorId = currentTrackedObject.SpatialAnchorId;
+                    currentTrackedObject.SpatialAnchorId = currentCloudAnchor.Identifier;
                     activeAnchors.Add(currentTrackedObject.SpatialAnchorId, anchorPosition);
 
                     // Notify subscribers

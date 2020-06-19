@@ -57,7 +57,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
 
         private void HandleDictation(string sentence)
         {
-            Debug.Log(sentence);
+            Debug.Log("Response from Bot: " + sentence);
             ReturnResponse(sentence);
         }
 
@@ -65,6 +65,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         {
             textToSpeechManager.SpeakText(response);
             onConversationFinished?.Invoke();
+            Debug.Log("Finished conversation with Bot.");
         }
     }
 }
