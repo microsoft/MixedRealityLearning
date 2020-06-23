@@ -48,6 +48,15 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         {
             // Subscribe to Azure Spatial Anchor events
             cloudManager.AnchorLocated += HandleAnchorLocated;
+            cloudManager.SessionUpdated += (sender, args) =>
+            {
+                Debug.Log($"Spatial Anchors Status Updated to: {args.Status}");
+            };
+            cloudManager.LogDebug += (sender, args) =>
+            {
+                Debug.Log($"CloudManager Debug: {args.Message}");
+            };
+            
             anchorPlacementController.OnIndicatorPlaced += HandleOnAnchorPlaced;
             anchorPlacementController.OnIndicatorCanceled += HandleOnAnchorPlacementCanceled;
             anchorArrowGuide.gameObject.SetActive(false);
@@ -242,7 +251,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             {
                 // Creates a new session if one does not exist
                 Debug.Log("\ncloudManager.CreateSessionAsync()");
-
                 await cloudManager.CreateSessionAsync();
             }
 
@@ -333,6 +341,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                 
                 // Notify subscribers
                 OnFindAnchorSucceeded?.Invoke(this, EventArgs.Empty);
+                currentWatcher?.Stop();
                 currentTrackedObject = null;
             }
             else

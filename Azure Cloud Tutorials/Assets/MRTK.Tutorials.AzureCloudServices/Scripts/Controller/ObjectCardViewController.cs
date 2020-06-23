@@ -111,6 +111,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         private void HandleOnAnchorFound(object sender, EventArgs e)
         {
+            Debug.Log("ObjectCardViewController.HandleOnAnchorFound");
             sceneController.AnchorManager.OnFindAnchorSucceeded -= HandleOnAnchorFound;
             SetButtonsInteractiveState(true);
         }
