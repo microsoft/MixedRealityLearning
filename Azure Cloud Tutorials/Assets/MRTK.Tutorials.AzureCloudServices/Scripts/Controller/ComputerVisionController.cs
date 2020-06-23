@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
@@ -39,6 +40,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private List<ImageThumbnail> imagesToCapture;
         private int currentImageIndex;
         private bool isWaitingForAirtap;
+        private bool isProcessingPhoto;
         
         private void Awake()
         {
@@ -64,8 +66,11 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         public async void StartPhotoCapture()
         {
-            if (isWaitingForAirtap)
+            Debug.Log("StartPhotoCapture");
+            if (isWaitingForAirtap || isProcessingPhoto)
             {
+                Debug.Log("isWaitingForAirtap || isProcessingPhoto");
+
                 return;
             }
             if (currentImageIndex == 6)
@@ -77,7 +82,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             isWaitingForAirtap = true;
             SetButtonsInteractiveState(false);
             messageLabel.text = "Do AirTap to take a photo.";
-            await Task.Delay(300);
         }
 
         public void DeleteCurrentPhoto()
@@ -162,7 +166,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         
         public void HandleOnPointerClick()
         {
-            if (isWaitingForAirtap)
+            if (isWaitingForAirtap && !isProcessingPhoto)
             {
                 CapturePhoto();
             }
@@ -170,17 +174,24 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         private async void CapturePhoto()
         {
+            isWaitingForAirtap = false;
+            if (isProcessingPhoto || currentImageIndex == 6)
+            {
+                SetButtonsInteractiveState(true);
+                return;
+            }
+            
+            isProcessingPhoto = true;
             currentImageIndex++;
-
             messageLabel.text = "Taking photo, stand still.";
             var imageThumbnail = await sceneController.TakePhotoWithThumbnail();
             var sprite = imageThumbnail.Texture.CreateSprite();
             images[currentImageIndex].sprite = sprite;
             previewImage.sprite = sprite;
             messageLabel.text = "";
-            
             imagesToCapture.Add(imageThumbnail);
-            isWaitingForAirtap = false;
+            Debug.Log("Taking photo done.");
+            isProcessingPhoto = false;
             SetButtonsInteractiveState(true);
         }
         

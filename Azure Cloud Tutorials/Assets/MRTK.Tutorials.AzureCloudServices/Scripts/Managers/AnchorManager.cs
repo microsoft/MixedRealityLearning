@@ -5,6 +5,7 @@ using Microsoft.Azure.SpatialAnchors;
 using Microsoft.Azure.SpatialAnchors.Unity;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Controller;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
+using MRTK.Tutorials.AzureCloudServices.Scripts.Utilities;
 using MRTK.Tutorials.AzureCloudServices.Scripts.UX;
 using UnityEngine;
 
@@ -144,22 +145,26 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             if (cloudManager.Session == null)
             {
                 // Creates a new session if one does not exist
+                Debug.Log("await cloudManager.CreateSessionAsync()");
                 await cloudManager.CreateSessionAsync();
             }
 
             // Starts the session if not already started
+            Debug.Log("await cloudManager.StartSessionAsync()");
             await cloudManager.StartSessionAsync();
             
             var anchorPosition = Instantiate(anchorPositionPrefab, indicatorTransform.position, indicatorTransform.rotation);
 
             // Create native XR anchor at the location of the object
             anchorPosition.gameObject.CreateNativeAnchor();
+            Debug.Log("anchorPosition.gameObject.CreateNativeAnchor()");
 
             // Create local cloud anchor
             var localCloudAnchor = new CloudSpatialAnchor();
 
             // Set the local cloud anchor's position to the native XR anchor's position
             localCloudAnchor.LocalAnchor = anchorPosition.gameObject.FindNativeAnchor().GetPointer();
+            Debug.Log("anchorPosition.gameObject.FindNativeAnchor().GetPointer()");
 
             // Check to see if we got the local XR anchor pointer
             if (localCloudAnchor.LocalAnchor == IntPtr.Zero)
@@ -182,6 +187,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                 var createProgress = cloudManager.SessionStatus.RecommendedForCreateProgress;
                 UnityDispatcher.InvokeOnAppThread(() => Debug.Log($"Move your device to capture more environment data: {createProgress:0%}"));
             }
+            Debug.Log("cloudManager is ready.");
 
             try
             {
@@ -228,25 +234,30 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         private async void FindAsaAnchor()
         {
             Debug.Log("\nAnchorManager.FindAsaAnchor()");
+            
+            Debug.Log("\nanchorCreationController.StartProgressIndicatorSession()");
             anchorCreationController.StartProgressIndicatorSession();
 
             if (cloudManager.Session == null)
             {
                 // Creates a new session if one does not exist
+                Debug.Log("\ncloudManager.CreateSessionAsync()");
+
                 await cloudManager.CreateSessionAsync();
             }
 
             // Starts the session if not already started
+            Debug.Log("\ncloudManager.StartSessionAsync()");
             await cloudManager.StartSessionAsync();
 
             // Create list of anchor IDs to locate
-            var anchorsToFind = new List<string> { currentTrackedObject.SpatialAnchorId };
-
-            anchorLocateCriteria = new AnchorLocateCriteria { Identifiers = anchorsToFind.ToArray() };
+            Debug.Log($"Trying to finding object {currentTrackedObject.Name} with anchor-id {currentTrackedObject.SpatialAnchorId}");
+            anchorLocateCriteria = new AnchorLocateCriteria { Identifiers = new []{ currentTrackedObject.SpatialAnchorId } };
 
             // Start watching for Anchors
             if (cloudManager != null && cloudManager.Session != null)
             {
+                Debug.Log("\ncurrentWatcher = cloudManager.Session.CreateWatcher(anchorLocateCriteria)");
                 currentWatcher = cloudManager.Session.CreateWatcher(anchorLocateCriteria);
             }
             else
