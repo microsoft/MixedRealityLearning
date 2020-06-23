@@ -296,7 +296,7 @@ namespace Photon.Pun
         }
 
         // PHOTONVIEW/RPC related
-
+#pragma warning disable 0414
         private static readonly Type typePunRPC = typeof(PunRPC);
         private static readonly Type typePhotonMessageInfo = typeof(PhotonMessageInfo);
         private static readonly object keyByteZero = (byte)0;
@@ -310,6 +310,7 @@ namespace Photon.Pun
         private static readonly object keyByteEight = (byte)8;
         private static readonly object[] emptyObjectArray = new object[0];
         private static readonly Type[] emptyTypeArray = new Type[0];
+#pragma warning restore 0414
 
         /// <summary>
         /// Executes a received RPC event
@@ -867,24 +868,25 @@ namespace Photon.Pun
         {
             PhotonView result = null;
             photonViewList.TryGetValue(viewID, out result);
+            
+            /// Removed aggressive find that likely had no real use case, and was expensive.
+            //if (result == null)
+            //{
+            //    PhotonView[] views = GameObject.FindObjectsOfType(typeof(PhotonView)) as PhotonView[];
 
-            if (result == null)
-            {
-                PhotonView[] views = GameObject.FindObjectsOfType(typeof(PhotonView)) as PhotonView[];
-
-                for (int i = 0; i < views.Length; i++)
-                {
-                    PhotonView view = views[i];
-                    if (view.ViewID == viewID)
-                    {
-                        if (view.didAwake)
-                        {
-                            Debug.LogWarning("Had to lookup view that wasn't in photonViewList: " + view);
-                        }
-                        return view;
-                    }
-                }
-            }
+            //    for (int i = 0; i < views.Length; i++)
+            //    {
+            //        PhotonView view = views[i];
+            //        if (view.ViewID == viewID)
+            //        {
+            //            if (view.didAwake)
+            //            {
+            //                Debug.LogWarning("Had to lookup view that wasn't in photonViewList: " + view);
+            //            }
+            //            return view;
+            //        }
+            //    }
+            //}
 
             return result;
         }
@@ -2166,7 +2168,7 @@ namespace Photon.Pun
                     int requestedFromOwnerId = requestValues[1];
 
 
-                    PhotonView requestedView = PhotonView.Find(requestedViewId);
+                    PhotonView requestedView = GetPhotonView(requestedViewId);
                     if (requestedView == null)
                     {
                         Debug.LogWarning("Can't find PhotonView of incoming OwnershipRequest. ViewId not found: " + requestedViewId);
@@ -2235,7 +2237,7 @@ namespace Photon.Pun
                     }
 
 
-                    PhotonView requestedView = PhotonView.Find(requestedViewId);
+                    PhotonView requestedView = GetPhotonView(requestedViewId);
                     if (requestedView != null)
                     {
                         int currentPvOwnerId = requestedView.OwnerActorNr;

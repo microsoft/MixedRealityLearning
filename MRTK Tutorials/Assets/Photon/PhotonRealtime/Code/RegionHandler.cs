@@ -353,11 +353,7 @@ namespace Photon.Realtime
 
             if (ping == null)
             {
-                if (RegionHandler.PingImplementation == null)
-                {
-                    ping = new PingMono();
-                }
-                else
+                if (RegionHandler.PingImplementation != null)
                 {
                     ping = (PhotonPing)Activator.CreateInstance(RegionHandler.PingImplementation);
                 }

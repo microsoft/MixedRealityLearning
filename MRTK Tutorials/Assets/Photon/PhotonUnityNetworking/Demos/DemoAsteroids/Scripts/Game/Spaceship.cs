@@ -29,9 +29,11 @@ namespace Photon.Pun.Demo.Asteroids
 
         private PhotonView photonView;
 
+#pragma warning disable 0109
         private new Rigidbody rigidbody;
         private new Collider collider;
         private new Renderer renderer;
+#pragma warning restore 0109
 
         private float rotation = 0.0f;
         private float acceleration = 0.0f;
@@ -158,7 +160,7 @@ namespace Photon.Pun.Demo.Asteroids
             GameObject bullet;
 
             /** Use this if you want to fire one bullet at a time **/
-            bullet = Instantiate(BulletPrefab, rigidbody.position, Quaternion.identity) as GameObject;
+            bullet = Instantiate(BulletPrefab, position, Quaternion.identity) as GameObject;
             bullet.GetComponent<Bullet>().InitializeBullet(photonView.Owner, (rotation * Vector3.forward), Mathf.Abs(lag));
 
 

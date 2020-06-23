@@ -4,6 +4,23 @@ Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
 
+Version 4.1.4.1 (30. April 2020 - rev5482)
+	Fixed: String serialization for characters with more bytes. UTF8.GetBytes was called with byte-count instead of character-count as parameter.
+Version 4.1.4.0 (28. April 2020 - rev5474)
+    Internal: Changed serialization of strings to produce no memory garbage. Strings that exceed a UTF8-encoded byte-length of 32767 (short.MaxValue) are not supported in either protocol (now throwing an exception).
+    Internal: Improved the serialization of float, double, float-array and double-array to produce less memory garbage with better performance.
+    Fixed: Cross platform serialization of float and double values in protocol 1.8 (which is used by default by PUN 2). Undiscovered, the C# client was using a wrong byte-order for network. The server and native clients were receiving a wrong value. Between C# clients, everything was fine.
+    Added: WebSocket support built-in to the Metro / UWP assembly. The PhotonMessageWebSocket is automatically used, unless some override is defined externally.
+    Changed: The socket implementations now disconnect when an exception happens due to sending. This uses the StatusCode.SendError, reported via OnStatusChanged callback. The LoadBalancingClient will handle this and report a DisconnectCause.Exception. Careful when updating only the library: Handle this in LoadBalancingClient.
+    Changed: The internal exception logging is now in log level INFO. This means the handled exception is no longer logged as if it's not.
+    Internal: Reverted to using the datagram encryption API v1. The new one is not fully implemented and should not be used yet (but was in v4.1.3.0).
+	Fixed: If a timeout message arrives after the client disconnected locally, the timeout is neither reported (via OnStatusChanged) nor does it trigger (another) disconnect. This avoids rare issues where clients would get stuck in Disconnecting state.
+	Added: Initial changes to support proxies for WSS. The PhotonPeer got a Connect overload which sets the proxy address and the IPhotonSocket got ProxyServerAddress. Higher level changes are upcoming.
+	Fixed: When the StreamBuffer for a large message got fragmented, this goes back to the StreamBuffer pool.
+	Changed: ExecuteCommand() for fragments. We now use a StreamBuffer from the pool and only adjust the buffered size if needed.
+	Added: Static PhotonPeer.MessageBufferPoolSize() to have access to the current StreamBuffer pool size.
+
+
 Version 4.1.3.0 (23. March 2020 - rev5399)
     Internal: Changed Visual Studio projects which build the C# Photon libraries. Added a .Net Standard 2.0 assembly, which has built-in WebSocket support.
     Added: IPhotonSocket.SerializationProtocol property. This provides the protocol of the current PhotonPeer.SerializationProtocolType as string.
@@ -16,7 +33,6 @@ Version 4.1.3.0 (23. March 2020 - rev5399)
     Internal: Datagram Encryption now has a new mode: GCM. It can be used seamlessly with the Photon Cloud.
     Internal: Native Datagram Encryption plugins and APIs are now more efficient.
     Removed: rHttp support.
-
 
 Version 4.1.2.20 (12. December 2019 - rev5296)
     Changed: DiffieHellmanCryptoProviderNative is now always compiled into the assembly using dynamic linking. If the payload encryption native library is present, it will be used automatically.

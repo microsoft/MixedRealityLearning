@@ -282,12 +282,15 @@ namespace Photon.Realtime
         /// <summary>Defines how the communication gets encrypted.</summary>
         public EncryptionMode EncryptionMode = EncryptionMode.PayloadEncryption;
 
-        /// <summary>The protocol which will be used on Master- and GameServer.</summary>
+        /// <summary>Optionally contains a protocol which will be used on Master- and GameServer. </summary>
         /// <remarks>
         /// When using AuthMode = AuthModeOption.AuthOnceWss, the client uses a wss-connection on the NameServer but another protocol on the other servers.
         /// As the NameServer sends an address, which is different per protocol, it needs to know the expected protocol.
+        ///
+        /// This is nullable by design. In many cases, the protocol on the NameServer is not different from the other servers.
+        /// If set, the operation AuthOnce will contain this value and the OpAuth response on the NameServer will execute a protocol switch.
         /// </remarks>
-        public ConnectionProtocol ExpectedProtocol = ConnectionProtocol.Udp;
+        public ConnectionProtocol? ExpectedProtocol { get; private set; }
 
 
         ///<summary>Simplifies getting the token for connect/init requests, if this feature is enabled.</summary>
@@ -806,7 +809,7 @@ namespace Photon.Realtime
                 this.Server = ServerConnection.MasterServer;
                 int portToUse = appSettings.IsDefaultPort ? 5055 : appSettings.Port;    // TODO: setup new (default) port config
                 this.MasterServerAddress = string.Format("{0}:{1}", appSettings.Server, portToUse);
-                //this.SerializationProtocol = SerializationProtocol.GpBinaryV16; // this is a workaround to use On Premises Servers, which don't support GpBinaryV18 yet.
+                this.SerializationProtocol = SerializationProtocol.GpBinaryV16; // this is a workaround to use On Premises Servers, which don't support GpBinaryV18 yet.
                 if (!this.LoadBalancingPeer.Connect(this.MasterServerAddress, this.AppId, this.TokenForInit))
                 {
                     return false;
@@ -850,7 +853,7 @@ namespace Photon.Realtime
             if (string.IsNullOrEmpty(this.AppId) || !this.IsUsingNameServer)
             {
                 // this is a workaround to use with version v4.0.29.11263 or lower, which doesn't support GpBinaryV18 yet.
-                //this.SerializationProtocol = SerializationProtocol.GpBinaryV16;
+                this.SerializationProtocol = SerializationProtocol.GpBinaryV16;
             }
 
             this.connectToBestRegion = false;
@@ -885,13 +888,11 @@ namespace Photon.Realtime
 
             if (this.AuthMode == AuthModeOption.AuthOnceWss)
             {
-                this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
+                if (this.ExpectedProtocol == null)
+                {
+                    this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
+                }
                 this.LoadBalancingPeer.TransportProtocol = ConnectionProtocol.WebSocketSecure;
-            }
-            else if (this.AuthMode == AuthModeOption.AuthOnce)
-            {
-                //Debug.LogWarning("Setting expected to current: "+this.LoadBalancingPeer.TransportProtocol);
-                this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
             }
 
             this.connectToBestRegion = false;
@@ -943,12 +944,11 @@ namespace Photon.Realtime
 
             if (this.AuthMode == AuthModeOption.AuthOnceWss)
             {
-                this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
+                if (this.ExpectedProtocol == null)
+                {
+                    this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
+                }
                 this.LoadBalancingPeer.TransportProtocol = ConnectionProtocol.WebSocketSecure;
-            }
-            else if (this.AuthMode == AuthModeOption.AuthOnce)
-            {
-                this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
             }
 
             this.connectToBestRegion = false;
@@ -1146,7 +1146,9 @@ namespace Photon.Realtime
                 {
                     return false;
                 }
-                return this.LoadBalancingPeer.OpAuthenticateOnce(this.AppId, this.AppVersion, this.AuthValues, this.CloudRegion, this.EncryptionMode, this.ExpectedProtocol);
+
+                ConnectionProtocol targetProtocolPastNameServer = this.ExpectedProtocol != null ? (ConnectionProtocol) this.ExpectedProtocol : this.LoadBalancingPeer.TransportProtocol;
+                return this.LoadBalancingPeer.OpAuthenticateOnce(this.AppId, this.AppVersion, this.AuthValues, this.CloudRegion, this.EncryptionMode, targetProtocolPastNameServer);
             }
         }
 
@@ -2234,6 +2236,11 @@ namespace Photon.Realtime
                 }
                 return false;
             }
+            if (this.LoadBalancingPeer.PeerState != PeerStateValue.Connected)
+            {
+                this.DebugReturn(DebugLevel.ERROR, string.Format("Operation {0} ({1}) can't be sent because peer is not connected, peer state: {2}", opName, opCode, this.LoadBalancingPeer.PeerState));
+                return false;
+            }
             return true;
         }
 
@@ -2437,10 +2444,11 @@ namespace Photon.Realtime
                                 this.MasterServerAddress = this.MasterServerAddress.Replace("5058", "27000").Replace("5055", "27001").Replace("5056", "27002");
                             }
 
-                            if (this.AuthMode == AuthModeOption.AuthOnceWss)
+                            if (this.AuthMode == AuthModeOption.AuthOnceWss && this.ExpectedProtocol != null)
                             {
-                                this.DebugReturn(DebugLevel.INFO, string.Format("Due to AuthOnceWss, switching TransportProtocol to ExpectedProtocol: {0}.", this.ExpectedProtocol));
-                                this.LoadBalancingPeer.TransportProtocol = this.ExpectedProtocol;
+                                this.DebugReturn(DebugLevel.INFO, string.Format("AuthOnceWss mode. Auth response switches TransportProtocol to ExpectedProtocol: {0}.", this.ExpectedProtocol));
+                                this.LoadBalancingPeer.TransportProtocol = (ConnectionProtocol)this.ExpectedProtocol;
+                                this.ExpectedProtocol = null;
                             }
                             this.DisconnectToReconnect();
                         }
@@ -2749,16 +2757,22 @@ namespace Photon.Realtime
 
                 case StatusCode.Disconnect:
                     // disconnect due to connection exception is handled below (don't connect to GS or master in that case)
-
-                    this.ChangeLocalID(-1);
                     this.friendListRequested = null;
 
                     bool wasInRoom = this.CurrentRoom != null;
                     this.CurrentRoom = null;    // players get cleaned up inside this, too, except LocalPlayer (which we keep)
+                    this.ChangeLocalID(-1);     // depends on this.CurrentRoom, so it must be called after updating that
 
                     if (this.Server == ServerConnection.GameServer && wasInRoom)
                     {
                         this.MatchMakingCallbackTargets.OnLeftRoom();
+                    }
+
+                    if (this.ExpectedProtocol != null)
+                    {
+                        this.DebugReturn(DebugLevel.INFO, string.Format("AuthOnceWss mode. On disconnect switches TransportProtocol to ExpectedProtocol: {0}.", this.ExpectedProtocol));
+                        this.LoadBalancingPeer.TransportProtocol = (ConnectionProtocol)this.ExpectedProtocol;
+                        this.ExpectedProtocol = null;
                     }
 
                     switch (this.State)
@@ -2817,6 +2831,7 @@ namespace Photon.Realtime
                     break;
                 case StatusCode.Exception:
                 case StatusCode.ExceptionOnReceive:
+                case StatusCode.SendError:
                     this.DisconnectedCause = DisconnectCause.Exception;
                     this.State = ClientState.Disconnecting;
                     break;
@@ -2914,6 +2929,7 @@ namespace Photon.Realtime
                         }
                         else
                         {
+                            originatingPlayer.IsInactive = false;
                             this.CurrentRoom.RemovePlayer(actorNr);
                         }
                     }
@@ -2928,7 +2944,7 @@ namespace Photon.Realtime
                         }
                     }
                     // finally, send notification that a player left
-                    this.InRoomCallbackTargets.OnPlayerLeftRoom(originatingPlayer); // TODO: make sure it's clear how to separate "inactive"- from "abandon"-leave, as well as kicked out
+                    this.InRoomCallbackTargets.OnPlayerLeftRoom(originatingPlayer);
                     break;
 
                 case EventCode.PropertiesChanged:
@@ -3053,69 +3069,41 @@ namespace Photon.Realtime
 
         /// <summary>
         /// This operation makes Photon call your custom web-service by path/name with the given parameters (converted into Json).
+        /// Use <see cref="IWebRpcCallback.OnWebRpcResponse"/> as a callback.
         /// </summary>
         /// <remarks>
         /// A WebRPC calls a custom, http-based function on a server you provide. The uriPath is relative to a "base path"
         /// which is configured server-side. The sent parameters get converted from C# types to Json. Vice versa, the response
         /// of the web-service will be converted to C# types and sent back as normal operation response.
         ///
-        ///
         /// To use this feature, you have to setup your server:
         ///
         /// For a Photon Cloud application, <a href="https://doc.photonengine.com/en-us/realtime/current/reference/webhooks">
         /// visit the Dashboard </a> and setup "WebHooks". The BaseUrl is used for WebRPCs as well.
         ///
-        ///
-        /// The response by Photon will call OnOperationResponse() with Code: OperationCode.WebRpc.
-        /// To get this response, you can derive the LoadBalancingClient, or (much easier) you set a suitable
-        /// OnOpResponseAction to be called.
-        ///
-        ///
-        /// It's important to understand that the OperationResponse tells you if the WebRPC could be called or not
-        /// but the content of the response will contain the values the web-service sent (if any).
-        /// If the web-service could not execute the request, it might return another error and a message. This is
-        /// inside the OperationResponse.
-        ///
-        /// The class WebRpcResponse is a helper-class that extracts the most valuable content from the WebRPC
+        /// The class <see cref="WebRpcResponse"/> is a helper-class that extracts the most valuable content from the WebRPC
         /// response.
         /// </remarks>
-        /// <example>
-        /// To get a WebRPC response, set a OnOpResponseAction:
-        ///
-        ///     this.OnOpResponseAction = this.OpResponseHandler;
-        ///
-        /// It could look like this:
-        ///
-        ///     public void OpResponseHandler(OperationResponse operationResponse)
-        ///     {
-        ///         if (operationResponse.OperationCode == OperationCode.WebRpc)
-        ///         {
-        ///             if (operationResponse.ReturnCode != 0)
-        ///             {
-        ///                 Console.WriteLine("WebRpc failed. Response: " + operationResponse.ToStringFull());
-        ///             }
-        ///             else
-        ///             {
-        ///                 WebRpcResponse webResponse = new WebRpcResponse(operationResponse);
-        ///                 Console.WriteLine(webResponse.DebugMessage);    // message from the webserver
-        ///
-        ///                 // do something with the response...
-        ///             }
-        ///         }
-        ///     }
-        /// </example>
         /// <param name="uriPath">The url path to call, relative to the baseUrl configured on Photon's server-side.</param>
         /// <param name="parameters">The parameters to send to the web-service method.</param>
         /// <param name="sendAuthCookie">Defines if the authentication cookie gets sent to a WebHook (if setup).</param>
         public bool OpWebRpc(string uriPath, object parameters, bool sendAuthCookie = false)
         {
+            if (string.IsNullOrEmpty(uriPath))
+            {
+                this.DebugReturn(DebugLevel.ERROR, "WebRPC method name must not be null nor empty.");
+                return false;
+            }
             if (!this.CheckIfOpCanBeSent(OperationCode.WebRpc, this.Server, "WebRpc"))
             {
                 return false;
             }
             Dictionary<byte, object> opParameters = new Dictionary<byte, object>();
             opParameters.Add(ParameterCode.UriPath, uriPath);
-            opParameters.Add(ParameterCode.WebRpcParameters, parameters);
+            if (parameters != null)
+            {
+                opParameters.Add(ParameterCode.WebRpcParameters, parameters);
+            }
             if (sendAuthCookie)
             {
                 opParameters.Add(ParameterCode.EventForward, WebFlags.SendAuthCookieConst);
@@ -3613,6 +3601,63 @@ namespace Photon.Realtime
         /// Please note: Class OperationResponse is in a namespace which needs to be "used":<br/>
         /// using ExitGames.Client.Photon;  // includes OperationResponse (and other classes)
         /// </remarks>
+        /// <example>
+        /// public void OnWebRpcResponse(OperationResponse response)
+        /// {
+        ///    Debug.LogFormat("WebRPC operation response {0}", response.ToStringFull());
+        ///    switch (response.ReturnCode)
+        ///    {
+        ///        case ErrorCode.Ok:
+        ///            WebRpcResponse webRpcResponse = new WebRpcResponse(response);
+        ///            Debug.LogFormat("Parsed WebRPC response {0}", response.ToStringFull());
+        ///            if (string.IsNullOrEmpty(webRpcResponse.Name))
+        ///            {
+        ///                Debug.LogError("Unexpected: WebRPC response did not contain WebRPC method name");
+        ///            }
+        ///            if (webRpcResponse.ResultCode == 0) // success
+        ///            {
+        ///                switch (webRpcResponse.Name)
+        ///                {
+        ///                    // todo: add your code here
+        ///                 case GetGameListWebRpcMethodName: // example
+        ///                    // ...
+        ///                    break;
+        ///             }
+        ///            }
+        ///            else if (webRpcResponse.ResultCode == -1)
+        ///            {
+        ///                Debug.LogErrorFormat("Web server did not return ResultCode for WebRPC method=\"{0}\", Message={1}", webRpcResponse.Name, webRpcResponse.Message);
+        ///            }
+        ///            else
+        ///            {
+        ///                Debug.LogErrorFormat("Web server returned ResultCode={0} for WebRPC method=\"{1}\", Message={2}", webRpcResponse.ResultCode, webRpcResponse.Name, webRpcResponse.Message);
+        ///            }
+        ///            break;
+        ///        case ErrorCode.ExternalHttpCallFailed: // web service unreachable
+        ///            Debug.LogErrorFormat("WebRPC call failed as request could not be sent to the server. {0}", response.DebugMessage);
+        ///            break;
+        ///        case ErrorCode.HttpLimitReached: // too many WebRPCs in a short period of time
+        ///                                         // the debug message should contain the limit exceeded
+        ///           Debug.LogErrorFormat("WebRPCs rate limit exceeded: {0}", response.DebugMessage);
+        ///            break;
+        ///       case ErrorCode.InvalidOperation: // WebRPC not configured at all OR not configured properly OR trying to send on name server
+        ///          if (PhotonNetwork.Server == ServerConnection.NameServer)
+        ///         {
+        ///             Debug.LogErrorFormat("WebRPC not supported on NameServer. {0}", response.DebugMessage);
+        ///         }
+        ///         else
+        ///         {
+        ///             Debug.LogErrorFormat("WebRPC not properly configured or not configured at all. {0}", response.DebugMessage);
+        ///         }
+        ///         break;
+        ///     default:
+        ///         // other unknown error, unexpected
+        ///         Debug.LogErrorFormat("Unexpected error, {0} {1}", response.ReturnCode, response.DebugMessage);
+        ///         break;
+        ///  }
+        /// }
+        ///
+        /// </example>
         void OnWebRpcResponse(OperationResponse response);
     }
 

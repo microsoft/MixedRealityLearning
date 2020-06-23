@@ -1,8 +1,28 @@
 PUN 2 Change Log
 
 
-v2.17.1 (28. March 2020)
-Fixed: PunVersion to "2.17". Was still "2.16". Of course you can edit this instead of re-downloading.
+v2.18.1 (30. April 2020)
+Fixed: String serialization issue in the Photon3Unity3d.dll (v4.1.4.0). Updated to Photon3Unity3d.dll (v4.1.4.1).
+v2.18 (28. April 2020)
+Fixed: Support for Unity 2019.3. As Unity 2020 is still beta, there may be more import / build issues. Please report via mail.
+Note: We noticed upgrading projects may create more than one PhotonServerSettings file. If your AppId seems gone, look up these files and keep the one with settings.
+Fixed: Asteroid Demo bullet instantation uses the position sent via the rpc, instead of the current local position.
+Updated: Nicer format for the countdown utility script to avoid floating points.
+Fixed: NullReferenceExceptions in PhotonTeamsManager.OnPlayerEnteredRoom and PhotonTeamsManager.OnPlayerLeftRoom.
+Added: PhotonTeamsManager.GetTeamMembersCount which is a helper method to get size of teams directly.
+Fixed: Photon teams extension methods for team assignment now rely only on Player.SetCustomProperties.
+Fixed: Removed obsolete usage of GuiLayer Components in demos for compatibility with Unity 2019.3 onwards.
+Fixed: Some warnings that Unity was showing on build.
+Changed: The checks before sending operations. As long as the peer is switching servers, there is no connection and operations can not be sent. This is logged better.
+Added: Logging of OnJoinRoomFailed to SupportLogger.
+Changed: StripKeysWithNullValues to reuse a list of key with null-values. This causes less allocations and garbage to clean.
+Fixed: Setting the serialization protocol for connections that directly go to the Master Server. This was broken in v2.17 by accident.
+Changed: The assembly PhotonWebsocket (WebSocket folder) will no longer export to UWP / Windows Store builds, even if the compile define WEBSOCKET is set. It is simply incompatible with the platform.
+Changed: LoadBalancingPeer.ConfigUnitySockets() will not set the UDP/TCP sockets for Windows Store builds.
+Changed: RegionHandler.GetPingImplementation will no longer use PingMono class, unless it is defined by some platform-specific code.
+Updated: The Realtime API and Photon3Unity3d.dll (v4.1.4.0) with lots of improvements and changes. Check the respective changelogs.
+
+
 v2.17 (26. March 2020)
 Added: New "Dev Region" feature. With this setting, all development builds will use the same region, avoiding initial matchmaking problems with best region selection. Development builds are turned on automatically, when the PhotonServerSettings get created initially and the "Dev Region" is set on first run in Editor.
 Changed: PhotonServerSettings inspector to accomodate the new values and reorganize existing ones.
@@ -11,6 +31,7 @@ Added: New animations for the Basics Tutorial. The previous ones were causing wa
 Added: New callback OnErrorInfo when the client receives an ErrorInfo event from the server. Implemented in MonoBehaviourPunCallbacks and SupportLogger.
 Changed: PhotonNetwork.SetPlayerCustomProperties return bool instead of void.
 Internal: ObjectsInOneUpdate will now initialize the capacity of a SerializeViewBatch.
+Removed: Metro folder and dlls. Unity deprecated builds for Windows 8.x Store, which means PUN can't support this anymore. Windows 10 UWP builds are supported using IL2CPP and the regular managed Photon dlls.
 Fixed: Unity Cloud Builds. A check prevents creation of ServerSettings when using Cloud Build.
 Internal: The PhotonEditor can now define a "customToken" for the AccountService registrations.
 Changed: Utility script OnJoinedInstantiate. It is now more versatile.
