@@ -19,9 +19,9 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
     [SerializeField]
     GameObject photonUserPrefab = default;
     [SerializeField]
-    GameObject rocketLauncherPrefab = default;
+    GameObject roverExplorerPrefab = default;
     [SerializeField]
-    Transform rocketLauncherLocation = default;
+    Transform roverExplorerLocation = default;
 
     private GameObject module;
     private Vector3 moduleLocation = Vector3.zero;
@@ -65,9 +65,9 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
             {
                 pool.ResourceCache.Add(photonUserPrefab.name, photonUserPrefab);
             }
-            if (rocketLauncherPrefab != null)
+            if (roverExplorerPrefab != null)
             {
-                pool.ResourceCache.Add(rocketLauncherPrefab.name, rocketLauncherPrefab);
+                pool.ResourceCache.Add(roverExplorerPrefab.name, roverExplorerPrefab);
             }
         }
     }
@@ -117,12 +117,12 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     void CreateInteractableObjects()
     {
-        GameObject go = PhotonNetwork.Instantiate(rocketLauncherPrefab.name, rocketLauncherLocation.position, rocketLauncherLocation.rotation);
+        GameObject go = PhotonNetwork.Instantiate(roverExplorerPrefab.name, roverExplorerLocation.position, roverExplorerLocation.rotation);
     }
 
     private void CreateMainLunarModule()
     {
-        module = PhotonNetwork.Instantiate(rocketLauncherPrefab.name, Vector3.zero, Quaternion.identity);
+        module = PhotonNetwork.Instantiate(roverExplorerPrefab.name, Vector3.zero, Quaternion.identity);
         PV.RPC("Rpc_SetModuleParent", RpcTarget.AllBuffered);
     }
 
