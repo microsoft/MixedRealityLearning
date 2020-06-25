@@ -301,7 +301,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             // Stop any existing session
             cloudManager.StopSession();
         }
-        
+
         #region EVENT HANDLERS
         private void HandleAnchorLocated(object sender, AnchorLocatedEventArgs args)
         {
@@ -310,39 +310,43 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             if (args.Status == LocateAnchorStatus.Located || args.Status == LocateAnchorStatus.AlreadyTracked)
             {
                 currentCloudAnchor = args.Anchor;
-                Debug.Log($"Azure anchor located successfully");
-                var indicator = Instantiate(anchorPositionPrefab);
+
+                AppDispatcher.Instance().Enqueue(() =>
+                {
+                    Debug.Log($"Azure anchor located successfully");
+                    var indicator = Instantiate(anchorPositionPrefab);
 
 #if WINDOWS_UWP || UNITY_WSA
-                indicator.gameObject.CreateNativeAnchor();
+                    indicator.gameObject.CreateNativeAnchor();
 
-                if (currentCloudAnchor == null)
-                {
-                    return;
-                }
-                Debug.Log("Local anchor position successfully set to Azure anchor position");
+                    if (currentCloudAnchor == null)
+                    {
+                        return;
+                    }
+                    Debug.Log("Local anchor position successfully set to Azure anchor position");
 
-                indicator.GetComponent<UnityEngine.XR.WSA.WorldAnchor>().SetNativeSpatialAnchorPtr(currentCloudAnchor.LocalAnchor);
+                    indicator.GetComponent<UnityEngine.XR.WSA.WorldAnchor>().SetNativeSpatialAnchorPtr(currentCloudAnchor.LocalAnchor);
 #elif UNITY_ANDROID || UNITY_IOS
-                Pose anchorPose = Pose.identity;
-                anchorPose = currentCloudAnchor.GetPose();
+                    Pose anchorPose = Pose.identity;
+                    anchorPose = currentCloudAnchor.GetPose();
 
-                Debug.Log($"Setting object to anchor pose with position '{anchorPose.position}' and rotation '{anchorPose.rotation}'");
-                indicator.transform.position = anchorPose.position;
-                indicator.transform.rotation = anchorPose.rotation;
+                    Debug.Log($"Setting object to anchor pose with position '{anchorPose.position}' and rotation '{anchorPose.rotation}'");
+                    indicator.transform.position = anchorPose.position;
+                    indicator.transform.rotation = anchorPose.rotation;
 
-                // Create a native anchor at the location of the object in question
-                indicator.gameObject.CreateNativeAnchor();
+                    // Create a native anchor at the location of the object in question
+                    indicator.gameObject.CreateNativeAnchor();
 #endif
-                
-                indicator.Init(currentTrackedObject);
-                anchorArrowGuide.SetTargetObject(indicator.transform);
-                activeAnchors.Add(currentTrackedObject.SpatialAnchorId, indicator);
-                
-                // Notify subscribers
+
+                    indicator.Init(currentTrackedObject);
+                    anchorArrowGuide.SetTargetObject(indicator.transform);
+                    activeAnchors.Add(currentTrackedObject.SpatialAnchorId, indicator);
+
+                    // Notify subscribers
                 OnFindAnchorSucceeded?.Invoke(this, EventArgs.Empty);
                 currentWatcher?.Stop();
                 currentTrackedObject = null;
+                });
             }
             else
             {
