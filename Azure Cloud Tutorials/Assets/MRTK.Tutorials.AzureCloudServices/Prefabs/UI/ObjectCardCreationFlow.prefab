@@ -14280,6 +14280,7 @@ GameObject:
   - component: {fileID: 6632923345564603732}
   - component: {fileID: 6632923345564603731}
   - component: {fileID: 8957881040764041251}
+  - component: {fileID: 2624913956457047360}
   m_Layer: 0
   m_Name: ObjectCardCreationFlow
   m_TagString: Untagged
@@ -14346,7 +14347,7 @@ MonoBehaviour:
   rotateLerpTime: 0.5
   scaleLerpTime: 0
   maintainScale: 1
-  smoothing: 1
+  smoothing: 0
   lifetime: 0
   referenceDirection: 1
   minDistance: 0.3
@@ -14484,8 +14485,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95875ef546b0c342b3b070b005a8237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneManager: {fileID: 0}
+  sceneController: {fileID: 0}
   computerVisionController: {fileID: 0}
+  hintTextPrefab: {fileID: 2724388207980783899, guid: 596b643b410f19a4a96ba8d0febf7963,
+    type: 3}
   objectNameLabel: {fileID: 379678180907323747}
   messageLabel: {fileID: 7218065651223894023}
   descriptionInputField: {fileID: 2743674255253274498}
@@ -14498,6 +14501,44 @@ MonoBehaviour:
   - {fileID: 1393170505193317481}
   - {fileID: 1393170503618067139}
   - {fileID: 619990567994283620}
+  - {fileID: 9187147470808059105}
+--- !u!114 &2624913956457047360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6632923345564603730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7e736ec19b1c5543a9bb27c150f94fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isFocusRequired: 0
+  MarkEventsAsUsed: 0
+  OnPointerDown:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPointerUp:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPointerClicked:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8957881040764041251}
+        m_MethodName: HandleOnPointerClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnPointerDragged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &6632923345615241382
 GameObject:
   m_ObjectHideFlags: 0
@@ -14592,8 +14633,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 0.99999994, z: 1}
-  m_Center: {x: 0.00000004856583, y: 0, z: 3.0616168e-17}
+  m_Size: {x: 1, y: 0.99999994, z: 0.67037606}
+  m_Center: {x: 0.000000036379788, y: 0, z: 0.1648116}
 --- !u!114 &6632923345615241402
 MonoBehaviour:
   m_ObjectHideFlags: 0

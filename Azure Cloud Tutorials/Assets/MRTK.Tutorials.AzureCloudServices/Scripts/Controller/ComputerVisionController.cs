@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
@@ -24,6 +24,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private SceneController sceneController;
         [Header("UI")]
         [SerializeField]
+        private GameObject hintTextPrefab;
+        [SerializeField]
         private GameObject previousMenu;
         [SerializeField]
         private Image previewImage;
@@ -38,6 +40,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         
         private TrackedObject trackedObject;
         private List<ImageThumbnail> imagesToCapture;
+        private GameObject hintTextInstance;
         private int currentImageIndex;
         private bool isWaitingForAirtap;
         private bool isProcessingPhoto;
@@ -50,17 +53,40 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             }
         }
 
-        public void Init(TrackedObject source)
+        private void Start()
+        {
+            if (hintTextInstance == null)
+            {
+                hintTextInstance = Instantiate(hintTextPrefab, Camera.main.transform);
+                hintTextInstance.SetActive(false);
+            }
+        }
+        
+        public async void Init(TrackedObject source)
         {
             trackedObject = source;
             currentImageIndex = -1;
             imagesToCapture = new List<ImageThumbnail>();
             previewImage.sprite = thumbnailPlaceHolderImage;
-            SetButtonsInteractiveState(true);
             foreach (var image in images)
             {
                 image.sprite = thumbnailPlaceHolderImage;
             }
+
+            if (string.IsNullOrWhiteSpace(trackedObject.CustomVisionTagName))
+            {
+                messageLabel.text = "Setting up custom vision project.";
+
+                var tagName = $"tag_{trackedObject.Name}";
+                var tagCreation = await sceneController.ObjectDetectionManager.CreateTag(tagName);
+                trackedObject.CustomVisionTagName = tagCreation.Name;
+                trackedObject.CustomVisionTagId = tagCreation.Id;
+                await sceneController.DataManager.UploadOrUpdate(trackedObject);
+                
+                messageLabel.text = "";
+            }
+            
+            SetButtonsInteractiveState(true);
             sceneController.StartCamera();
         }
 
@@ -79,6 +105,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 return;
             }
             
+            hintTextInstance.SetActive(true);
             isWaitingForAirtap = true;
             SetButtonsInteractiveState(false);
             messageLabel.text = "Do AirTap to take a photo.";
@@ -109,6 +136,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 return;
             }
             
+            SetButtonsInteractiveState(false);
+            
             // Check if there is already an existing iteration and delete it
             if(!string.IsNullOrEmpty(sceneController.CurrentProject.CustomVisionIterationId))
             {
@@ -118,7 +147,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             }
 
             messageLabel.text = "Please wait, uploading images.";
-            SetButtonsInteractiveState(false);
             var tagId = trackedObject.CustomVisionTagId;
             foreach (var imageThumbnail in imagesToCapture)
             {
@@ -175,6 +203,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private async void CapturePhoto()
         {
             isWaitingForAirtap = false;
+            hintTextInstance.SetActive(false);
+
             if (isProcessingPhoto || currentImageIndex == 6)
             {
                 SetButtonsInteractiveState(true);

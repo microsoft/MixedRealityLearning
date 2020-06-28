@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
@@ -21,6 +22,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [SerializeField]
         private ComputerVisionController computerVisionController;
         [SerializeField]
+        private GameObject hintTextPrefab;
+        [SerializeField]
         private TMP_Text objectNameLabel;
         [SerializeField]
         private TMP_Text messageLabel;
@@ -34,12 +37,23 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private Interactable[] buttons;
         
         private TrackedObject trackedObject;
-        
+        private GameObject hintTextInstance;
+        private bool isWaitingForAirtap;
+
         private void Awake()
         {
             if (sceneController == null)
             {
                 sceneController = FindObjectOfType<SceneController>();
+            }
+        }
+
+        private void Start()
+        {
+            if (hintTextInstance == null)
+            {
+                hintTextInstance = Instantiate(hintTextPrefab, Camera.main.transform);
+                hintTextInstance.SetActive(false);
             }
         }
 
@@ -69,7 +83,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         /// <summary>
         /// Take a thumbnail photo for the TrackedObject and upload to azure blob storage.
         /// </summary>
-        public async void TakeThumbnailPhoto()
+        public void TakeThumbnailPhoto()
         {
             if (!sceneController.IsCameraActive)
             {
@@ -78,16 +92,9 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             }
             
             SetButtonsInteractiveState(false);
-            
-            var photo = await sceneController.TakePhotoWithThumbnail();
-            thumbnailImage.sprite = photo.Texture.CreateSprite();
-            
-            messageLabel.text = "Uploading Thumbnail, please wait ...";
-            var blobName = await sceneController.DataManager.UploadBlob(photo.ImageData, trackedObject.Name + "_thumbnail.png");
-            trackedObject.ThumbnailBlobName = blobName;
-            SaveChanges();
-            
-            SetButtonsInteractiveState(true);
+            hintTextInstance.SetActive(true);
+            isWaitingForAirtap = true;
+            messageLabel.text = "Look at object and do Airtap to take photo.";
         }
 
         /// <summary>
@@ -163,6 +170,30 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             messageLabel.text = "Move pointer and AirTap on the desired place to save the location.";
             sceneController.AnchorManager.StartPlacingAnchor(trackedObject);
             sceneController.AnchorManager.OnCreateAnchorSucceeded += HandleOnCreateAnchorSucceeded;
+        }
+        
+        public void HandleOnPointerClick()
+        {
+            if (isWaitingForAirtap)
+            {
+                CapturePhoto();
+            }
+        }
+        
+        private async void CapturePhoto()
+        {
+            isWaitingForAirtap = false;
+            hintTextInstance.SetActive(false);
+
+            var photo = await sceneController.TakePhotoWithThumbnail();
+            thumbnailImage.sprite = photo.Texture.CreateSprite();
+            
+            messageLabel.text = "Uploading Thumbnail, please wait ...";
+            var blobName = await sceneController.DataManager.UploadBlob(photo.ImageData, trackedObject.Name + "_thumbnail.png");
+            trackedObject.ThumbnailBlobName = blobName;
+            SaveChanges();
+            
+            SetButtonsInteractiveState(true);
         }
 
         private async void HandleOnCreateAnchorSucceeded(object sender, string id)

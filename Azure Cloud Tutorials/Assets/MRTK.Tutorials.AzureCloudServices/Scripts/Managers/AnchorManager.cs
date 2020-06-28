@@ -220,14 +220,14 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                     activeAnchors.Add(currentTrackedObject.SpatialAnchorId, anchorPosition);
 
                     // Notify subscribers
-                    OnCreateAnchorSucceeded?.Invoke(this, currentCloudAnchor.Identifier);
+                    AppDispatcher.Instance().Enqueue(() => OnCreateAnchorSucceeded?.Invoke(this, currentCloudAnchor.Identifier));
                 }
                 else
                 {
                     Debug.Log($"Failed to save cloud anchor with ID '{currentCloudAnchor.Identifier}' to Azure");
 
                     // Notify subscribers
-                    OnCreateAnchorFailed?.Invoke(this, EventArgs.Empty);
+                    AppDispatcher.Instance().Enqueue(() => OnCreateAnchorFailed?.Invoke(this, EventArgs.Empty));
                 }
                 
                 currentTrackedObject = null;
@@ -289,7 +289,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
 
             // Notify subscribers
             activeAnchors.Add(currentTrackedObject.SpatialAnchorId, indicator);
-            OnFindAnchorSucceeded?.Invoke(this, EventArgs.Empty);
+            AppDispatcher.Instance().Enqueue(() => OnFindAnchorSucceeded?.Invoke(this, EventArgs.Empty));
             currentTrackedObject = null;
         }
 
@@ -343,9 +343,9 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                     activeAnchors.Add(currentTrackedObject.SpatialAnchorId, indicator);
 
                     // Notify subscribers
-                OnFindAnchorSucceeded?.Invoke(this, EventArgs.Empty);
-                currentWatcher?.Stop();
-                currentTrackedObject = null;
+                    OnFindAnchorSucceeded?.Invoke(this, EventArgs.Empty);
+                    currentWatcher?.Stop();
+                    currentTrackedObject = null;
                 });
             }
             else

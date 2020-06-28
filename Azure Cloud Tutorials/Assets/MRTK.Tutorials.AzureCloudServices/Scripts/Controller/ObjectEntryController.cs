@@ -20,8 +20,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private ObjectCardViewController objectCardPrefab;
         [Header("UI Elements")]
         [SerializeField]
-        private Interactable submitButton;
-        [SerializeField]
         private ButtonConfigHelper submitButtonConfigHelper;
         [SerializeField]
         private TMP_Text hintLabel;
@@ -29,6 +27,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private TMP_InputField inputField;
         [SerializeField]
         private string loadingText = "Please wait...";
+        [SerializeField]
+        private Interactable[] buttons;
         
         private bool isInSearchMode;
         
@@ -45,14 +45,10 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             inputField.text = "";
         }
 
-        public void Init()
-        {
-            submitButtonConfigHelper.MainLabelText = isInSearchMode ? "Search Object" : "Set Object";
-        }
-
         public void SetSearchMode(bool searchModeActive)
         {
             isInSearchMode = searchModeActive;
+            submitButtonConfigHelper.MainLabelText = isInSearchMode ? "Search Object" : "Set Object";
         }
 
         public async void SubmitQuery()
@@ -71,7 +67,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 return;
             }
 
-            submitButton.IsEnabled = false;
+            SetButtonsInteractiveState(false);
             if (isInSearchMode)
             {
                 var project = await FindObject(inputField.text);
@@ -92,7 +88,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                     objectEditPanel.Init(project);
                 }
             }
-            submitButton.IsEnabled = true;
+            SetButtonsInteractiveState(true);
         }
 
         private async Task<TrackedObject> FindObject(string searchName)
@@ -114,25 +110,29 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         {
             hintLabel.SetText(loadingText);
             hintLabel.gameObject.SetActive(true);
-            var project = await sceneController.DataManager.FindTrackedObjectByName(searchName);
-            if (project == null)
+            var trackedObject = await sceneController.DataManager.FindTrackedObjectByName(searchName);
+            if (trackedObject == null)
             {
-                project = new TrackedObject(searchName);
-                var success = await sceneController.DataManager.UploadOrUpdate(project);
+                trackedObject = new TrackedObject(searchName);
+                var success = await sceneController.DataManager.UploadOrUpdate(trackedObject);
                 if (!success)
                 {
                     return null;
                 }
-
-                var tagName = $"tag_{project.Name}";
-                var tagCreation = await sceneController.ObjectDetectionManager.CreateTag(tagName);
-                project.CustomVisionTagName = tagCreation.Name;
-                project.CustomVisionTagId = tagCreation.Id;
-                await sceneController.DataManager.UploadOrUpdate(project);
+                
+                await sceneController.DataManager.UploadOrUpdate(trackedObject);
             }
 
             hintLabel.gameObject.SetActive(false);
-            return project;
+            return trackedObject;
+        }
+        
+        private void SetButtonsInteractiveState(bool state)
+        {
+            foreach (var interactable in buttons)
+            {
+                interactable.IsEnabled = state;
+            }
         }
     }
 }
