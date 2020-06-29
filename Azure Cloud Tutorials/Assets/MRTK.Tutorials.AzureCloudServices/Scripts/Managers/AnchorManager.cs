@@ -138,12 +138,15 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             var indicator = Instantiate(anchorPositionPrefab, indicatorTransform.position, indicatorTransform.rotation);
             anchorCreationController.StartProgressIndicatorSession();
             await Task.Delay(2500);
-            indicator.Init(currentTrackedObject);
             var mockAnchorId = Guid.NewGuid().ToString();
             currentTrackedObject.SpatialAnchorId = mockAnchorId;
             activeAnchors.Add(currentTrackedObject.SpatialAnchorId, indicator);
-            OnCreateAnchorSucceeded?.Invoke(this, mockAnchorId);
-            currentTrackedObject = null;
+            AppDispatcher.Instance().Enqueue(() =>
+            {
+                indicator.Init(currentTrackedObject);
+                OnCreateAnchorSucceeded?.Invoke(this, mockAnchorId);
+                currentTrackedObject = null;
+            });
         }
 
         private async void CreateAsaAnchor(Transform indicatorTransform)
@@ -162,17 +165,17 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             Debug.Log("await cloudManager.StartSessionAsync()");
             await cloudManager.StartSessionAsync();
             
-            var anchorPosition = Instantiate(anchorPositionPrefab, indicatorTransform.position, indicatorTransform.rotation);
+            var anchorPositionIndicator = Instantiate(anchorPositionPrefab, indicatorTransform.position, indicatorTransform.rotation);
 
             // Create native XR anchor at the location of the object
-            anchorPosition.gameObject.CreateNativeAnchor();
+            anchorPositionIndicator.gameObject.CreateNativeAnchor();
             Debug.Log("anchorPosition.gameObject.CreateNativeAnchor()");
 
             // Create local cloud anchor
             var localCloudAnchor = new CloudSpatialAnchor();
 
             // Set the local cloud anchor's position to the native XR anchor's position
-            localCloudAnchor.LocalAnchor = anchorPosition.gameObject.FindNativeAnchor().GetPointer();
+            localCloudAnchor.LocalAnchor = anchorPositionIndicator.gameObject.FindNativeAnchor().GetPointer();
             Debug.Log("anchorPosition.gameObject.FindNativeAnchor().GetPointer()");
 
             // Check to see if we got the local XR anchor pointer
@@ -201,14 +204,16 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             try
             {
                 // Actually save
+                Debug.Log("await cloudManager.CreateAnchorAsync(localCloudAnchor)");
                 await cloudManager.CreateAnchorAsync(localCloudAnchor);
+                Debug.Log("Anchor created!");
 
                 // Store
                 currentCloudAnchor = localCloudAnchor;
 
                 // Success?
                 var success = currentCloudAnchor != null;
-
+                
                 if (success)
                 {
                     Debug.Log($"Azure anchor with ID '{currentCloudAnchor.Identifier}' created successfully");
@@ -217,20 +222,28 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                     Debug.Log($"Current Azure anchor ID updated to '{currentCloudAnchor.Identifier}'");
 
                     currentTrackedObject.SpatialAnchorId = currentCloudAnchor.Identifier;
-                    activeAnchors.Add(currentTrackedObject.SpatialAnchorId, anchorPosition);
-
+                    activeAnchors.Add(currentTrackedObject.SpatialAnchorId, anchorPositionIndicator);
                     // Notify subscribers
-                    AppDispatcher.Instance().Enqueue(() => OnCreateAnchorSucceeded?.Invoke(this, currentCloudAnchor.Identifier));
+                    Debug.Log("OnCreateAnchorSucceeded?.Invoke(this, currentCloudAnchor.Identifier)");
+                    AppDispatcher.Instance().Enqueue(() =>
+                    {
+                        anchorPositionIndicator.Init(currentTrackedObject);
+                        currentTrackedObject = null;
+                        OnCreateAnchorSucceeded?.Invoke(this, currentCloudAnchor.Identifier);
+                    });
                 }
                 else
                 {
                     Debug.Log($"Failed to save cloud anchor with ID '{currentCloudAnchor.Identifier}' to Azure");
 
                     // Notify subscribers
-                    AppDispatcher.Instance().Enqueue(() => OnCreateAnchorFailed?.Invoke(this, EventArgs.Empty));
+                    AppDispatcher.Instance().Enqueue(() =>
+                    {
+                        currentTrackedObject = null;
+                        Destroy(anchorPositionIndicator.gameObject);
+                        OnCreateAnchorFailed?.Invoke(this, EventArgs.Empty);
+                    });
                 }
-                
-                currentTrackedObject = null;
             }
             catch (Exception ex)
             {

@@ -30,25 +30,29 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [SerializeField]
         private Interactable cancelButton;
         
+        private void Awake()
+        {
+            // Configure
+            tapToPlace.AutoStart = true;
+        }
+
         private void Start()
         {
+            // Always start in placing mode
+            placingVisual.SetActive(true);
+            confirmingVisual.SetActive(false);
+            
             // Set up layer mask array
             LayerMask layerMask = LayerMask.GetMask("Spatial Awarenes");
             var layerNumber = (int)(Mathf.Log((uint)layerMask.value, 2));
             LayerMask[] layerMasks = { layerNumber };
-
-            // Configure
-            tapToPlace.AutoStart = true;
+            
             tapToPlace.DefaultPlacementDistance = 1;
             tapToPlace.MaxRaycastDistance = 3;
             tapToPlace.SurfaceNormalOffset = 0;
             tapToPlace.KeepOrientationVertical = true;
             tapToPlace.RotateAccordingToSurface = false;
             tapToPlace.MagneticSurfaces = layerMasks;
-
-            // Always start in placing mode
-            placingVisual.SetActive(true);
-            confirmingVisual.SetActive(false);
 
             // Set collider size to control TapToPlace.SurfaceNormalOffset (offset = radius)
             GetComponent<SphereCollider>().radius = 0;
