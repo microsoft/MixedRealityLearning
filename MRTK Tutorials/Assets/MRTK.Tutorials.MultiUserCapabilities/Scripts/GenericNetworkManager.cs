@@ -1,50 +1,51 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-public class GenericNetworkManager : MonoBehaviour
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    public static GenericNetworkManager instance;
-    public static event Action OnReadyToStartNetwork;
-
-    private bool isConnected;
-
-    [HideInInspector]
-    public PhotonView localUser;
-    [HideInInspector]
-    public string AzureAnchorID = "";
-
-    void Awake()
+    public class GenericNetworkManager : MonoBehaviour
     {
-        if (GenericNetworkManager.instance == null)
+        public static GenericNetworkManager Instance;
+
+        [HideInInspector] public string azureAnchorId = "";
+        [HideInInspector] public PhotonView localUser;
+        private bool isConnected;
+
+        private void Awake()
         {
-            GenericNetworkManager.instance = this;
-        }
-        else
-        {
-            if (GenericNetworkManager.instance != this)
+            if (Instance == null)
             {
-                Destroy(GenericNetworkManager.instance.gameObject);
-                GenericNetworkManager.instance = this;
+                Instance = this;
             }
+            else
+            {
+                if (Instance != this)
+                {
+                    Destroy(Instance.gameObject);
+                    Instance = this;
+                }
+            }
+
+            DontDestroyOnLoad(gameObject);
         }
-        DontDestroyOnLoad(this.gameObject);
-    }
 
-    void Start()
-    {
-        ConnectToNetwork();
-    }
+        private void Start()
+        {
+            ConnectToNetwork();
+        }
 
-    // For non Photon Networking solutions
-    void StartNetwork(string ipaddress, string port)
-    {
-    }
+        // For future non PUN solutions
+        private void StartNetwork(string ipAddress, string port)
+        {
+            throw new NotImplementedException();
+        }
 
-    void ConnectToNetwork()
-    {
-        OnReadyToStartNetwork?.Invoke();
+        private void ConnectToNetwork()
+        {
+            OnReadyToStartNetwork?.Invoke();
+        }
+
+        public static event Action OnReadyToStartNetwork;
     }
 }

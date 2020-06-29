@@ -1,90 +1,90 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using Photon.Pun;
+﻿using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
-using Random = System.Random;
 
-public class PhotonLobby : MonoBehaviourPunCallbacks
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    public static PhotonLobby Lobby;
-    private int roomNumber = 1;
-    private int userIDCount = 0;
-
-    void Awake()
+    public class PhotonLobby : MonoBehaviourPunCallbacks
     {
-        if (PhotonLobby.Lobby == null)
+        public static PhotonLobby Lobby;
+
+        private int roomNumber = 1;
+        private int userIdCount;
+
+        private void Awake()
         {
-            PhotonLobby.Lobby = this;
-        }
-        else
-        {
-            if (PhotonLobby.Lobby != this)
+            if (Lobby == null)
             {
-                Destroy(PhotonLobby.Lobby.gameObject);
-                PhotonLobby.Lobby = this;
+                Lobby = this;
             }
+            else
+            {
+                if (Lobby != this)
+                {
+                    Destroy(Lobby.gameObject);
+                    Lobby = this;
+                }
+            }
+
+            DontDestroyOnLoad(gameObject);
+
+            GenericNetworkManager.OnReadyToStartNetwork += StartNetwork;
         }
-        DontDestroyOnLoad(this.gameObject);
 
-        GenericNetworkManager.OnReadyToStartNetwork += StartNetwork;
-    }
+        public override void OnConnectedToMaster()
+        {
+            var randomUserId = Random.Range(0, 999999);
+            PhotonNetwork.AutomaticallySyncScene = true;
+            PhotonNetwork.AuthValues = new AuthenticationValues();
+            PhotonNetwork.AuthValues.UserId = randomUserId.ToString();
+            userIdCount++;
+            PhotonNetwork.NickName = PhotonNetwork.AuthValues.UserId;
+            PhotonNetwork.JoinRandomRoom();
+        }
 
-    public void StartNetwork()
-    {
-        PhotonNetwork.ConnectUsingSettings();
-        Lobby = this;
-    }
+        public override void OnJoinedRoom()
+        {
+            base.OnJoinedRoom();
 
-    public override void OnConnectedToMaster()
-    {
-        int randomuserID = UnityEngine.Random.Range(0, 999999);
-        PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.AuthValues = new AuthenticationValues();
-        PhotonNetwork.AuthValues.UserId = randomuserID.ToString();
-        userIDCount++;
-        PhotonNetwork.NickName = PhotonNetwork.AuthValues.UserId;
-        PhotonNetwork.JoinRandomRoom();
-    }
+            Debug.Log("\nPhotonLobby.OnJoinedRoom()");
+            Debug.Log("Current room name: " + PhotonNetwork.CurrentRoom.Name);
+            Debug.Log("Other players in room: " + PhotonNetwork.CountOfPlayersInRooms);
+            Debug.Log("Total players in room: " + (PhotonNetwork.CountOfPlayersInRooms + 1));
+        }
 
-    public override void OnJoinedRoom()
-    {
-        base.OnJoinedRoom();
+        public override void OnJoinRandomFailed(short returnCode, string message)
+        {
+            CreateRoom();
+        }
 
-        Debug.Log("\nPhotonLobby.OnJoinedRoom()");
-        Debug.Log("Current room name: " + PhotonNetwork.CurrentRoom.Name);
-        Debug.Log("Other players in room: " + PhotonNetwork.CountOfPlayersInRooms);
-        Debug.Log("Total players in room: " + (PhotonNetwork.CountOfPlayersInRooms + 1));
-    }
+        public override void OnCreateRoomFailed(short returnCode, string message)
+        {
+            Debug.Log("\nPhotonLobby.OnCreateRoomFailed()");
+            Debug.LogError("Creating Room Failed");
+            CreateRoom();
+        }
 
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        CreateRoom();
-    }
+        public override void OnCreatedRoom()
+        {
+            base.OnCreatedRoom();
+            roomNumber++;
+        }
 
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
-        Debug.Log("\nPhotonLobby.OnCreateRoomFailed()");
-        Debug.LogError("Creating Room Failed");
-        CreateRoom();
-    }
+        public void OnCancelButtonClicked()
+        {
+            PhotonNetwork.LeaveRoom();
+        }
 
-    public override void OnCreatedRoom()
-    {
-        base.OnCreatedRoom();
-        roomNumber++;
-    }
+        private void StartNetwork()
+        {
+            PhotonNetwork.ConnectUsingSettings();
+            Lobby = this;
+        }
 
-    public void OnCancelButtonClicked()
-    {
-        PhotonNetwork.LeaveRoom();
-    }
-
-    void CreateRoom()
-    {
-        RoomOptions roomOptions = new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = 10 };
-        PhotonNetwork.CreateRoom("Room" + UnityEngine.Random.Range(1, 3000), roomOptions);
+        private void CreateRoom()
+        {
+            var roomOptions = new RoomOptions {IsVisible = true, IsOpen = true, MaxPlayers = 10};
+            PhotonNetwork.CreateRoom("Room" + Random.Range(1, 3000), roomOptions);
+        }
     }
 }
