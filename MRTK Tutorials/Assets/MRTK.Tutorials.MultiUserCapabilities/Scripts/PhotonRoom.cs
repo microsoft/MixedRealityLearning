@@ -117,7 +117,10 @@ public class PhotonRoom : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     void CreateInteractableObjects()
     {
-        GameObject go = PhotonNetwork.Instantiate(roverExplorerPrefab.name, roverExplorerLocation.position, roverExplorerLocation.rotation);
+        var position = roverExplorerLocation.position;
+        var positionOnTopOfSurface = new Vector3(position.x, position.y + (roverExplorerLocation.localScale.y / 2), position.z);
+        
+        GameObject go = PhotonNetwork.Instantiate(roverExplorerPrefab.name, positionOnTopOfSurface, roverExplorerLocation.rotation);
     }
 
     private void CreateMainLunarModule()

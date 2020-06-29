@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
+[RequireComponent(typeof(PhotonView), typeof(GenericNetSync))]
 public class OwnershipHandler : MonoBehaviourPun, IPunOwnershipCallbacks, IMixedRealityInputHandler
 {
     private PhotonView PV;
