@@ -60,6 +60,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -178,6 +179,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -278,6 +280,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -294,12 +297,12 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "  1. Move the cube to a different location\r.\n  2. Start Azure Session.\n
-    \ 3. Create Azure Anchor (creates anchor at the location of the cube).\n  4. Stop
-    Azure Session.\n  5. Remove Local Anchor (allows the user to move the cube).\r\n
-    \ 6. Move the cube somewhere else\r.\n  7. Start Azure Session.\n  8. Find Azure
-    Anchor (positions the cube at the location from step 3)\r.\n  9. Delete Azure
-    Anchor.\n10. Stop Azure session."
+  m_Text: "  1. Move the cube to a different location\r\n  2. Start Azure Session\n 
+    3. Create Azure Anchor (creates anchor at the location of the cube)\n  4. Stop
+    Azure Session\n  5. Remove Local Anchor (allows the user to move the cube).\n 
+    6. Move the cube somewhere else\r\n  7. Start Azure Session\n  8. Find Azure
+    Anchor (positions the cube at the location from step 3)\r\n  9. Delete Azure
+    Anchor\n10. Stop Azure session"
 --- !u!1 &5729969540610607212
 GameObject:
   m_ObjectHideFlags: 0
@@ -351,9 +354,9 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 3
+  serializedVersion: 4
   m_Convex: 0
-  m_CookingOptions: 14
+  m_CookingOptions: 30
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &5753040944735457972
 MeshRenderer:
@@ -369,6 +372,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -453,6 +457,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -471,7 +476,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'HoloLens
 
-    Immersive headset'
+    Android and iOS'
 --- !u!1 &5730091106582238552
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,6 +537,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -594,6 +600,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
