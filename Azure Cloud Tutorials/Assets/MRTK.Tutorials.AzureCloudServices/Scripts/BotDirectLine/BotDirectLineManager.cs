@@ -134,7 +134,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
                 Debug.Log("SendMessageCoroutine: " + conversationId + "; " + message);
 
                 var body = new MessageActivity(fromId, message, DirectLineChannelId, null, fromName).ToJsonString();
-                body = body.Replace("\"channelId\": \"directline\", ", "");
+                body = body.Replace("\"channelId\": \"directline\", ", "\"locale\": \"en-EN\", ");
                 UnityWebRequest webRequest = CreateWebRequest(
                     WebRequestMethods.Post,
                     DirectLineConversationsApiUri

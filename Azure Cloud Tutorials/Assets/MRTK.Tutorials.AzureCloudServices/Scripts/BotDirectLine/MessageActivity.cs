@@ -22,6 +22,12 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
             set;
         }
 
+        public string Locale
+        {
+            get; 
+            set;
+        }
+
         public string FromId
         {
             get;
@@ -87,6 +93,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
             ConversationId = conversationId;
             Text = text;
             ReplyToId = replyToId;
+            Locale = "en-EN";
         }
 
         public static MessageActivity FromJson(SimpleJSON.JSONNode activityJsonRootNode)

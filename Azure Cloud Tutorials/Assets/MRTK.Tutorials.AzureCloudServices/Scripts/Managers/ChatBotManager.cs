@@ -77,11 +77,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
 
         public void StopConversation()
         {
-            // if (IsListening)
-            // {
-            //     return;
-            // }
-            
             IsListening = false;
             conversationId = null;
             processedMessages = new List<string>();
