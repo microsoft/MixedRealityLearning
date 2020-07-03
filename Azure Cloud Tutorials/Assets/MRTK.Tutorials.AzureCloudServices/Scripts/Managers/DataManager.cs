@@ -18,7 +18,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         
         [Header("Base Settings")]
         [SerializeField]
-        private string connectionString = "UseDevelopmentStorage=true";
+        private string connectionString;
         [SerializeField]
         private string projectName = "MyAzurePowerToolsProject";
         [Header("Table Settings")]
