@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using HoloToolkit.Unity;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
@@ -102,7 +103,10 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         {
             conversationId = id;
             isPerformingInit = false;
-            StartListening();
+            var greetingMessage = "Greetings, I can help you with tracked objects. Just ask.";
+            textToSpeechManager.SpeakText(greetingMessage);
+            messageLabel.text = greetingMessage;
+            dictationButton.IsEnabled = true;
         }
 
         private void HandleOnMessagesReceived(object sender, IList<MessageActivity> messages)
@@ -128,28 +132,33 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             IsSpeaking = true;
             messageLabel.text = String.Empty;
 
+            var textToSpeach = new StringBuilder();
+
             foreach (var messageActivity in messages.Where(m => m.FromId != userId))
             {
                 if (processedMessages.Contains(messageActivity.Id))
                 {
                     continue;
                 }
-                processedMessages.Add(messageActivity.Id);
-
-                while (textToSpeechManager.AudioSource.isPlaying)
+                if (messageActivity.Text.Contains("Greetings"))
                 {
-                    yield return new WaitForSeconds(0.5f);
+                    continue;
                 }
                 
-                Debug.Log($"Start speaking message: {messageActivity.Text}");
-                textToSpeechManager.SpeakText(messageActivity.Text);
-                messageLabel.text += $"\nBot: {messageActivity.Text}";
+                processedMessages.Add(messageActivity.Id);
 
-                while (textToSpeechManager.AudioSource.isPlaying)
-                {
-                    yield return new WaitForSeconds(0.5f);
-                }
+                Debug.Log($"Appending message: {messageActivity.Text}");
+                textToSpeach.AppendLine(messageActivity.Text);
             }
+            
+            Debug.Log($"Bot will say: {textToSpeach.ToString()}");
+            messageLabel.text = textToSpeach.ToString();
+            textToSpeechManager.SpeakText(textToSpeach.ToString());
+            
+            do
+            {
+                yield return new WaitForSeconds(0.5f);
+            } while (textToSpeechManager.AudioSource.isPlaying);
             
             IsSpeaking = false;
             dictationButton.IsEnabled = true;
@@ -157,12 +166,25 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         private void OnDictationComplete(string detectedDictation)
         {
+            detectedDictation = SanitizeDictation(detectedDictation);
+
             Debug.Log($"Dictation received: {detectedDictation}");
             dictationHandler.StopRecording();
             messageLabel.text = "Ok, let me process that quickly.";
             Debug.Log($"Sending message to bot: {detectedDictation}");
             IsListening = false;
             chatBotManager.SentMessage(conversationId, userId, detectedDictation);
+        }
+
+        private string SanitizeDictation(string dictation)
+        {
+            dictation = dictation.Replace(".", "");
+            if (dictation.EndsWith(" ") && dictation.Length > 2)
+            {
+                dictation = dictation.Remove(dictation.Length - 1, 1);
+            }
+
+            return dictation;
         }
     }
 }
