@@ -1,76 +1,70 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Photon.Pun;
+using UnityEngine;
 
-public class GenericNetSync : MonoBehaviourPun, IPunObservable
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    public bool isUser;
-
-    public Vector3 startingLocalPosition;
-    public Quaternion startingLocalRotation;
-    public Vector3 startingScale;
-
-    private Vector3 networkLocalPosition;
-    private Quaternion networkLocalRotation;
-    private Vector3 networkLocalScale;
-
-    private PhotonView PV;
-    private Camera mainCamera;
-
-    void Start()
+    public class GenericNetSync : MonoBehaviourPun, IPunObservable
     {
-        PV = GetComponent<PhotonView>();
-        mainCamera = Camera.main;
+        [SerializeField] private bool isUser = default;
 
-        if (isUser)
+        private Camera mainCamera;
+
+        private Vector3 networkLocalPosition;
+        private Quaternion networkLocalRotation;
+
+        private Vector3 startingLocalPosition;
+        private Quaternion startingLocalRotation;
+
+        void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            if (TableAnchor.instance != null)
+            if (stream.IsWriting)
             {
-                transform.parent = FindObjectOfType<TableAnchor>().transform;
+                stream.SendNext(transform.localPosition);
+                stream.SendNext(transform.localRotation);
             }
-
-            if (PV.IsMine)
+            else
             {
-                GenericNetworkManager.instance.localUser = PV;
+                networkLocalPosition = (Vector3) stream.ReceiveNext();
+                networkLocalRotation = (Quaternion) stream.ReceiveNext();
             }
         }
 
-        startingLocalPosition = transform.localPosition;
-        startingLocalRotation = transform.localRotation;
-        startingScale = transform.localScale;
-
-        networkLocalPosition = startingLocalPosition;
-        networkLocalRotation = startingLocalRotation;
-        networkLocalScale = startingScale;
-    }
-
-    void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
+        private void Start()
         {
-            stream.SendNext(transform.localPosition);
-            stream.SendNext(transform.localRotation);
-        }
-        else
-        {
-            networkLocalPosition = (Vector3)stream.ReceiveNext();
-            networkLocalRotation = (Quaternion)stream.ReceiveNext();
-        }
-    }
+            mainCamera = Camera.main;
 
-    void FixedUpdate()
-    {
-        if (!PV.IsMine)
-        {
-            transform.localPosition = networkLocalPosition;
-            transform.localRotation = networkLocalRotation;
+            if (isUser)
+            {
+                if (TableAnchor.Instance != null) transform.parent = FindObjectOfType<TableAnchor>().transform;
+
+                if (photonView.IsMine) GenericNetworkManager.Instance.localUser = photonView;
+            }
+
+            var trans = transform;
+            startingLocalPosition = trans.localPosition;
+            startingLocalRotation = trans.localRotation;
+
+            networkLocalPosition = startingLocalPosition;
+            networkLocalRotation = startingLocalRotation;
         }
 
-        if (PV.IsMine && isUser)
+        // private void FixedUpdate()
+        private void Update()
         {
-            transform.position = mainCamera.transform.position;
-            transform.rotation = mainCamera.transform.rotation;
+            if (!photonView.IsMine)
+            {
+                var trans = transform;
+                trans.localPosition = networkLocalPosition;
+                trans.localRotation = networkLocalRotation;
+            }
+
+            if (photonView.IsMine && isUser)
+            {
+                var trans = transform;
+                var mainCameraTransform = mainCamera.transform;
+                trans.position = mainCameraTransform.position;
+                trans.rotation = mainCameraTransform.rotation;
+            }
         }
     }
 }

@@ -201,8 +201,7 @@ namespace Photon.Realtime
                 sb.AppendFormat("AppID: \"{0}\" AppVersion: \"{1}\" UserId: {3} PeerID: {2} ",
                     string.IsNullOrEmpty(this.client.AppId) || this.client.AppId.Length < 8
                         ? this.client.AppId
-                        : string.Concat(this.client.AppId.Substring(0, 8), "***"), this.client.AppVersion, this.client.LoadBalancingPeer.PeerID,
-                    this.client.UserId);
+                        : string.Concat(this.client.AppId.Substring(0, 8), "***"), this.client.AppVersion, this.client.LoadBalancingPeer.PeerID, this.client.UserId);
                 //NOTE: this.client.LoadBalancingPeer.ServerIpAddress requires Photon3Unity3d.dll v4.1.2.5 and up
                 sb.AppendFormat("NameServer: {0} Server: {1} IP: {2} Region: {3}", this.client.NameServerHost, this.client.CurrentServerAddress, this.client.LoadBalancingPeer.ServerIpAddress, this.client.CloudRegion);
 
@@ -260,6 +259,7 @@ namespace Photon.Realtime
 
         public void OnJoinRoomFailed(short returnCode, string message)
         {
+            Debug.Log(this.GetFormattedTimestamp() + " SupportLogger OnJoinRoomFailed(" + returnCode+","+message+").");
         }
 
         public void OnJoinRandomFailed(short returnCode, string message)

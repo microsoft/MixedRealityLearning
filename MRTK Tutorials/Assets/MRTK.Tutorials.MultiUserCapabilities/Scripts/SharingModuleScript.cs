@@ -1,33 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class SharingModuleScript : MonoBehaviour
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    AnchorModuleScript anchorModuleScript;
-
-    void Start()
+    public class SharingModuleScript : MonoBehaviour
     {
-        anchorModuleScript = GetComponent<AnchorModuleScript>();
-    }
+        private AnchorModuleScript anchorModuleScript;
 
-    public void ShareAzureAnchor()
-    {
-        Debug.Log("\nSharingModuleScript.ShareAnchor()");
+        private void Start()
+        {
+            anchorModuleScript = GetComponent<AnchorModuleScript>();
+        }
 
-        GenericNetworkManager.instance.AzureAnchorID = anchorModuleScript.currentAzureAnchorID;
-        Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
+        public void ShareAzureAnchor()
+        {
+            Debug.Log("\nSharingModuleScript.ShareAzureAnchor()");
 
-        GameObject PVuser = GenericNetworkManager.instance.localUser.gameObject;
-        PhotonUser pu = PVuser.gameObject.GetComponent<PhotonUser>();
-        pu.PVShareAnchorNetwork();
-    }
+            GenericNetworkManager.Instance.azureAnchorId = anchorModuleScript.currentAzureAnchorID;
+            Debug.Log("GenericNetworkManager.Instance.azureAnchorId: " + GenericNetworkManager.Instance.azureAnchorId);
 
-    public void GetAzureAnchor()
-    {
-        Debug.Log("\nSharingModuleScript.GetSharedAnchor()");
-        Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
+            var pvLocalUser = GenericNetworkManager.Instance.localUser.gameObject;
+            var pu = pvLocalUser.gameObject.GetComponent<PhotonUser>();
+            pu.ShareAzureAnchorId();
+        }
 
-        anchorModuleScript.FindAzureAnchor(GenericNetworkManager.instance.AzureAnchorID);
+        public void GetAzureAnchor()
+        {
+            Debug.Log("\nSharingModuleScript.GetAzureAnchor()");
+            Debug.Log("GenericNetworkManager.Instance.azureAnchorId: " + GenericNetworkManager.Instance.azureAnchorId);
+
+            anchorModuleScript.FindAzureAnchor(GenericNetworkManager.Instance.azureAnchorId);
+        }
     }
 }

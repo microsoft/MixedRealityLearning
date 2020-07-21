@@ -3,6 +3,16 @@ Photon Realtime C# Client - Changelog
 Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
+Version 4.1.4.0 (27. April 2020 rev5468)
+    Fixed: When connecting directly to a Master Server (self hosted), the serialization protocol 1.6 is used (not the detault 1.8). This was changed accidentally in v4.1.3.0 (and thus PUN 2.17).
+    Added: Connection state check in CheckIfOpCanBeSent() to fail early if an op can't be sent.
+    Updated: WebRPC handling and added an example to the doc of OnWebRpcResponse.
+    Added: Logging of OnJoinRoomFailed to SupportLogger.
+    Changed: StripKeysWithNullValues to reuse a list of key with null-values. This causes less allocations and garbage to clean. As a downside, the method now runs only for one thread (even for distinct IDictionary instances). This should not be a problem for the expected use case.
+    Changed: The LoadBalancingClient.OnStatusChanged will handle StatusCode.SendError as disconnect due to Exception. Log level INFO should log the inner exception when sending.
+    Fixed: Cleanup of the RoomReference for the local player object on disconnect. This prevents issues when setting properties, after joining and leaving a room (back on Master Server).
+	Internal: LoadBalancingClient.ExpectedProtocol is now a nullable property with private setter. It's used internally (only) to switch to the target transport protocol when Authmode AuthOnceWss is "done".
+	Fixed: EventLeave handling. When a player gets removed from the room, the IsInactive property must be set to false before doing the OnPlayerLeftRoom callback. Use Player.IsInactive to know the 'reason' for the callback.
 
 Version 4.1.3.0 (23.03.2020 rev5394)
     Changed: Trying to set empty custom properties Hashtable will fail (return false) and log error.

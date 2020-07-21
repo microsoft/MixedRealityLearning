@@ -51,7 +51,7 @@ namespace Photon.Pun.UtilityScripts
         protected void OnValidate()
         {
             /// Check the prefab to make sure it is the actual resource, and not a scene object or other instance.
-            if (!ReferenceEquals(PrefabsToInstantiate, null))
+            if (PrefabsToInstantiate != null)
                 for (int i = 0; i < PrefabsToInstantiate.Count; ++i)
                 {
                     var prefab = PrefabsToInstantiate[i];
@@ -166,7 +166,7 @@ namespace Photon.Pun.UtilityScripts
             {
                 foreach (GameObject o in this.PrefabsToInstantiate)
                 {
-                    if (ReferenceEquals(o, null))
+                    if (o == null)
                         continue;
 #if UNITY_EDITOR
                     Debug.Log("Auto-Instantiating: " + o.name);
@@ -260,7 +260,7 @@ namespace Photon.Pun.UtilityScripts
                                 lastUsedSpawnPointIndex = 0;
 
                             /// Use Vector.Zero and Quaternion.Identity if we are dealing with no or a null spawnpoint.
-                            return ReferenceEquals(SpawnPoints, null) || SpawnPoints.Count == 0 ? null : SpawnPoints[lastUsedSpawnPointIndex];
+                            return SpawnPoints == null || SpawnPoints.Count == 0 ? null : SpawnPoints[lastUsedSpawnPointIndex];
                         }
 
                     case SpawnSequence.Random:

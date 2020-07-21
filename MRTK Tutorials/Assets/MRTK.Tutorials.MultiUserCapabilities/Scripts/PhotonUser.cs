@@ -1,51 +1,46 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Photon.Pun;
+﻿using Photon.Pun;
 using UnityEngine;
 
-public class PhotonUser : MonoBehaviour
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    private PhotonView PV;
-    private string username;
-
-    void Start()
+    public class PhotonUser : MonoBehaviour
     {
-        PV = GetComponent<PhotonView>();
+        private PhotonView pv;
+        private string username;
 
-        if (PV.IsMine)
+        private void Start()
         {
+            pv = GetComponent<PhotonView>();
+
+            if (!pv.IsMine) return;
+
             username = "User" + PhotonNetwork.NickName;
-            PV.RPC("RPC_SetNickName", RpcTarget.AllBuffered, username);
+            pv.RPC("PunRPC_SetNickName", RpcTarget.AllBuffered, username);
         }
-    }
 
-    [PunRPC]
-    void RPC_SetNickName(string nName)
-    {
-        gameObject.name = nName;
-    }
-
-    [PunRPC]
-    void RPC_SetSharedAnchorID(string anchorID)
-    {
-        GenericNetworkManager.instance.AzureAnchorID = anchorID;
-        Debug.Log("\nPhotonRoom.RPC_SetSharedAnchorID()");
-        Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
-    }
-
-    public void PVShareAnchorNetwork()
-    {
-        DebugWindowMessaging.Clear();
-        Debug.Log("\nPhotonRoom.PVShareAnchorNetwork()");
-        Debug.Log("GenericNetworkManager.AzureAnchorID: " + GenericNetworkManager.instance.AzureAnchorID);
-        if (PV != null)
+        [PunRPC]
+        private void PunRPC_SetNickName(string nName)
         {
-            PV.RPC("RPC_SetSharedAnchorID", RpcTarget.AllBuffered, GenericNetworkManager.instance.AzureAnchorID);
-            Debug.Log("Azure Anchor ID shared by user: " + PV.Controller.UserId);
+            gameObject.name = nName;
         }
-        else
+
+        [PunRPC]
+        private void PunRPC_ShareAzureAnchorId(string anchorId)
         {
-            Debug.LogError("PV is null");
+            GenericNetworkManager.Instance.azureAnchorId = anchorId;
+
+            Debug.Log("\nPhotonUser.PunRPC_ShareAzureAnchorId()");
+            Debug.Log("GenericNetworkManager.instance.azureAnchorId: " + GenericNetworkManager.Instance.azureAnchorId);
+            Debug.Log("Azure Anchor ID shared by user: " + pv.Controller.UserId);
+        }
+
+        public void ShareAzureAnchorId()
+        {
+            if (pv != null)
+                pv.RPC("PunRPC_ShareAzureAnchorId", RpcTarget.AllBuffered,
+                    GenericNetworkManager.Instance.azureAnchorId);
+            else
+                Debug.LogError("PV is null");
         }
     }
 }

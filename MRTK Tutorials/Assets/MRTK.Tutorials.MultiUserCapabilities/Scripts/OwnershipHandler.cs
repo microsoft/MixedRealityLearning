@@ -1,59 +1,52 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using Microsoft.MixedReality.Toolkit.Input;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
-public class OwnershipHandler : MonoBehaviourPun, IPunOwnershipCallbacks, IMixedRealityInputHandler
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    private PhotonView PV;
-
-    void Start()
+    [RequireComponent(typeof(PhotonView), typeof(GenericNetSync))]
+    public class OwnershipHandler : MonoBehaviourPun, IPunOwnershipCallbacks, IMixedRealityInputHandler
     {
-        PV = GetComponent<PhotonView>();
-    }
-
-    public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
-    {
-        targetView.TransferOwnership(requestingPlayer);
-    }
-
-    public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
-    {
-    }
-
-    void TransferControl(Player idPlayer)
-    {
-        if (PV.IsMine)
+        public void OnInputDown(InputEventData eventData)
         {
-            PV.TransferOwnership(idPlayer);
+            photonView.RequestOwnership();
         }
-    }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (PV != null)
+        public void OnInputUp(InputEventData eventData)
         {
-            this.PV.RequestOwnership();
+            throw new NotImplementedException();
         }
-    }
 
-    private void OnTriggerExit(Collider other)
-    {
-    }
+        public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
+        {
+            targetView.TransferOwnership(requestingPlayer);
+        }
 
-    public void OnInputUp(InputEventData eventData)
-    {
-    }
+        public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
+        {
+            throw new NotImplementedException();
+        }
 
-    public void OnInputDown(InputEventData eventData)
-    {
-        this.PV.RequestOwnership();
-    }
+        private void TransferControl(Player idPlayer)
+        {
+            if (photonView.IsMine) photonView.TransferOwnership(idPlayer);
+        }
 
-    public void RequestOwnership()
-    {
-        this.PV.RequestOwnership();
+        private void OnTriggerEnter(Collider other)
+        {
+            if (photonView != null) photonView.RequestOwnership();
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RequestOwnership()
+        {
+            photonView.RequestOwnership();
+        }
     }
 }

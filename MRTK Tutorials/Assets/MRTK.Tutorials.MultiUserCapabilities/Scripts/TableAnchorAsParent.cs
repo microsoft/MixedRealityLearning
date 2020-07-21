@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class TableAnchorAsParent : MonoBehaviour
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    void Start()
+    public class TableAnchorAsParent : MonoBehaviour
     {
-        if (TableAnchor.instance != null)
+        private void Start()
         {
-            transform.parent = TableAnchor.instance.transform;
+            if (TableAnchor.Instance != null) transform.parent = TableAnchor.Instance.transform;
         }
     }
 }

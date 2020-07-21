@@ -1,23 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class TableAnchor : MonoBehaviour
+namespace MRTK.Tutorials.MultiUserCapabilities
 {
-    public static TableAnchor instance;
-
-    void Start()
+    public class TableAnchor : MonoBehaviour
     {
-        if (TableAnchor.instance == null)
+        public static TableAnchor Instance;
+
+        private void Start()
         {
-            TableAnchor.instance = this;
-        }
-        else
-        {
-            if (TableAnchor.instance != this)
+            if (Instance == null)
             {
-                Destroy(TableAnchor.instance.gameObject);
-                TableAnchor.instance = this;
+                Instance = this;
+            }
+            else
+            {
+                if (Instance == this) return;
+                Destroy(Instance.gameObject);
+                Instance = this;
             }
         }
     }

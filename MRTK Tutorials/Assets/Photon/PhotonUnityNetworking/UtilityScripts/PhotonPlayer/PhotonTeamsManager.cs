@@ -203,7 +203,7 @@ namespace Photon.Pun.UtilityScripts
                 return;
             }
             PhotonTeam team = otherPlayer.GetPhotonTeam();
-            if (!playersPerTeam[team.Code].Remove(otherPlayer))
+            if (team != null && !playersPerTeam[team.Code].Remove(otherPlayer))
             {
                 Debug.LogWarningFormat("Unexpected situation while removing player {0} who left from team {1}, updating teams for all", otherPlayer, team);
                 // revert to 'brute force' in case of unexpected situation
@@ -214,6 +214,10 @@ namespace Photon.Pun.UtilityScripts
         void IInRoomCallbacks.OnPlayerEnteredRoom(Player newPlayer)
         {
             PhotonTeam team = newPlayer.GetPhotonTeam();
+            if (team == null)
+            {
+                return;
+            }
             if (playersPerTeam[team.Code].Contains(newPlayer))
             {
                 // player rejoined w/ same team
@@ -273,13 +277,7 @@ namespace Photon.Pun.UtilityScripts
         /// <returns>If successful or not.</returns>
         public bool TryGetTeamByCode(byte code, out PhotonTeam team)
         {
-            team = null;
-            if (teamsByCode.ContainsKey(code))
-            {
-                team = teamsByCode[code];
-                return true;
-            }
-            return false;
+            return teamsByCode.TryGetValue(code, out team);
         }
 
         /// <summary>
@@ -290,13 +288,7 @@ namespace Photon.Pun.UtilityScripts
         /// <returns>If successful or not.</returns>
         public bool TryGetTeamByName(string teamName, out PhotonTeam team)
         {
-            team = null;
-            if (teamsByName.ContainsKey(teamName))
-            {
-                team = teamsByName[teamName];
-                return true;
-            }
-            return false;
+            return teamsByName.TryGetValue(teamName, out team);
         }
 
         /// <summary>
@@ -412,6 +404,51 @@ namespace Photon.Pun.UtilityScripts
             return false;
         }
 
+        /// <summary>
+        /// Gets the number of players in a team by team code.
+        /// </summary>
+        /// <param name="code">Unique code of the team</param>
+        /// <returns>Number of players joined to the team.</returns>
+        public int GetTeamMembersCount(byte code)
+        {
+            PhotonTeam team;
+            if (this.TryGetTeamByCode(code, out team))
+            {
+                return this.GetTeamMembersCount(team);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Gets the number of players in a team by team name.
+        /// </summary>
+        /// <param name="name">Unique name of the team</param>
+        /// <returns>Number of players joined to the team.</returns>
+        public int GetTeamMembersCount(string name)
+        {
+            PhotonTeam team;
+            if (this.TryGetTeamByName(name, out team))
+            {
+                return this.GetTeamMembersCount(team);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Gets the number of players in a team.
+        /// </summary>
+        /// <param name="team">The team you want to know the size of</param>
+        /// <returns>Number of players joined to the team.</returns>
+        public int GetTeamMembersCount(PhotonTeam team)
+        {
+            HashSet<Player> players;
+            if (team != null && this.playersPerTeam.TryGetValue(team.Code, out players) && players != null)
+            {
+                return players.Count;
+            }
+            return 0;
+        }
+
         #endregion
 
         #region Unused methods
@@ -482,18 +519,7 @@ namespace Photon.Pun.UtilityScripts
                 Debug.LogWarningFormat("JoinTeam failed: player ({0}) is already joined to a team ({1}), call SwitchTeam instead", player, team);
                 return false;
             }
-            if (PhotonNetwork.InRoom && !PhotonNetwork.OfflineMode)
-            {
-                return PhotonNetwork.NetworkingClient.OpSetCustomPropertiesOfActor(player.ActorNumber,
-                    new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } });
-            }
-            if (PhotonNetwork.IsConnectedAndReady)
-            {
-                player.SetCustomProperties(new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } });
-                return true;
-            }
-            Debug.LogWarningFormat("JoinTeam failed: method was called while the client is not ready, networking client state: {0}", PhotonNetwork.NetworkClientState);
-            return false;
+            return player.SetCustomProperties(new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } });
         }
 
         /// <summary>
@@ -542,19 +568,8 @@ namespace Photon.Pun.UtilityScripts
                 Debug.LogWarningFormat("SwitchTeam failed: player ({0}) is already joined to the same team {1}", player, team);
                 return false;
             }
-            if (PhotonNetwork.InRoom && !PhotonNetwork.OfflineMode)
-            {
-                return PhotonNetwork.NetworkingClient.OpSetCustomPropertiesOfActor(player.ActorNumber,
-                    new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } },
-                    new Hashtable { { PhotonTeamsManager.TeamPlayerProp, currentTeam.Code }});
-            }
-            if (PhotonNetwork.IsConnectedAndReady)
-            {
-                player.SetCustomProperties(new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } });
-                return true;
-            }
-            Debug.LogWarningFormat("SwitchTeam failed: method was called while the client is not ready, networking client state: {0}", PhotonNetwork.NetworkClientState);
-            return false;
+            return player.SetCustomProperties(new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } },
+                new Hashtable { { PhotonTeamsManager.TeamPlayerProp, currentTeam.Code }});
         }
 
         /// <summary>Switch the player's team using a team code.</summary>
@@ -592,18 +607,7 @@ namespace Photon.Pun.UtilityScripts
                 Debug.LogWarningFormat("LeaveCurrentTeam failed: player ({0}) was not joined to any team", player);
                 return false;
             }
-            if (PhotonNetwork.InRoom && !PhotonNetwork.OfflineMode)
-            {
-                return PhotonNetwork.NetworkingClient.OpSetCustomPropertiesOfActor(player.ActorNumber,
-                    new Hashtable { { PhotonTeamsManager.TeamPlayerProp, null } });
-            } 
-            if (PhotonNetwork.IsConnectedAndReady)
-            {
-                player.SetCustomProperties(new Hashtable { { PhotonTeamsManager.TeamPlayerProp, null } });
-                return true;
-            }
-            Debug.LogWarningFormat("LeaveCurrentTeam failed: method was called while the client is not ready, networking client state: {0}", PhotonNetwork.NetworkClientState);
-            return false;
+            return player.SetCustomProperties(new Hashtable {{PhotonTeamsManager.TeamPlayerProp, null}}, new Hashtable {{PhotonTeamsManager.TeamPlayerProp, currentTeam.Code}});
         }
 
         /// <summary>
