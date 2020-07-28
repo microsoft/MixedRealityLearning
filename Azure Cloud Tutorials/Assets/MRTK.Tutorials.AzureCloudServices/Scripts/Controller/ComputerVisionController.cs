@@ -158,18 +158,19 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             sceneController.CurrentProject.CustomVisionIterationId = objectTrainingResult.Id;
             await sceneController.DataManager.UpdateProject(sceneController.CurrentProject);
 
-            var tries = 15;
-            while (tries > 0)
+            var tries = 0;
+            while (tries < 180)
             {
                 await Task.Delay(1000);
                 var status = await sceneController.ObjectDetectionManager.GetTrainingStatus(objectTrainingResult.Id);
+
                 if (status.IsCompleted())
                 {
                     var publishResult = await sceneController.ObjectDetectionManager.PublishTrainingIteration(objectTrainingResult.Id,
                         trainingModelPublishingName);
                     if (!publishResult)
                     {
-                        Debug.LogError("Failed to publish, please check the custom vision portal for your project.");
+                        messageLabel.text = "Failed to publish, please check the custom vision portal of your project.";
                     }
                     else
                     {
@@ -186,7 +187,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                     break;
                 }
                 
-                tries--;
+                tries++;
             }
             
             SetButtonsInteractiveState(true);
