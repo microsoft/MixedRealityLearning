@@ -16,7 +16,6 @@ namespace MRTK.Tutorials.MultiUserCapabilities
 
         public void OnInputUp(InputEventData eventData)
         {
-            throw new NotImplementedException();
         }
 
         public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
@@ -26,7 +25,6 @@ namespace MRTK.Tutorials.MultiUserCapabilities
 
         public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
         {
-            throw new NotImplementedException();
         }
 
         private void TransferControl(Player idPlayer)
@@ -41,7 +39,6 @@ namespace MRTK.Tutorials.MultiUserCapabilities
 
         private void OnTriggerExit(Collider other)
         {
-            throw new NotImplementedException();
         }
 
         public void RequestOwnership()
