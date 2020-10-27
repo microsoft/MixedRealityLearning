@@ -9,7 +9,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
     public class AnchorArrowGuide : MonoBehaviour
     {
         [SerializeField]
-        private DirectionalIndicator directionalIndicator;
+        private DirectionalIndicator directionalIndicator = default;
         
         private void OnBecameInvisible()
         {

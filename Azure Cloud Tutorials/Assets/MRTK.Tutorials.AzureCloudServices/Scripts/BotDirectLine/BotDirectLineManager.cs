@@ -82,7 +82,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
             {
                 UnityWebRequest webRequest = CreateWebRequest(WebRequestMethods.Post, DirectLineConversationsApiUri);
 
-                yield return webRequest.Send();
+                yield return webRequest.SendWebRequest();
 
                 if (webRequest.isNetworkError)
                 {
@@ -142,7 +142,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
                     + "/" + DirectLineActivitiesApiUriPostfix,
                     body);
 
-                yield return webRequest.Send();
+                yield return webRequest.SendWebRequest();
 
                 if (webRequest.isNetworkError)
                 {
@@ -202,7 +202,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
                 }
 
                 UnityWebRequest webRequest = CreateWebRequest(WebRequestMethods.Get, uri);
-                yield return webRequest.Send();
+                yield return webRequest.SendWebRequest();
 
                 if (webRequest.isNetworkError)
                 {

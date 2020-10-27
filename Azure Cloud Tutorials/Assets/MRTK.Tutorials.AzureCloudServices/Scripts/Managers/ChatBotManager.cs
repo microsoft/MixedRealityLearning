@@ -23,7 +23,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         public event EventHandler<IList<MessageActivity>> OnMessagesReceived;
         
         [SerializeField]
-        private string directLineSecretKey;
+        private string directLineSecretKey = default;
         
         private void Awake()
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
     public class AnchorPlacementController : MonoBehaviour
     {
         public event EventHandler<Transform> OnIndicatorPlaced;
-        public event EventHandler OnIndicatorCanceled;
+        // public event EventHandler OnIndicatorCanceled;
         
         [Header("References")]
         [SerializeField]
@@ -20,15 +20,15 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [SerializeField]
         private GameObject confirmingVisual = default;
         [SerializeField]
-        private TapToPlace tapToPlace;
+        private TapToPlace tapToPlace = default;
 
         [Header("UX")]
         [SerializeField]
-        private GameObject saveLocationDialog;
+        private GameObject saveLocationDialog = default;
         [SerializeField]
-        private Interactable submitButton;
+        private Interactable submitButton = default;
         [SerializeField]
-        private Interactable cancelButton;
+        private Interactable cancelButton = default;
         
         private void Awake()
         {

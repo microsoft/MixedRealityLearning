@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
@@ -17,17 +17,17 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private SceneController sceneController;
         [Header("UI")]
         [SerializeField]
-        private TMP_Text objectNameLabel;
+        private TMP_Text objectNameLabel = default;
         [SerializeField]
-        private TMP_Text descriptionLabel;
+        private TMP_Text descriptionLabel = default;
         [SerializeField]
-        private TMP_Text messageLabel;
+        private TMP_Text messageLabel = default;
         [SerializeField]
-        private Image thumbnailImage;
+        private Image thumbnailImage = default;
         [SerializeField]
-        private Sprite thumbnailPlaceHolderImage;
+        private Sprite thumbnailPlaceHolderImage = default;
         [SerializeField]
-        private Interactable[] buttons;
+        private Interactable[] buttons = default;
         
         private TrackedObject trackedObject;
         private bool isSearchingWithComputerVision;
@@ -143,6 +143,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 }
                 catch (Exception e)
                 {
+                    Debug.Log(e.Message);
                     isSearchingWithComputerVision = false;
                     objectDetectedWithComputerVision = false;
                     messageLabel.text = "Server error, try later again.";

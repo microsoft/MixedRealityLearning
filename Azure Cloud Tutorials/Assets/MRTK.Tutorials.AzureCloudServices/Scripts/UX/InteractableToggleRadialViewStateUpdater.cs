@@ -8,7 +8,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
     public class InteractableToggleRadialViewStateUpdater : MonoBehaviour
     {
         [SerializeField]
-        private RadialView target;
+        private RadialView target = default;
 
         private Interactable interactable;
         

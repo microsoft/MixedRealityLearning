@@ -24,19 +24,19 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         
         [Header("Anchor Manager")]
         [SerializeField]
-        private SpatialAnchorManager cloudManager;
+        private SpatialAnchorManager cloudManager = default;
         [Header("Controller")]
         [SerializeField]
-        private AnchorPlacementController anchorPlacementController;
+        private AnchorPlacementController anchorPlacementController = default;
         [SerializeField]
-        private AnchorCreationController anchorCreationController;
+        private AnchorCreationController anchorCreationController = default;
         [Header("UX")]
         [SerializeField]
-        private AnchorPosition anchorPositionPrefab;
+        private AnchorPosition anchorPositionPrefab = default;
         [SerializeField]
         private GameObject objectCardPrefab;
         [SerializeField]
-        private AnchorArrowGuide anchorArrowGuide;
+        private AnchorArrowGuide anchorArrowGuide = default;
 
         private Dictionary<string, AnchorPosition> activeAnchors = new Dictionary<string, AnchorPosition>();
         private CloudSpatialAnchor currentCloudAnchor;
@@ -58,7 +58,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             };
             
             anchorPlacementController.OnIndicatorPlaced += HandleOnAnchorPlaced;
-            anchorPlacementController.OnIndicatorCanceled += HandleOnAnchorPlacementCanceled;
+            // anchorPlacementController.OnIndicatorCanceled += HandleOnAnchorPlacementCanceled;
             anchorArrowGuide.gameObject.SetActive(false);
         }
 

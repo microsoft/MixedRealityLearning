@@ -20,21 +20,21 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private SceneController sceneController;
         [Header("UI Elements")]
         [SerializeField]
-        private ComputerVisionController computerVisionController;
+        private ComputerVisionController computerVisionController = default;
         [SerializeField]
-        private GameObject hintTextPrefab;
+        private GameObject hintTextPrefab = default;
         [SerializeField]
-        private TMP_Text objectNameLabel;
+        private TMP_Text objectNameLabel = default;
         [SerializeField]
-        private TMP_Text messageLabel;
+        private TMP_Text messageLabel = default;
         [SerializeField]
-        private TMP_InputField descriptionInputField;
+        private TMP_InputField descriptionInputField = default;
         [SerializeField]
-        private Image thumbnailImage;
+        private Image thumbnailImage = default;
         [SerializeField]
-        private Sprite thumbnailPlaceHolderImage;
+        private Sprite thumbnailPlaceHolderImage = default;
         [SerializeField]
-        private Interactable[] buttons;
+        private Interactable[] buttons = default;
         
         private TrackedObject trackedObject;
         private GameObject hintTextInstance;

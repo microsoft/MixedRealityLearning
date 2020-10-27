@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Utilities;
@@ -22,21 +22,21 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         
         [Header("Managers")]
         [SerializeField]
-        private DataManager dataManager;
+        private DataManager dataManager = default;
         [SerializeField]
-        private ObjectDetectionManager objectDetectionManager;
+        private ObjectDetectionManager objectDetectionManager = default;
         [SerializeField]
-        private AnchorManager anchorManager;
+        private AnchorManager anchorManager = default;
 
         [Header("Misc Settings")]
         [SerializeField]
-        private GameObject mainMenu;
+        private GameObject mainMenu = default;
 
         [Header("Events")]
         [SerializeField]
-        private UnityEvent onCameraStarted;
+        private UnityEvent onCameraStarted = default;
         [SerializeField]
-        private UnityEvent onCameraStopped;
+        private UnityEvent onCameraStopped = default;
 
 #if UNITY_WSA
         private PhotoCapture photoCapture;

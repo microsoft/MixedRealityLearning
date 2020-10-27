@@ -14,11 +14,11 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
         public TrackedObject TrackedObject => trackedObject;
 
         [SerializeField]
-        private GameObject toolTipPanel;
+        private GameObject toolTipPanel = default;
         [SerializeField]
-        private ObjectCardViewController objectCard;
+        private ObjectCardViewController objectCard = default;
         [SerializeField]
-        private TextMeshPro labelText;
+        private TextMeshPro labelText = default;
 
         private TrackedObject trackedObject;
 

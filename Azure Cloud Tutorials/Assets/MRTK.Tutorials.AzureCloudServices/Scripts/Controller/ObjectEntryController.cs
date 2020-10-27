@@ -13,22 +13,22 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         [SerializeField]
         private SceneController sceneController;
         [SerializeField]
-        private GameObject searchObjectPanel;
+        private GameObject searchObjectPanel = default;
         [SerializeField]
-        private ObjectEditController objectEditPanel;
+        private ObjectEditController objectEditPanel = default;
         [SerializeField]
-        private ObjectCardViewController objectCardPrefab;
+        private ObjectCardViewController objectCardPrefab = default;
         [Header("UI Elements")]
         [SerializeField]
-        private ButtonConfigHelper submitButtonConfigHelper;
+        private ButtonConfigHelper submitButtonConfigHelper = default;
         [SerializeField]
-        private TMP_Text hintLabel;
+        private TMP_Text hintLabel = default;
         [SerializeField]
-        private TMP_InputField inputField;
+        private TMP_InputField inputField = default;
         [SerializeField]
         private string loadingText = "Please wait...";
         [SerializeField]
-        private Interactable[] buttons;
+        private Interactable[] buttons = default;
         
         private bool isInSearchMode;
         
