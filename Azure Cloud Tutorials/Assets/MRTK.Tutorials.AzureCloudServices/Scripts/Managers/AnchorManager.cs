@@ -58,7 +58,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             };
             
             anchorPlacementController.OnIndicatorPlaced += HandleOnAnchorPlaced;
-            anchorPlacementController.OnIndicatorCanceled += HandleOnAnchorPlacementCanceled;
+            // anchorPlacementController.OnIndicatorCanceled += HandleOnAnchorPlacementCanceled;
             anchorArrowGuide.gameObject.SetActive(false);
         }
 

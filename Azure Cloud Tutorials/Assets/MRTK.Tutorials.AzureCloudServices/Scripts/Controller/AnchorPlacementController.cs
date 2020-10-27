@@ -12,7 +12,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
     public class AnchorPlacementController : MonoBehaviour
     {
         public event EventHandler<Transform> OnIndicatorPlaced;
-        public event EventHandler OnIndicatorCanceled;
+        // public event EventHandler OnIndicatorCanceled;
         
         [Header("References")]
         [SerializeField]
