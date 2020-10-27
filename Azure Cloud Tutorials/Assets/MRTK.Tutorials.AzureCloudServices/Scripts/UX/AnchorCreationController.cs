@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
 using UnityEngine;
@@ -11,9 +11,9 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
     public class AnchorCreationController : MonoBehaviour
     {
         [SerializeField]
-        private AnchorManager anchorManager;
+        private AnchorManager anchorManager = default;
         [SerializeField]
-        private ProgressIndicatorOrbsRotator anchorCreationProgressIndicatorPrefab;
+        private ProgressIndicatorOrbsRotator anchorCreationProgressIndicatorPrefab = default;
         
         private ProgressIndicatorOrbsRotator indicatorObjectInstance;
         private Transform cameraTransform;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit.UI;
@@ -24,19 +24,19 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         private SceneController sceneController;
         [Header("UI")]
         [SerializeField]
-        private GameObject hintTextPrefab;
+        private GameObject hintTextPrefab = default;
         [SerializeField]
-        private GameObject previousMenu;
+        private GameObject previousMenu = default;
         [SerializeField]
-        private Image previewImage;
+        private Image previewImage = default;
         [SerializeField]
-        private TMP_Text messageLabel;
+        private TMP_Text messageLabel = default;
         [SerializeField]
-        private Image[] images;
+        private Image[] images = default;
         [SerializeField]
-        private Sprite thumbnailPlaceHolderImage;
+        private Sprite thumbnailPlaceHolderImage = default;
         [SerializeField]
-        private Interactable[] buttons;
+        private Interactable[] buttons = default;
         
         private TrackedObject trackedObject;
         private List<ImageThumbnail> imagesToCapture;

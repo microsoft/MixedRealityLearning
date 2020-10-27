@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,25 +20,25 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         public bool IsSpeaking { get; private set; }
         
         [SerializeField]
-        private ChatBotManager chatBotManager;
+        private ChatBotManager chatBotManager = default;
         
         [Header("References")]
         [SerializeField]
-        private DictationHandler dictationHandler;
+        private DictationHandler dictationHandler = default;
         [SerializeField]
-        private TextToSpeechManager textToSpeechManager;
+        private TextToSpeechManager textToSpeechManager = default;
 
         [Header("UI Elements")]
         [SerializeField]
-        private Interactable dictationButton;
+        private Interactable dictationButton = default;
         [SerializeField]
-        private TMP_Text messageLabel;
+        private TMP_Text messageLabel = default;
         
         [Header("Events")]
         [SerializeField]
-        private UnityEvent onConversationStarted;
+        private UnityEvent onConversationStarted = default;
         [SerializeField]
-        private UnityEvent onConversationFinished;
+        private UnityEvent onConversationFinished = default;
 
         private bool isPerformingInit;
         private string userId = Guid.NewGuid().ToString().Replace("-", "");

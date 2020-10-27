@@ -6,7 +6,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Utilities
 {
     public class DebugWindow : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI debugText;
+        [SerializeField] private TextMeshProUGUI debugText = default;
 
         private ScrollRect scrollRect;
 

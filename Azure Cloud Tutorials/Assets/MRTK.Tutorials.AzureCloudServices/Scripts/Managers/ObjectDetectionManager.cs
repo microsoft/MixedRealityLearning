@@ -12,19 +12,19 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
     {
         [Header("Azure Settings")]
         [SerializeField]
-        private string azureResourceSubscriptionId;
+        private string azureResourceSubscriptionId = default;
         [SerializeField]
-        private string azureResourceGroupName;
+        private string azureResourceGroupName = default;
         [SerializeField]
-        private string cognitiveServiceResourceName;
+        private string cognitiveServiceResourceName = default;
         [SerializeField]
-        private string resourceBaseEndpoint;
+        private string resourceBaseEndpoint = default;
 
         [Header("Project Settings")]
         [SerializeField]
-        private string apiKey;
+        private string apiKey = default;
         [SerializeField]
-        private string projectId;
+        private string projectId = default;
 
         /// <summary>
         /// Create a tag for the project to associate images with for later detection once a project is trained.

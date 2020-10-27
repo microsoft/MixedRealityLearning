@@ -5,7 +5,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
     public class CloseDialogController : MonoBehaviour
     {
         [SerializeField]
-        private GameObject mainMenu;
+        private GameObject mainMenu = default;
 
         private GameObject originMenu;
         private GameObject targetMenu;

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -18,7 +18,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         
         [Header("Base Settings")]
         [SerializeField]
-        private string connectionString;
+        private string connectionString = default;
         [SerializeField]
         private string projectName = "MyAzurePowerToolsProject";
         [Header("Table Settings")]
@@ -37,9 +37,9 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         private bool tryCreateBlobContainerOnStart = true;
         [Header("Events")]
         [SerializeField]
-        private UnityEvent onDataManagerReady;
+        private UnityEvent onDataManagerReady = default;
         [SerializeField]
-        private UnityEvent onDataManagerInitFailed;
+        private UnityEvent onDataManagerInitFailed = default;
 
         private CloudStorageAccount storageAccount;
         private CloudTableClient cloudTableClient;
