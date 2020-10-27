@@ -143,6 +143,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 }
                 catch (Exception e)
                 {
+                    Debug.Log(e.Message);
                     isSearchingWithComputerVision = false;
                     objectDetectedWithComputerVision = false;
                     messageLabel.text = "Server error, try later again.";
