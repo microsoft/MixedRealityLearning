@@ -90,7 +90,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             sceneController.StartCamera();
         }
 
-        public async void StartPhotoCapture()
+        public void StartPhotoCapture()
         {
             Debug.Log("StartPhotoCapture");
             if (isWaitingForAirtap || isProcessingPhoto)

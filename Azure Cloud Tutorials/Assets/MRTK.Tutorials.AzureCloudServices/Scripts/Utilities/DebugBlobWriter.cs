@@ -85,7 +85,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Utilities
             await fileBlobReference.AppendTextAsync(message);
         }
 
-        private async void HandleOnlogMessageReceived(string message, string stacktrace, LogType type)
+        private void HandleOnlogMessageReceived(string message, string stacktrace, LogType type)
         {
             messages.Enqueue($"[{DateTime.Now:HH:mm:ss}] {type}: {message}\n");
         }
