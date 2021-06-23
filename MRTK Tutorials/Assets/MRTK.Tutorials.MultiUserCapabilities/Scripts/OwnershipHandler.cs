@@ -27,6 +27,10 @@ namespace MRTK.Tutorials.MultiUserCapabilities
         {
         }
 
+        public void OnOwnershipTransferFailed(PhotonView targetView, Player previousOwner)
+        {
+        }
+
         private void TransferControl(Player idPlayer)
         {
             if (photonView.IsMine) photonView.TransferOwnership(idPlayer);
