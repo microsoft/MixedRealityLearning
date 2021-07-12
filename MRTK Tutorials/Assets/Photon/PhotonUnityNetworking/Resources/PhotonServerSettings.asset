@@ -21,7 +21,9 @@ MonoBehaviour:
     FixedRegion: 
     Server: 
     Port: 0
+    ProxyServer: 
     Protocol: 0
+    EnableProtocolFallback: 1
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
@@ -30,18 +32,7 @@ MonoBehaviour:
   EnableSupportLogger: 0
   RunInBackground: 1
   StartInOfflineMode: 0
-  RpcList:
-  - ClickRpc
-  - DestroyRpc
-  - DestroySpaceship
-  - Fire
-  - PunRPC_ResetPlacement
-  - PunRPC_SetNickName
-  - PunRPC_SetPlacement
-  - PunRPC_ShareAzureAnchorId
-  - PunRPC_ToggleExplodedView
-  - PunRPC_TogglePlacementHints
-  - RespawnSpaceship
+  RpcList: []
   DisableAutoOpenWizard: 1
-  ShowSettings: 1
+  ShowSettings: 0
   DevRegionSetOnce: 0
