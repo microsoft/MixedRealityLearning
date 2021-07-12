@@ -125,7 +125,7 @@ public class AnchorModuleScript : MonoBehaviour
         CloudSpatialAnchor localCloudAnchor = new CloudSpatialAnchor();
 
         // Now we set the local cloud anchor's position to the native XR anchor's position
-        localCloudAnchor.LocalAnchor = theObject.FindNativeAnchor().GetPointer();
+        localCloudAnchor.LocalAnchor = await theObject.FindNativeAnchor().GetPointer();
 
         // Check to see if we got the local XR anchor pointer
         if (localCloudAnchor.LocalAnchor == IntPtr.Zero)

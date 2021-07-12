@@ -3,7 +3,7 @@
 --- !u!129 &1
 PlayerSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 20
+  serializedVersion: 22
   productGUID: 891748533e228314786476cb9d454002
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
@@ -49,6 +49,8 @@ PlayerSettings:
   m_StereoRenderingPath: 2
   m_ActiveColorSpace: 0
   m_MTRendering: 1
+  mipStripping: 0
+  numberOfMipsStripped: 0
   m_StackTraceTypes: 010000000100000001000000010000000100000001000000
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
@@ -111,10 +113,14 @@ PlayerSettings:
   switchNVNShaderPoolsGranularity: 33554432
   switchNVNDefaultPoolsGranularity: 16777216
   switchNVNOtherPoolsGranularity: 16777216
+  switchNVNMaxPublicTextureIDCount: 0
+  switchNVNMaxPublicSamplerIDCount: 0
   stadiaPresentMode: 0
   stadiaTargetFramerate: 0
   vulkanNumSwapchainBuffers: 3
   vulkanEnableSetSRGBWrite: 0
+  vulkanEnablePreTransform: 0
+  vulkanEnableLateAcquireNextImage: 0
   m_SupportedAspectRatios:
     4:3: 1
     5:4: 1
@@ -129,31 +135,6 @@ PlayerSettings:
   xboxOneDisableKinectGpuReservation: 1
   xboxOneEnable7thCore: 1
   vrSettings:
-    cardboard:
-      depthFormat: 0
-      enableTransitionView: 0
-    daydream:
-      depthFormat: 0
-      useSustainedPerformanceMode: 0
-      enableVideoLayer: 0
-      useProtectedVideoMemory: 0
-      minimumSupportedHeadTracking: 0
-      maximumSupportedHeadTracking: 1
-    hololens:
-      depthFormat: 0
-      depthBufferSharingEnabled: 1
-    lumin:
-      depthFormat: 0
-      frameTiming: 2
-      enableGLCache: 0
-      glCacheMaxBlobSize: 524288
-      glCacheMaxFileSize: 8388608
-    oculus:
-      sharedDepthBuffer: 1
-      dashSupport: 1
-      lowOverheadMode: 0
-      protectedContext: 0
-      v2Signing: 0
     enable360StereoCapture: 0
   isWsaHolographicRemotingEnabled: 0
   enableFrameTimingStats: 0
@@ -165,7 +146,11 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier: {}
-  buildNumber: {}
+  buildNumber:
+    Standalone: 0
+    iPhone: 0
+    tvOS: 0
+  overrideDefaultApplicationIdentifier: 0
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 24
   AndroidTargetSdkVersion: 0
@@ -185,7 +170,7 @@ PlayerSettings:
   iOSTargetOSVersionString: 11.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
-  tvOSTargetOSVersionString: 10.0
+  tvOSTargetOSVersionString: 11.0
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIRequiresFullScreen: 1
@@ -219,8 +204,8 @@ PlayerSettings:
   iOSLaunchScreeniPadFillPct: 100
   iOSLaunchScreeniPadSize: 100
   iOSLaunchScreeniPadCustomXibPath: 
-  iOSUseLaunchScreenStoryboard: 0
   iOSLaunchScreenCustomStoryboardPath: 
+  iOSLaunchScreeniPadCustomStoryboardPath: 
   iOSDeviceRequirements: []
   iOSURLSchemes: []
   iOSBackgroundModes: 0
@@ -228,6 +213,7 @@ PlayerSettings:
   metalEditorSupport: 1
   metalAPIValidation: 1
   iOSRenderExtraFrameOnPause: 0
+  iosCopyPluginsCodeInsteadOfSymlink: 0
   appleDeveloperTeamID: 
   iOSManualSigningProvisioningProfileID: 
   tvOSManualSigningProvisioningProfileID: 
@@ -237,9 +223,17 @@ PlayerSettings:
   iOSRequireARKit: 0
   iOSAutomaticallyDetectAndAddCapabilities: 1
   appleEnableProMotion: 0
+  shaderPrecisionModel: 0
   clonedFromGUID: c0afd0d1d80e3634a9dac47e8a0426ea
   templatePackageId: com.unity.template.3d@3.1.4
   templateDefaultScene: Assets/Scenes/SampleScene.unity
+  useCustomMainManifest: 0
+  useCustomLauncherManifest: 0
+  useCustomMainGradleTemplate: 0
+  useCustomLauncherGradleManifest: 0
+  useCustomBaseGradleTemplate: 0
+  useCustomGradlePropertiesTemplate: 0
+  useCustomProguardFile: 0
   AndroidTargetArchitectures: 1
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
@@ -257,6 +251,9 @@ PlayerSettings:
     height: 180
     banner: {fileID: 0}
   androidGamepadSupportLevel: 0
+  AndroidMinifyWithR8: 0
+  AndroidMinifyRelease: 0
+  AndroidMinifyDebug: 0
   AndroidValidateAppBundleSize: 1
   AndroidAppBundleSizeToValidate: 150
   m_BuildTargetIcons: []
@@ -410,7 +407,7 @@ PlayerSettings:
     m_Automatic: 1
   - m_BuildTarget: AppleTVSupport
     m_APIs: 10000000
-    m_Automatic: 0
+    m_Automatic: 1
   - m_BuildTarget: WebGLSupport
     m_APIs: 0b000000
     m_Automatic: 1
@@ -440,6 +437,7 @@ PlayerSettings:
     tvOS: 1
   m_BuildTargetGroupLightmapEncodingQuality: []
   m_BuildTargetGroupLightmapSettings: []
+  m_BuildTargetNormalMapEncoding: []
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
@@ -449,12 +447,14 @@ PlayerSettings:
   cameraUsageDescription: Required for augmented reality support.
   locationUsageDescription: 
   microphoneUsageDescription: 
+  switchNMETAOverride: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144
   switchSocketAllocatorPoolSize: 128
   switchSocketConcurrencyLimit: 14
   switchScreenResolutionBehavior: 2
   switchUseCPUProfiler: 0
+  switchUseGOLDLinker: 0
   switchApplicationID: 0x01004b9000490000
   switchNSODependencies: 
   switchTitleNames_0: 
@@ -472,6 +472,7 @@ PlayerSettings:
   switchTitleNames_12: 
   switchTitleNames_13: 
   switchTitleNames_14: 
+  switchTitleNames_15: 
   switchPublisherNames_0: 
   switchPublisherNames_1: 
   switchPublisherNames_2: 
@@ -487,6 +488,7 @@ PlayerSettings:
   switchPublisherNames_12: 
   switchPublisherNames_13: 
   switchPublisherNames_14: 
+  switchPublisherNames_15: 
   switchIcons_0: {fileID: 0}
   switchIcons_1: {fileID: 0}
   switchIcons_2: {fileID: 0}
@@ -502,6 +504,7 @@ PlayerSettings:
   switchIcons_12: {fileID: 0}
   switchIcons_13: {fileID: 0}
   switchIcons_14: {fileID: 0}
+  switchIcons_15: {fileID: 0}
   switchSmallIcons_0: {fileID: 0}
   switchSmallIcons_1: {fileID: 0}
   switchSmallIcons_2: {fileID: 0}
@@ -517,6 +520,7 @@ PlayerSettings:
   switchSmallIcons_12: {fileID: 0}
   switchSmallIcons_13: {fileID: 0}
   switchSmallIcons_14: {fileID: 0}
+  switchSmallIcons_15: {fileID: 0}
   switchManualHTML: 
   switchAccessibleURLs: 
   switchLegalInformation: 
@@ -579,6 +583,9 @@ PlayerSettings:
   switchSocketInitializeEnabled: 1
   switchNetworkInterfaceManagerInitializeEnabled: 1
   switchPlayerConnectionEnabled: 1
+  switchUseNewStyleFilepaths: 0
+  switchUseMicroSleepForYield: 1
+  switchMicroSleepForYieldTime: 25
   ps4NPAgeRating: 12
   ps4NPTitleSecret: 
   ps4NPTrophyPackPath: 
@@ -605,6 +612,7 @@ PlayerSettings:
   ps4ShareFilePath: 
   ps4ShareOverlayImagePath: 
   ps4PrivacyGuardImagePath: 
+  ps4ExtraSceSysFile: 
   ps4NPtitleDatPath: 
   ps4RemotePlayKeyAssignment: -1
   ps4RemotePlayKeyMappingDir: 
@@ -647,6 +655,9 @@ PlayerSettings:
   ps4disableAutoHideSplash: 0
   ps4videoRecordingFeaturesUsed: 0
   ps4contentSearchFeaturesUsed: 0
+  ps4CompatibilityPS5: 0
+  ps4AllowPS5Detection: 0
+  ps4GPU800MHz: 1
   ps4attribEyeToEyeDistanceSettingVR: 0
   ps4IncludedModules: []
   ps4attribVROutputEnabled: 0
@@ -666,9 +677,10 @@ PlayerSettings:
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
   webGLCompressionFormat: 1
+  webGLWasmArithmeticExceptions: 0
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
-  webGLWasmStreaming: 0
+  webGLDecompressionFallback: 0
   scriptingDefineSymbols:
     1: PHOTON_UNITY_NETWORKING;PUN_2_0_OR_NEWER;PUN_2_OR_NEWER
     4: ARFOUNDATION_PRESENT;PHOTON_UNITY_NETWORKING;PUN_2_0_OR_NEWER;PUN_2_OR_NEWER
@@ -681,16 +693,22 @@ PlayerSettings:
     27: PHOTON_UNITY_NETWORKING;PUN_2_0_OR_NEWER;PUN_2_OR_NEWER
     28: PHOTON_UNITY_NETWORKING;PUN_2_0_OR_NEWER;PUN_2_OR_NEWER
     29: PHOTON_UNITY_NETWORKING;PUN_2_0_OR_NEWER;PUN_2_OR_NEWER
+  additionalCompilerArguments: {}
   platformArchitecture:
     iPhone: 1
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}
+  suppressCommonWarnings: 1
   allowUnsafeCode: 0
+  useDeterministicCompilation: 1
+  useReferenceAssemblies: 1
+  enableRoslynAnalyzers: 1
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   gcIncremental: 0
+  assemblyVersionValidation: 1
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
@@ -719,44 +737,44 @@ PlayerSettings:
   metroSplashScreenUseBackgroundColor: 0
   platformCapabilities:
     WindowsStoreApps:
-      AllJoyn: False
-      Appointments: False
-      BackgroundMediaPlayback: False
-      BlockedChatMessages: False
-      Bluetooth: False
-      Chat: False
-      CodeGeneration: False
-      Contacts: False
-      EnterpriseAuthentication: False
-      GazeInput: True
-      HumanInterfaceDevice: False
-      InputInjectionBrokered: False
-      InternetClient: True
-      InternetClientServer: True
-      Location: False
-      LowLevelDevices: False
-      Microphone: True
-      MusicLibrary: False
-      Objects3D: False
       OfflineMapsManagement: False
-      PhoneCall: False
-      PhoneCallHistoryPublic: False
-      PicturesLibrary: False
-      PointOfService: False
+      HumanInterfaceDevice: False
+      Location: False
+      Chat: False
+      Bluetooth: False
+      AllJoyn: False
+      MusicLibrary: False
+      LowLevelDevices: False
       PrivateNetworkClientServer: True
-      Proximity: False
-      RecordedCallsFolder: False
-      RemoteSystem: False
-      RemovableStorage: False
-      SharedUserCertificates: False
-      SpatialPerception: True
-      SystemManagement: False
-      UserAccountInformation: False
-      UserDataTasks: False
-      UserNotificationListener: False
+      InternetClientServer: True
       VideosLibrary: False
-      VoipCall: False
+      Objects3D: False
+      InternetClient: True
+      RemoteSystem: False
+      BlockedChatMessages: False
+      PhoneCall: False
+      UserDataTasks: False
+      Appointments: False
+      SystemManagement: False
+      SpatialPerception: True
+      Microphone: True
+      SharedUserCertificates: False
+      InputInjectionBrokered: False
+      PicturesLibrary: False
+      RemovableStorage: False
       WebCam: False
+      VoipCall: False
+      GazeInput: True
+      UserAccountInformation: False
+      UserNotificationListener: False
+      PhoneCallHistoryPublic: False
+      PointOfService: False
+      RecordedCallsFolder: False
+      Contacts: False
+      Proximity: False
+      CodeGeneration: False
+      BackgroundMediaPlayback: False
+      EnterpriseAuthentication: False
   metroTargetDeviceFamilies:
     Desktop: False
     Holographic: False
@@ -786,6 +804,7 @@ PlayerSettings:
   XboxOneCapability: []
   XboxOneGameRating: {}
   XboxOneIsContentPackage: 0
+  XboxOneEnhancedXboxCompatibilityMode: 0
   XboxOneEnableGPUVariability: 1
   XboxOneSockets: {}
   XboxOneSplashScreen: {fileID: 0}
@@ -794,10 +813,7 @@ PlayerSettings:
   XboxOneXTitleMemory: 8
   XboxOneOverrideIdentityName: 
   XboxOneOverrideIdentityPublisher: 
-  vrEditorSettings:
-    daydream:
-      daydreamIconForeground: {fileID: 0}
-      daydreamIconBackground: {fileID: 0}
+  vrEditorSettings: {}
   cloudServicesEnabled:
     UNet: 1
   luminIcon:
@@ -812,11 +828,12 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
+  activeInputHandler: 1
   cloudProjectId: 
   framebufferDepthMemorylessMode: 0
+  qualitySettingsNames: []
   projectName: 
   organizationId: 
   cloudEnabled: 0
-  enableNativePlatformBackendsForNewInputSystem: 0
-  disableOldInputManagerSupport: 0
   legacyClampBlendShapeWeights: 0
+  virtualTexturingSupportEnabled: 0
