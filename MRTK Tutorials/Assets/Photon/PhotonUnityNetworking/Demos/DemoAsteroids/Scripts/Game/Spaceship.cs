@@ -62,7 +62,13 @@ namespace Photon.Pun.Demo.Asteroids
 
         public void Update()
         {
-            if (!photonView.IsMine || !controllable)
+            if (!photonView.AmOwner || !controllable)
+            {
+                return;
+            }
+
+            // we don't want the master client to apply input to remote ships while the remote player is inactive
+            if (this.photonView.CreatorActorNr != PhotonNetwork.LocalPlayer.ActorNumber)
             {
                 return;
             }

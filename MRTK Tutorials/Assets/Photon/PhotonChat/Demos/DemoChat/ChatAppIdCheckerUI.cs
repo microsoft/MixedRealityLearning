@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ChatAppIdCheckerUI.cs" company="Exit Games GmbH">
-//   Part of: PhotonChat demo, 
-// </copyright>                                                                                             
+// <copyright company="Exit Games GmbH"/>
+// <summary>Demo code for Photon Chat in Unity.</summary>
 // <author>developer@exitgames.com</author>
 // --------------------------------------------------------------------------------------------------------------------
+
 
 using UnityEngine;
 
@@ -11,39 +11,44 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 
-
-/// <summary>
-/// This is used in the Editor Splash to properly inform the developer about the chat AppId requirement.
-/// </summary>
-[ExecuteInEditMode]
-public class ChatAppIdCheckerUI : MonoBehaviour
+namespace Photon.Chat.Demo
 {
-    public Text Description;
-
-    public void Update()
+    /// <summary>
+    /// This is used in the Editor Splash to properly inform the developer about the chat AppId requirement.
+    /// </summary>
+    [ExecuteInEditMode]
+    public class ChatAppIdCheckerUI : MonoBehaviour
     {
-		if (string.IsNullOrEmpty(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat))
+        public Text Description;
+
+        public void Update()
         {
-            if (Description != null)
+            if (string.IsNullOrEmpty(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat))
             {
-                Description.text =
-                    "<Color=Red>WARNING:</Color>\nPlease setup a Chat AppId in the PhotonServerSettings file.";
+                if (this.Description != null)
+                {
+                    this.Description.text = "<Color=Red>WARNING:</Color>\nPlease setup a Chat AppId in the PhotonServerSettings file.";
+                }
             }
-        }
-        else
-        {
-            if (Description != null)
+            else
             {
-                Description.text = string.Empty;
+                if (this.Description != null)
+                {
+                    this.Description.text = string.Empty;
+                }
             }
         }
     }
 }
+
 #else
 
-public class ChatAppIdCheckerUI : MonoBehaviour
+namespace Photon.Chat.Demo
 {
-    // empty class. if PUN is not present, we currently don't check Chat-AppId "presence".
+    public class ChatAppIdCheckerUI : MonoBehaviour
+    {
+        // empty class. if PUN is not present, we currently don't check Chat-AppId "presence".
+    }
 }
 
 #endif
