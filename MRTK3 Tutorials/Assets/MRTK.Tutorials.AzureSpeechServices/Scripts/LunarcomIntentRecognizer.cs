@@ -11,9 +11,14 @@ using System.Text;
 public class LunarcomIntentRecognizer : MonoBehaviour
 {
     [Header("CLU Credentials")]
-    public string cluEndpoint = "";
-    public string cluProjectName = "";
-    public string cluDeploymentName = "";
+    [SerializeField]
+    private string cluEndpoint = "";
+    [SerializeField]
+    private string cluProjectName = "";
+    [SerializeField]
+    private string cluDeploymentName = "";
+    [SerializeField]
+    private string languageServiceAPIKey = "";
 
     [Header("Rocket Launcher Buttons")]
     public GameObject HintsButton;
@@ -189,7 +194,7 @@ public class LunarcomIntentRecognizer : MonoBehaviour
             unityWebRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
             unityWebRequest.downloadHandler = new DownloadHandlerBuffer();
             unityWebRequest.SetRequestHeader("Content-Type", "application/json");
-            unityWebRequest.SetRequestHeader("Ocp-Apim-Subscription-Key", lunarcomController.SpeechServiceAPIKey);
+            unityWebRequest.SetRequestHeader("Ocp-Apim-Subscription-Key", languageServiceAPIKey);
 
             yield return unityWebRequest.SendWebRequest();
 
