@@ -116,7 +116,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             {
                 messageLabel.text = "Setting up custom vision project.";
 
-                var tagName = $"tag_{trackedObject.Name}";
+                var tagName = $"{trackedObject.Name}";
                 var tagCreation = await sceneController.ObjectDetectionManager.CreateTag(tagName);
                 trackedObject.CustomVisionTagName = tagCreation.Name;
                 trackedObject.CustomVisionTagId = tagCreation.Id;

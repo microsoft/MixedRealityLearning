@@ -17,12 +17,18 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         private string azureResourceGroupName = default;
         [SerializeField]
         private string cognitiveServiceResourceName = default;
+
+        [Header("Endpoints and Keys")]
         [SerializeField]
         private string resourceBaseEndpoint = default;
-
-        [Header("Project Settings")]
+        [SerializeField]
+        private string resourceBasePredictionEndpoint = default;
         [SerializeField]
         private string apiKey = default;
+        [SerializeField]
+        private string apiPredictionKey = default;
+
+        [Header("Project Settings")]
         [SerializeField]
         private string projectId = default;
 
@@ -39,7 +45,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             {
                 client.DefaultRequestHeaders.Add("Training-Key", apiKey);
                 var result = await client.PostAsync(
-                    $"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/tags?name={nameOfTag}", null);
+                    $"{resourceBaseEndpoint}/customvision/v3.3/training/projects/{projectId}/tags?name={nameOfTag}", null);
 
                 if (!result.IsSuccessStatusCode)
                 {
@@ -69,7 +75,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
                 var result = await client.PostAsync(
-                    $"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/images?tagIds={tagIds}",
+                    $"{resourceBaseEndpoint}/customvision/v3.3/training/projects/{projectId}/images?tagIds={tagIds}",
                     content);
 
                 if (!result.IsSuccessStatusCode)
@@ -97,7 +103,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             {
                 client.DefaultRequestHeaders.Add("Training-Key", apiKey);
                 var result = await client.PostAsync(
-                    $"{resourceBaseEndpoint}/customvision/v3.0/training/projects/{projectId}/train", null);
+                    $"https://testkleincustomvision.cognitiveservices.azure.com/customvision/v3.3/training/projects/{projectId}/train", null);
 
                 if (!result.IsSuccessStatusCode)
                 {
@@ -192,9 +198,9 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
 
             using (var client = new HttpClient())
             {
-                client.DefaultRequestHeaders.Add("Prediction-Key", apiKey);
+                client.DefaultRequestHeaders.Add("Prediction-Key", apiPredictionKey);
                 var result = await client.PostAsync(
-                    $"{resourceBaseEndpoint}/customvision/v3.0/prediction/{projectId}/classify/iterations/{publishedName}/image",
+                    $"{resourceBasePredictionEndpoint}/customvision/v3.0/prediction/{projectId}/classify/iterations/{publishedName}/image",
                     new ByteArrayContent(image));
 
                 if (!result.IsSuccessStatusCode)
