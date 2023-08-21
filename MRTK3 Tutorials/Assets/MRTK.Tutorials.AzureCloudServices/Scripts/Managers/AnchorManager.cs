@@ -335,19 +335,22 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                     var indicator = Instantiate(anchorPositionPrefab);
 
 #if WINDOWS_UWP || UNITY_WSA
-                    indicator.gameObject.CreateNativeAnchor();
-
-                    if (currentCloudAnchor == null)
-                    {
-                        return;
-                    }
+                // HoloLens: The position will be set based on the unityARUserAnchor that was located.
+                // On HoloLens, if we do not have a cloudAnchor already, we will have already positioned the
+                // object based on the passed in worldPos/worldRot and attached a new world anchor,
+                // so we are ready to commit the anchor to the cloud if requested.
+                // If we do have a cloudAnchor, we will use it's pointer to setup the world anchor,
+                // which will position the object automatically.
+                if (currentCloudAnchor != null)
+                {
                     Debug.Log("Local anchor position successfully set to Azure anchor position");
                     Pose anchorPose = Pose.identity;
                     anchorPose = currentCloudAnchor.GetPose();
 
                     Debug.Log($"Setting object to anchor pose with position '{anchorPose.position}' and rotation '{anchorPose.rotation}'");
-                    indicator.transform.position = anchorPose.position;
-                    indicator.transform.rotation = anchorPose.rotation;
+
+                    indicator.gameObject.AddComponent<CloudNativeAnchor>().CloudToNative(currentCloudAnchor);
+                }
 
 #elif UNITY_ANDROID || UNITY_IOS
                     Pose anchorPose = Pose.identity;
