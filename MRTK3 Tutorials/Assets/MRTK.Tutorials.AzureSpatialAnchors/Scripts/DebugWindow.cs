@@ -1,4 +1,7 @@
-﻿using TMPro;
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 

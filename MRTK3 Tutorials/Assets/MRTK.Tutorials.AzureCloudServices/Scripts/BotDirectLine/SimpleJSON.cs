@@ -1,4 +1,6 @@
-﻿//#define USE_SharpZipLib
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
 #if !UNITY_WEBPLAYER
 #define USE_FileIO
 #endif

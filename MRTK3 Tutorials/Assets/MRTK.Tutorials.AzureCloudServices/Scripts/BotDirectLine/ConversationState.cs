@@ -1,4 +1,7 @@
-﻿namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
+namespace MRTK.Tutorials.AzureCloudServices.Scripts.BotDirectLine
 {
     public class ConversationState
     {

@@ -1,4 +1,7 @@
-﻿/*
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
+/*
 Copyright 2015 Pim de Witte All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");

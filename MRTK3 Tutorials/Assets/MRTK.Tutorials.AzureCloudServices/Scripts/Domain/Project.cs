@@ -1,4 +1,7 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace MRTK.Tutorials.AzureCloudServices.Scripts.Domain
 {

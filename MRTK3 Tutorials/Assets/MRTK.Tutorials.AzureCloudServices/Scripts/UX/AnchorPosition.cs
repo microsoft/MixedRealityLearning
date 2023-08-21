@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
+using System.Collections;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Controller;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using TMPro;

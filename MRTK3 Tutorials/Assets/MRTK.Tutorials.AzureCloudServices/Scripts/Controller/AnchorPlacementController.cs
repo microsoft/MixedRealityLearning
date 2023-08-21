@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
 using System;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
