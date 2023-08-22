@@ -577,8 +577,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2175478652027172229}
-  - component: {fileID: 1139776592252384845}
-  - component: {fileID: 2276937809704101044}
   - component: {fileID: 2175478652027172225}
   m_Layer: 0
   m_Name: ChatBotPanel
@@ -609,28 +607,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1139776592252384845
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2175478652027172224}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2581405d4003513439348cfbc0ba7058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chatBotManager: {fileID: 0}
-  speechAudioSource: {fileID: 2175478652027172225}
-  dictationButton: {fileID: 5256770535212785410}
-  messageLabel: {fileID: 8911669392158206457}
-  onConversationStarted:
-    m_PersistentCalls:
-      m_Calls: []
-  onConversationFinished:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!82 &2175478652027172225
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1577,7 +1553,7 @@ PrefabInstance:
     - target: {fileID: 1952199377435673060, guid: 5e1e5c2fb89ded5469dd37ccbed1a896, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1139776592252384845}
+      objectReference: {fileID: 0}
     - target: {fileID: 1952199377435673060, guid: 5e1e5c2fb89ded5469dd37ccbed1a896, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -1622,17 +1598,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1220126736778559586, guid: 5e1e5c2fb89ded5469dd37ccbed1a896, type: 3}
   m_PrefabInstance: {fileID: 6045051221588565734}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5256770535212785410 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1952199377435673060, guid: 5e1e5c2fb89ded5469dd37ccbed1a896, type: 3}
-  m_PrefabInstance: {fileID: 6045051221588565734}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c32e8a7644144f8419bb881ad588ed0e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &7589003650750727442
 PrefabInstance:
   m_ObjectHideFlags: 0

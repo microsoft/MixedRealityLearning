@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. 
 // Licensed under the MIT License.
 
-using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine;
 
 namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX

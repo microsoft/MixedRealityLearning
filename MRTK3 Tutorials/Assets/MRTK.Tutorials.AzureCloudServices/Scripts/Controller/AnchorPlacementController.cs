@@ -2,9 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
-using Microsoft.MixedReality.Toolkit;
-using Microsoft.MixedReality.Toolkit.SpatialManipulation;
-using Microsoft.MixedReality.Toolkit.UX;
+using MixedReality.Toolkit.SpatialManipulation;
+using MixedReality.Toolkit.UX;
 using UnityEngine;
 
 namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller

@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Threading.Tasks;
-using Microsoft.MixedReality.Toolkit;
+using MixedReality.Toolkit;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Domain;
 using MRTK.Tutorials.AzureCloudServices.Scripts.Managers;
 using TMPro;

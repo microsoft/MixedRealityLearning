@@ -1515,7 +1515,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7515307512509578125}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.105, y: 0, z: 0}
+  m_LocalPosition: {x: 0.105, y: -0.05, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1736,6 +1736,7 @@ MonoBehaviour:
         m_Calls: []
   disabledInteractorTypes:
   - reference: Microsoft.MixedReality.Toolkit.IGrabInteractor, Microsoft.MixedReality.Toolkit.Core
+  - reference: MixedReality.Toolkit.IGrabInteractor, MixedReality.Toolkit.Core
   <ToggleMode>k__BackingField: 0
   <SelectThreshold>k__BackingField: 0.9
   <DeselectThreshold>k__BackingField: 0.1
@@ -1771,21 +1772,57 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 5164580079201964523}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 71131518291265410}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6937913858450710952}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   <OnEnabled>k__BackingField:
     m_PersistentCalls:
       m_Calls: []
   <OnDisabled>k__BackingField:
     m_PersistentCalls:
       m_Calls: []
-  smoothSelectedness: 1
+  smoothSelectionProgress: 1
   distanceSpaceMode: 1
   startPushPlane: -0.003838122
   endPushPlane: 0.006
   returnSpeed: 0.25
   enforceFrontPush: 1
-  rejectXYRolloff: 1
-  rolloffXYDepth: 3
-  rejectZRolloff: 0
+  rejectXYRollOff: 1
+  rollOffXYDepth: 3
+  rejectZRollOff: 0
   extendSpeed: 0.5
 --- !u!114 &1059837315711396087
 MonoBehaviour:
@@ -1810,28 +1847,30 @@ MonoBehaviour:
     - key: PassiveHover
       value:
         effects:
-        - rid: 3
+        - rid: 0
         isVariable: 0
     - key: ActiveHover
       value:
         effects:
-        - rid: 4
+        - rid: 0
         isVariable: 0
     - key: Select
       value:
         effects:
-        - rid: 5
+        - rid: 0
         isVariable: 1
     - key: Toggle
       value:
         effects:
-        - rid: 6
+        - rid: 0
         isVariable: 0
   interactable: {fileID: 6681762658626998179}
   animator: {fileID: 9203722430485371702}
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 0
       type: {class: SpriteTintEffect, ns: Microsoft.MixedReality.Toolkit.UX, asm: Microsoft.MixedReality.Toolkit.UXCore}
       data:
@@ -1853,40 +1892,6 @@ MonoBehaviour:
         color: {r: 1, g: 1, b: 1, a: 0.5176471}
         playbackMode: 0
         blendMode: 2
-    - rid: 3
-      type: {class: AnimationEffect, ns: Microsoft.MixedReality.Toolkit.UX, asm: Microsoft.MixedReality.Toolkit.UXCore}
-      data:
-        name: Animation
-        clip: {fileID: 7400000, guid: 4601d63e0c1b50442af76f234651f8a7, type: 2}
-        speed: 1
-        playbackMode: 0
-        weightMode: 0
-        transitionDuration: 0
-    - rid: 4
-      type: {class: AnimationEffect, ns: Microsoft.MixedReality.Toolkit.UX, asm: Microsoft.MixedReality.Toolkit.UXCore}
-      data:
-        name: Animation
-        clip: {fileID: 7400000, guid: df1fdf2e763ac6d4281d5894f5fab7e4, type: 2}
-        speed: 1
-        playbackMode: 0
-        weightMode: 0
-        transitionDuration: 0
-    - rid: 5
-      type: {class: AnimationEffect, ns: Microsoft.MixedReality.Toolkit.UX, asm: Microsoft.MixedReality.Toolkit.UXCore}
-      data:
-        name: Animation
-        clip: {fileID: 7400000, guid: 4f51b3f10e946db4fb9e1d234e168a43, type: 2}
-        speed: 1
-        playbackMode: 1
-        weightMode: 0
-        transitionDuration: 0
-    - rid: 6
-      type: {class: SetTargetsActiveEffect, ns: Microsoft.MixedReality.Toolkit.UX, asm: Microsoft.MixedReality.Toolkit.UXCore}
-      data:
-        name: Set Targets Active/Inactive
-        invert: 0
-        targets:
-        - {fileID: 7098040134127045657}
 --- !u!82 &7856037645555419401
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2336,6 +2341,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 0
       type: {class: AnimationEffect, ns: Microsoft.MixedReality.Toolkit.UX, asm: Microsoft.MixedReality.Toolkit.UXCore}
       data:
@@ -2950,6 +2957,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71b747cb8ccf6ee43997fb6a4a774530, type: 3}
+--- !u!1 &6937913858450710952 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2442667709598556270, guid: 71b747cb8ccf6ee43997fb6a4a774530, type: 3}
+  m_PrefabInstance: {fileID: 4732846368480461254}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6937913858450710957 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2442667709598556267, guid: 71b747cb8ccf6ee43997fb6a4a774530, type: 3}
@@ -2960,7 +2972,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4200744624060275946, guid: 71b747cb8ccf6ee43997fb6a4a774530, type: 3}
   m_PrefabInstance: {fileID: 4732846368480461254}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 6937913858450710952}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9948e9fba1749b64e90ae553e685038a, type: 3}
@@ -3918,6 +3930,14 @@ PrefabInstance:
     - target: {fileID: 6632923345564603735, guid: 0bfb8541bf5459a49a4543e014c65759, type: 3}
       propertyPath: m_RootOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6632923345564603735, guid: 0bfb8541bf5459a49a4543e014c65759, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.79999995
+      objectReference: {fileID: 0}
+    - target: {fileID: 6632923345564603735, guid: 0bfb8541bf5459a49a4543e014c65759, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 6632923345564603735, guid: 0bfb8541bf5459a49a4543e014c65759, type: 3}
       propertyPath: m_LocalPosition.x
