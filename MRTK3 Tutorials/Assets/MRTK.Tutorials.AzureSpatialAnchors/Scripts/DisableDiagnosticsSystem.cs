@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. 
 // Licensed under the MIT License.
 
-using Microsoft.MixedReality.Toolkit;
+using MixedReality.Toolkit;
 using UnityEngine;
 
 namespace MRTK.Tutorials.AzureSpatialAnchors

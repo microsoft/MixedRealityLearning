@@ -8,7 +8,7 @@ using UnityEngine.Events;
 using Windows.UI.ViewManagement;
 #endif
 
-namespace Microsoft.MixedReality.Toolkit.Experimental.UI
+namespace MixedReality.Toolkit.Experimental.UI
 {
     /// <summary>
     /// Class that can launch and hide a system keyboard specifically for HoloLens 2.
