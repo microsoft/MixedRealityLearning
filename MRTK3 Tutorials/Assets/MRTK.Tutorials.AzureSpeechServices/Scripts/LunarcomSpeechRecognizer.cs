@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
+using UnityEngine;
 using Microsoft.CognitiveServices.Speech;
 
 public class LunarcomSpeechRecognizer : MonoBehaviour

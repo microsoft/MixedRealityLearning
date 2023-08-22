@@ -1,11 +1,12 @@
+// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
 using UnityEngine;
-using UnityEngine.UI;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.Networking;
 using UnityEngine.Windows.Speech;
-using Microsoft.MixedReality.Toolkit.UX;
+using MixedReality.Toolkit.UX;
 using System.Text;
 
 public class LunarcomIntentRecognizer : MonoBehaviour
