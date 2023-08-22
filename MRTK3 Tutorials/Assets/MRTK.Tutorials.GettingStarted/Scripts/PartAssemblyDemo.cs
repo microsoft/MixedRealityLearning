@@ -1,4 +1,7 @@
-﻿using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+﻿// Copyright (c) Microsoft Corporation. 
+// Licensed under the MIT License.
+
+using MixedReality.Toolkit.SpatialManipulation;
 using System.Collections;
 using UnityEngine;
 
