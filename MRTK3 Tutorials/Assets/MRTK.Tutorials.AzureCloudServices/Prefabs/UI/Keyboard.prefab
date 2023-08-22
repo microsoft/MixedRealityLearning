@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5497929481156897953}
   - component: {fileID: 5497929481156897952}
   - component: {fileID: 5497929481156897955}
-  - component: {fileID: 5497929481156897954}
   m_Layer: 5
   m_Name: MRKeyboardInputField_TMP
   m_TagString: Untagged
@@ -177,18 +176,6 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
---- !u!114 &5497929481156897954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5497929481156897956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cac44176376ab544f9ca44f05c9b9091, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5497929481162371830
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,7 +185,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5497929481162371831}
-  - component: {fileID: 5497929481162371828}
+  - component: {fileID: 1454542093764826397}
   m_Layer: 5
   m_Name: Text Area
   m_TagString: Untagged
@@ -228,7 +215,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 1.5}
   m_SizeDelta: {x: -20, y: -17}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &5497929481162371828
+--- !u!114 &1454542093764826397
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -237,7 +224,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5497929481162371830}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Script: {fileID: 11500000, guid: a55c55bcb6842b94db6488b68732ce01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding: {x: 0, y: 0, z: 0, w: 0}
@@ -330,7 +317,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -344,7 +331,7 @@ MonoBehaviour:
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
-  m_textAlignment: 257
+  m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -524,8 +511,6 @@ GameObject:
   - component: {fileID: 5855039240462168194}
   - component: {fileID: 5855039240462168197}
   - component: {fileID: 5855039240462168196}
-  - component: {fileID: 5855039240462168199}
-  - component: {fileID: 5855039240462168198}
   m_Layer: 5
   m_Name: Keyboard
   m_TagString: Untagged
@@ -551,7 +536,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.11634773, y: 0.05615615}
+  m_AnchoredPosition: {x: 0.11633301, y: 0.056152344}
   m_SizeDelta: {x: 1, y: 0.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &5855039240462168194
@@ -597,7 +582,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &5855039240462168196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -615,29 +600,3 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &5855039240462168199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5855039240462168201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff4e3b9019304b5aaec5664de0778d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5855039240462168198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5855039240462168201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fcaf896491074042b7ed7684454a412, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventsToReceive: 0
-  debounceThreshold: 0.01
