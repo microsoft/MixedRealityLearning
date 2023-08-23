@@ -34,7 +34,7 @@ public class AnchorFeedbackScript : MonoBehaviour
 
     void Start()
     {
-        feedbackText.text = "";    
+        feedbackText.text = string.Empty;    
     }
 
     private void AnchorModuleScript_OnStartASASession()

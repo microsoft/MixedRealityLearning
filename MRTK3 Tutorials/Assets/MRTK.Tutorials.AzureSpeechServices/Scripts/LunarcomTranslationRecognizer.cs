@@ -10,7 +10,7 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
     public TranslateToLanguage TargetLanguage = TranslateToLanguage.Russian;
 
     private string recognizedString = "Select a mode to begin.";
-    private string translatedString = "";
+    private string translatedString = string.Empty;
     private object threadLocker = new object();
 
     private TranslationRecognizer translator;
@@ -18,7 +18,7 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
     private bool micPermissionGranted = false;
 
     private string fromLanguage = "en-US";
-    private string toLanguage = "";
+    private string toLanguage = string.Empty;
 
     private LunarcomController lunarcomController;
 
@@ -56,7 +56,7 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
         if (recognitionMode == RecognitionMode.Tralation_Recognizer)
         {
             recognizedString = "Say something...";
-            translatedString = "";
+            translatedString = string.Empty;
             BeginTranslating();
         } else
         {
@@ -65,8 +65,8 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
                 translator.StopContinuousRecognitionAsync();
             }
             translator = null;
-            recognizedString = "";
-            translatedString = "";
+            recognizedString = string.Empty;
+            translatedString = string.Empty;
         }
     }
 
@@ -113,7 +113,7 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
     {
         if (e.Result.Reason == ResultReason.TranslatingSpeech)
         {
-            if (e.Result.Text != "")
+            if (e.Result.Text != string.Empty)
             {
                 recognizedString = e.Result.Text;
 
@@ -155,11 +155,11 @@ public class LunarcomTranslationRecognizer : MonoBehaviour
     {
         if (lunarcomController.CurrentRecognitionMode() == RecognitionMode.Tralation_Recognizer)
         {
-            if (recognizedString != "")
+            if (recognizedString != string.Empty)
             {
                 lunarcomController.UpdateLunarcomText(recognizedString);
 
-                if (translatedString != "")
+                if (translatedString != string.Empty)
                 {
                     lunarcomController.outputText.text += "\n\nTranslation:\n" + translatedString;
                 }

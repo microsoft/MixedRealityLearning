@@ -160,7 +160,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 }
                 
                 thumbnailImage.sprite = thumbnailPlaceHolderImage;
-                trackedObject.ThumbnailBlobName = "";
+                trackedObject.ThumbnailBlobName = string.Empty;
                 SaveChanges();
             }
             else

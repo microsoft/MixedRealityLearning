@@ -126,8 +126,8 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
                 Name = projectName,
                 RowKey = projectName,
                 PartitionKey = partitionKey,
-                CustomVisionIterationId = "",
-                CustomVisionPublishedModelName = ""
+                CustomVisionIterationId = string.Empty,
+                CustomVisionPublishedModelName = string.Empty
             };
             
             var insertOrMergeOperation = TableOperation.InsertOrMerge(project);

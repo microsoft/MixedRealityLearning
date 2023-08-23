@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
 {
-    //[RequireComponent(typeof(Interactable))]
     public class InteractableToggleRadialViewStateUpdater : MonoBehaviour
     {
         
@@ -25,6 +24,5 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
         {
             interactable.ForceSetToggled(!target.enabled);
         }
-        
     }
 }

@@ -46,7 +46,7 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
                 recognizer.StopContinuousRecognitionAsync();
             } 
             recognizer = null;
-            recognizedString = "";
+            recognizedString = string.Empty;
         }
     }
 
@@ -140,7 +140,7 @@ public class LunarcomSpeechRecognizer : MonoBehaviour
     {
         if (lunarcomController.CurrentRecognitionMode() == RecognitionMode.Speech_Recognizer)
         {
-            if (recognizedString != "")
+            if (recognizedString != string.Empty)
             {
                 lunarcomController.UpdateLunarcomText(recognizedString);
             }

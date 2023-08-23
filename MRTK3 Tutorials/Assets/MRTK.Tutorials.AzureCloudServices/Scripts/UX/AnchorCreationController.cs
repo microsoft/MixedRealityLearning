@@ -16,10 +16,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
         
         [SerializeField]
         private AnchorManager anchorManager = default;
-        [SerializeField]
-        //private ProgressIndicatorOrbsRotator anchorCreationProgressIndicatorPrefab = default;
-        
-        //private ProgressIndicatorOrbsRotator indicatorObjectInstance;
+
         private Transform cameraTransform;
         private bool waitingForAnchorCreation;
 
@@ -31,8 +28,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
             // Subscribe to Anchor Manager events
             anchorManager.OnFindAnchorSucceeded += (sender, args) => waitingForAnchorCreation = false;
             anchorManager.OnCreateAnchorSucceeded += (sender, s) => waitingForAnchorCreation = false;
-            //indicatorObjectInstance = Instantiate(anchorCreationProgressIndicatorPrefab, cameraTransform.position, cameraTransform.rotation);
-            //indicatorObjectInstance.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -45,19 +40,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.UX
                 return;
             }
             waitingForAnchorCreation = true;
-
-            /*
-            await indicatorObjectInstance.OpenAsync();
-            while (waitingForAnchorCreation)
-            {
-                indicatorObjectInstance.Message = "Move your device to capture more environment data";
-                await Task.Yield();
-            }
-
-            indicatorObjectInstance.Message = "Location saved successfully";
-            await indicatorObjectInstance.CloseAsync();
-            */
         }
-        
     }
 }

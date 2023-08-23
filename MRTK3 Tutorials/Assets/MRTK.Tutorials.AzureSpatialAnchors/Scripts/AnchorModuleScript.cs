@@ -18,13 +18,8 @@ using Windows.Storage;
 
 public class AnchorModuleScript : MonoBehaviour
 {
-    [SerializeField]
-    [Tooltip("The unique identifier used to identify the shared file (containing the Azure anchor ID) on the web server.")]
-    private string publicSharingPin = "1982734901747";
-
-    [HideInInspector]
     // Anchor ID for anchor stored in Azure (provided by Azure) 
-    public string currentAzureAnchorID = "";
+    public string CurrentAzureAnchorID { get; set; } = string.Empty;
 
     private SpatialAnchorManager cloudManager;
     private CloudSpatialAnchor currentCloudAnchor;
@@ -157,11 +152,11 @@ public class AnchorModuleScript : MonoBehaviour
 
                 // Update the current Azure anchor ID
                 Debug.Log($"Current Azure anchor ID updated to '{currentCloudAnchor.Identifier}'");
-                currentAzureAnchorID = currentCloudAnchor.Identifier;
+                CurrentAzureAnchorID = currentCloudAnchor.Identifier;
             }
             else
             {
-                Debug.Log($"Failed to save cloud anchor with ID '{currentAzureAnchorID}' to Azure");
+                Debug.Log($"Failed to save cloud anchor with ID '{CurrentAzureAnchorID}' to Azure");
 
                 // Notify AnchorFeedbackScript
                 OnCreateAnchorFailed?.Invoke();
@@ -184,7 +179,7 @@ public class AnchorModuleScript : MonoBehaviour
 
         if (theObject.FindNativeAnchor() == null)
         {
-            Debug.Log("Local anchor deleted succesfully");
+            Debug.Log("Local anchor deleted successfully");
         }
         else
         {
@@ -198,7 +193,7 @@ public class AnchorModuleScript : MonoBehaviour
 
         if (id != "")
         {
-            currentAzureAnchorID = id;
+            CurrentAzureAnchorID = id;
         }
 
         // Notify AnchorFeedbackScript
@@ -207,9 +202,9 @@ public class AnchorModuleScript : MonoBehaviour
         // Set up list of anchor IDs to locate
         List<string> anchorsToFind = new List<string>();
 
-        if (currentAzureAnchorID != "")
+        if (CurrentAzureAnchorID != "")
         {
-            anchorsToFind.Add(currentAzureAnchorID);
+            anchorsToFind.Add(CurrentAzureAnchorID);
         }
         else
         {
@@ -221,7 +216,7 @@ public class AnchorModuleScript : MonoBehaviour
         
         anchorLocateCriteria.BypassCache = true;
         
-        Debug.Log($"Anchor locate criteria configured to look for Azure anchor with ID '{currentAzureAnchorID}'");
+        Debug.Log($"Anchor locate criteria configured to look for Azure anchor with ID '{CurrentAzureAnchorID}'");
 
         // Start watching for Anchors
         if ((cloudManager != null) && (cloudManager.Session != null))
@@ -264,9 +259,9 @@ public class AnchorModuleScript : MonoBehaviour
 #endif
 
         string filePath = Path.Combine(path, filename);
-        File.WriteAllText(filePath, currentAzureAnchorID);
+        File.WriteAllText(filePath, CurrentAzureAnchorID);
 
-        Debug.Log($"Current Azure anchor ID '{currentAzureAnchorID}' successfully saved to path '{filePath}'");
+        Debug.Log($"Current Azure anchor ID '{CurrentAzureAnchorID}' successfully saved to path '{filePath}'");
     }
   
     public void GetAzureAnchorIdFromDisk()
@@ -282,60 +277,9 @@ public class AnchorModuleScript : MonoBehaviour
 #endif
 
         string filePath = Path.Combine(path, filename);
-        currentAzureAnchorID = File.ReadAllText(filePath);
+        CurrentAzureAnchorID = File.ReadAllText(filePath);
 
-        Debug.Log($"Current Azure anchor ID successfully updated with saved Azure anchor ID '{currentAzureAnchorID}' from path '{path}'");
-    }
-
-    public void ShareAzureAnchorIdToNetwork()
-    {
-        Debug.Log("\nAnchorModuleScript.ShareAzureAnchorID()");
-
-        string filename = "SharedAzureAnchorID." + publicSharingPin;
-        string path = Application.persistentDataPath;
-
-#if WINDOWS_UWP
-        StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-        path = storageFolder.Path + "/";           
-#endif
-
-        string filePath = Path.Combine(path, filename);
-        File.WriteAllText(filePath, currentAzureAnchorID);
-
-        Debug.Log($"Current Azure anchor ID '{currentAzureAnchorID}' successfully saved to path '{filePath}'");
-
-        try
-        {
-            var client = new RestClient("http://167.99.111.15:8090");
-
-            Debug.Log($"Connecting to network client '{client}'... please wait...");
-
-            var request = new RestRequest("/uploadFile.php", Method.POST);
-            request.AddHeader("Accept", "application/json");
-            request.AddHeader("Content-Type", "multipart/form-data");
-            request.AddFile("the_file", filePath);
-            request.AddParameter("replace_file", 1);  // Only needed if you want to upload a static file
-
-            var httpResponse = client.Execute(request);
-
-            Debug.Log("Uploading file... please wait...");
-
-            string json = httpResponse.Content.ToString();
-        }
-        catch (Exception ex)
-        {
-            Debug.Log(string.Format("Exception: {0}", ex.Message));
-            throw;
-        }
-
-        Debug.Log($"Current Azure anchor ID '{currentAzureAnchorID}' shared successfully");
-    }
-
-    public void GetAzureAnchorIdFromNetwork()
-    {
-        Debug.Log("\nAnchorModuleScript.GetSharedAzureAnchorID()");
-
-        StartCoroutine(GetSharedAzureAnchorIDCoroutine(publicSharingPin));
+        Debug.Log($"Current Azure anchor ID successfully updated with saved Azure anchor ID '{CurrentAzureAnchorID}' from path '{path}'");
     }
     #endregion
 
@@ -419,40 +363,6 @@ public class AnchorModuleScript : MonoBehaviour
         lock (dispatchQueue)
         {
             dispatchQueue.Enqueue(updateAction);
-        }
-    }
-
-    IEnumerator GetSharedAzureAnchorIDCoroutine(string sharingPin)
-    {
-        string url = "http://167.99.111.15:8090/file-uploads/static/file." + sharingPin.ToLower();
-
-        Debug.Log($"Looking for url '{url}'... please wait...");
-
-        using (UnityWebRequest www = UnityWebRequest.Get(url))
-        {
-            yield return www.SendWebRequest();
-            if (www.isNetworkError || www.isHttpError)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                Debug.Log("Downloading... please wait...");
-
-                string filename = "SharedAzureAnchorID." + publicSharingPin;
-                string path = Application.persistentDataPath;
-
-#if WINDOWS_UWP
-                StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-                path = storageFolder.Path;
-#endif
-                currentAzureAnchorID = www.downloadHandler.text;
-
-                Debug.Log($"Current Azure anchor ID successfully updated with shared Azure anchor ID '{currentAzureAnchorID}' url");
-
-                string filePath = Path.Combine(path, filename);
-                File.WriteAllText(filePath, currentAzureAnchorID);
-            }
         }
     }
     #endregion

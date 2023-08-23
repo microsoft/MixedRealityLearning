@@ -184,7 +184,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             if (!string.IsNullOrEmpty(sceneController.CurrentProject.CustomVisionIterationId))
             {
                 await sceneController.ObjectDetectionManager.DeleteTrainingIteration(sceneController.CurrentProject.CustomVisionIterationId);
-                sceneController.CurrentProject.CustomVisionIterationId = "";
+                sceneController.CurrentProject.CustomVisionIterationId = string.Empty;
                 await sceneController.DataManager.UpdateProject(sceneController.CurrentProject);
             }
 
@@ -262,7 +262,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             var sprite = imageThumbnail.Texture.CreateSprite();
             images[currentImageIndex].sprite = sprite;
             previewImage.sprite = sprite;
-            messageLabel.text = "";
+            messageLabel.text = string.Empty;
             imagesToCapture.Add(imageThumbnail);
             Debug.Log("Taking photo done.");
             isProcessingPhoto = false;
