@@ -124,7 +124,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
                 trackedObject.CustomVisionTagId = tagCreation.Id;
                 await sceneController.DataManager.UploadOrUpdate(trackedObject);
 
-                messageLabel.text = "";
+                messageLabel.text = string.Empty;
             }
 
             SetButtonsInteractiveState(true);
@@ -275,7 +275,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
             {
                 interactable.enabled = state;
             }
-            
         }
     }
 }

@@ -46,7 +46,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
 
         private void OnEnable()
         {
-            inputField.text = "";
+            inputField.text = string.Empty;
         }
 
         public void SetSearchMode(bool searchModeActive)
@@ -133,12 +133,10 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         
         private void SetButtonsInteractiveState(bool state)
         {
-            
             foreach (var interactable in buttons)
             {
                 interactable.enabled = state;
             }
-            
         }
     }
 }
