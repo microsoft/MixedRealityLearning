@@ -61,7 +61,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             };
             
             anchorPlacementController.OnIndicatorPlaced += HandleOnAnchorPlaced;
-            // anchorPlacementController.OnIndicatorCanceled += HandleOnAnchorPlacementCanceled;
             anchorArrowGuide.gameObject.SetActive(false);
         }
 
@@ -107,7 +106,6 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         public void CreateAnchor(Transform indicatorTransform)
         {
             Debug.Log("Anchor position has been set, saving location process started.");
-            // currentAnchorPositionGo = Instantiate(anchorPositionPrefab, indicatorTransform.position, indicatorTransform.rotation);
             if (Application.isEditor)
             {
                 CreateAsaAnchorEditor(indicatorTransform);
@@ -397,7 +395,5 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
             anchorPlacementController.gameObject.SetActive(false);
         }
         #endregion
-        
-        
     }
 }

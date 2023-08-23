@@ -32,9 +32,13 @@ namespace MRTK.Tutorials.GettingStarted
         public void TogglePlacementHints()
         {
             if (isPunEnabled)
+            {
                 OnTogglePlacementHints?.Invoke();
+            }
             else
+            {
                 Toggle();
+            }
         }
 
         /// <summary>

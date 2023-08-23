@@ -13,13 +13,13 @@ public class LunarcomIntentRecognizer : MonoBehaviour
 {
     [Header("CLU Credentials")]
     [SerializeField]
-    private string cluEndpoint = "";
+    private string cluEndpoint = string.Empty;
     [SerializeField]
-    private string cluProjectName = "";
+    private string cluProjectName = string.Empty;
     [SerializeField]
-    private string cluDeploymentName = "";
+    private string cluDeploymentName = string.Empty;
     [SerializeField]
-    private string languageServiceAPIKey = "";
+    private string languageServiceAPIKey = string.Empty;
 
     [Header("Rocket Launcher Buttons")]
     public GameObject HintsButton;
@@ -57,7 +57,7 @@ public class LunarcomIntentRecognizer : MonoBehaviour
             {
                 StopCapturingAudio();
             }
-            recognizedString = "";
+            recognizedString = string.Empty;
             commandCaptured = false;
         }
     }
@@ -129,14 +129,14 @@ public class LunarcomIntentRecognizer : MonoBehaviour
     {
         public string id = "1";
         public string participantId = "1";
-        public string text = "";
+        public string text = string.Empty;
     }
 
     [Serializable]
     class QueryParameters
     {
-        public string projectName = "";
-        public string deploymentName = "";
+        public string projectName = string.Empty;
+        public string deploymentName = string.Empty;
         public string stringIndexType = "TextElement_V8";
     }
 

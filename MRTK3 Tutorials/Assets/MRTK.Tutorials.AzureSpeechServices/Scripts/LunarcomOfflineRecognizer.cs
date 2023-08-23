@@ -48,7 +48,7 @@ public class LunarcomOfflineRecognizer : MonoBehaviour
                 recognizer.StopContinuousRecognitionAsync();
             }
             recognizer = null;
-            recognizedString = "";
+            recognizedString = string.Empty;
         }
     }
 
@@ -132,7 +132,7 @@ public class LunarcomOfflineRecognizer : MonoBehaviour
     {
         if (lunarcomController.CurrentRecognitionMode() == RecognitionMode.Offline)
         {
-            if (recognizedString != "" && recognizedString != "Offline Transcription:\n")
+            if (recognizedString != string.Empty && recognizedString != "Offline Transcription:\n")
             {
                 if (recognizedString != "Say something..." && recognizedString != "Select a mode to begin.")
                 {

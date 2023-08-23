@@ -6,8 +6,8 @@ using Microsoft.CognitiveServices.Speech;
 
 public class LunarcomWakeWordRecognizer : MonoBehaviour
 {
-    public string WakeWord = "";
-    public string DismissWord = "";
+    public string WakeWord = string.Empty;
+    public string DismissWord = string.Empty;
 
     private string recognizedString = "Select a mode to begin.";
     private object threadLocker = new object();
@@ -36,7 +36,7 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
             LunarcomOfflineRecognizer lunarcomOfflineRecognizer = GetComponent<LunarcomOfflineRecognizer>();
             if (lunarcomOfflineRecognizer.simulateOfflineMode != SimuilateOfflineMode.Enabled)
             {
-                if (WakeWord != "" && WakeWord != "*")
+                if (WakeWord != string.Empty && WakeWord != "*")
                 {
                     lunarcomController.ShowTerminal();
                     BeginRecognizing();
@@ -45,7 +45,7 @@ public class LunarcomWakeWordRecognizer : MonoBehaviour
         }
         else
         {
-            if (WakeWord != "" && WakeWord != "*")
+            if (WakeWord != string.Empty && WakeWord != "*")
             {
                 lunarcomController.ShowTerminal();
                 BeginRecognizing();

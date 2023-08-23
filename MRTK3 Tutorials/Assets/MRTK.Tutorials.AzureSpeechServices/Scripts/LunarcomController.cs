@@ -14,8 +14,8 @@ public class LunarcomController : MonoBehaviour
     public static LunarcomController lunarcomController = null;
 
     [Header("Speech SDK Credentials")]
-    public string SpeechServiceAPIKey = "";
-    public string SpeechServiceRegion = "";
+    public string SpeechServiceAPIKey = string.Empty;
+    public string SpeechServiceRegion = string.Empty;
 
     [Header("Object References")]
     public GameObject terminal;
@@ -84,13 +84,13 @@ public class LunarcomController : MonoBehaviour
     {
         if (lunarcomWakeWordRecognizer != null)
         {
-            if (lunarcomWakeWordRecognizer.WakeWord == "")
+            if (lunarcomWakeWordRecognizer.WakeWord == string.Empty)
             {
                 lunarcomWakeWordRecognizer.WakeWord = "*";
                 lunarcomWakeWordRecognizer.DismissWord = "*";
             }
 
-            if (lunarcomWakeWordRecognizer.DismissWord == "")
+            if (lunarcomWakeWordRecognizer.DismissWord == string.Empty)
             {
                 lunarcomWakeWordRecognizer.DismissWord = "*";
             }
@@ -174,7 +174,7 @@ public class LunarcomController : MonoBehaviour
         onSelectRecognitionMode(speechRecognitionMode);
         if (speechRecognitionMode == RecognitionMode.Disabled)
         {
-            if (outputText.text == "Say something..." || outputText.text == "")
+            if (outputText.text == "Say something..." || outputText.text == string.Empty)
             {
                 outputText.text = "Select a mode to begin.";
             }

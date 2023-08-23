@@ -122,7 +122,7 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Controller
         public void CloseCard()
         {
             isSearchingWithComputerVision = false;
-            messageLabel.text = "";
+            messageLabel.text = string.Empty;
             sceneController.OpenMainMenu();
             Destroy(gameObject);
         }
