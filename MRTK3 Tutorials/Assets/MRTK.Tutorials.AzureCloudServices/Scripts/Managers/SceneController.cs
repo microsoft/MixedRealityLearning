@@ -35,6 +35,12 @@ namespace MRTK.Tutorials.AzureCloudServices.Scripts.Managers
         [SerializeField]
         private GameObject mainMenu = default;
 
+        [Header("Events")]
+        [SerializeField]
+        private UnityEvent onCameraStarted = default;
+        [SerializeField]
+        private UnityEvent onCameraStopped = default;
+
 #if UNITY_WSA
         private PhotoCapture photoCapture;
 #else
